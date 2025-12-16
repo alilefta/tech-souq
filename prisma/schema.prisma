@@ -1,0 +1,136 @@
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model Category {
+  id            Int       @id @default(autoincrement())
+  name          String
+  description   String?
+  slug          String    @unique
+  imageUrl      String?
+  products      Product[]
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Product {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String
+  price       Decimal     @db.Decimal(10, 2)
+  images      String[]   
+  
+  slug        String      @unique
+  isActive    Boolean     @default(true)
+  stock       Int         @default(0) // in future, we could expand for new Inventory model
+  
+  // Relations
+  category    Category    @relation(fields: [categoryId], references: [id])
+  categoryId  Int
+  
+  orderItems  OrderItem[]
+  cartItems   CartItem[] 
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+
+model Cart {
+  id            String @id @default(cuid())
+  userId        String?    
+  items         CartItem[]
+
+  // If you add Auth later, you link this to User
+
+  // user data
+  first_name    String?
+  last_name     String?
+  email         String?
+  address       String?
+
+  discountId    Int?
+  discount      Discount? @relation(fields: [discountId], references: [id])
+
+  createdAt     DateTime @default(now())
+}
+
+model CartItem {
+  id            Int         @id @default(autoincrement()) // Added distinct ID for easier UI handling
+  productId     Int
+  cartId        String
+
+  product       Product     @relation(fields: [productId], references: [id])
+  cart          Cart        @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  quantity      Int
+
+  @@unique([productId, cartId])
+}
+
+model Order {
+  id          String      @id @default(cuid()) // String IDs are better for Order lookup URLs
+
+  // Guest Info
+  firstName   String
+  lastName    String
+  email       String
+  address     String
+  
+  total       Decimal     @db.Decimal(10, 2)
+  status      OrderStatus @default(PENDING) 
+  
+
+  items    OrderItem[]
+
+  discountId Int?
+  discount Discount? @relation(fields: [discountId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id])
+
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+
+  quantity  Int
+  priceAt_time     Decimal  @db.Decimal(10, 2) // KEEP THIS: Snapshot price at time of order
+
+  @@unique([orderId, productId])
+}
+
+
+
+model Discount {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  value     Decimal  // Percentage or Fixed amount? Logic will be needed.
+
+  isActive  Boolean  @default(true)
+  expiresAt DateTime
+
+  orders    Order[] 
+  carts     Cart[]
+  
+  createdAt DateTime @default(now())
+}
