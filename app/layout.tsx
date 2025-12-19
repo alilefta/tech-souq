@@ -1,18 +1,27 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Inter } from "next/font/google";
+import { Geist_Mono, Inter, Lora } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { AnnouncementBanner } from "@/components/announcement-banner";
+import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
 
-const inter = Inter({
+const sans = Inter({
 	variable: "--font-inter",
 	subsets: ["latin"],
 	weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
-const geistMono = Geist_Mono({
-	variable: "--font-geist-mono",
+const mono = Geist_Mono({
+	variable: "--font-mono",
 	subsets: ["latin"],
 	weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+});
+
+const serif = Lora({
+	variable: "--font-serif",
+	subsets: ["latin"],
+	weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -43,9 +52,15 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<body className={`${inter.variable} ${geistMono.variable} antialiased`}>
+			<head>
+				<script src="https://tweakcn.com/live-preview.min.js"></script>
+			</head>
+			<body className={`${sans.variable} ${mono.variable}  ${serif.variable} antialiased`}>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-					{children}
+					<AnnouncementBanner />
+					<Navbar /> {/* Stays persistent across pages */}
+					<main className="min-h-screen">{children}</main>
+					<Footer />
 				</ThemeProvider>
 			</body>
 		</html>
