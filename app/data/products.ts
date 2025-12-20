@@ -1,10 +1,11 @@
 // for fetching operations
 import { Category, Product } from "@/generated/prisma/browser";
-import { ProductOrderByRelationAggregateInput, ProductOrderByWithAggregationInput, ProductWhereInput } from "@/generated/prisma/models";
+import { ProductOrderByWithAggregationInput, ProductWhereInput } from "@/generated/prisma/models";
 import { prisma } from "@/prisma/prisma";
 
 const DEV_RATING = 4.5;
 const DEV_REVIEWS = 312;
+const ITEMS_PER_PAGE = 2;
 
 export interface ProductCardDTO {
 	id: number;
@@ -47,14 +48,17 @@ export async function getFilteredProducts({
 	lowPrice,
 	highPrice,
 	sort,
+	page = 1,
 }: {
 	category?: string | string[];
 	searchQuery?: string;
 	lowPrice?: number;
 	highPrice?: number;
 	sort?: string;
+	page?: number;
 }) {
-	console.log("Server params:", category, searchQuery, lowPrice, highPrice, sort);
+	const skip = (page - 1) * ITEMS_PER_PAGE;
+
 	let categoryCondition: ProductWhereInput | null = null;
 	if (category) {
 		if (typeof category === "string") {
@@ -153,26 +157,75 @@ export async function getFilteredProducts({
 		}
 	}
 
-	const products = await prisma.product.findMany({
-		where: {
-			AND: [categoryCondition ? { ...categoryCondition } : {}, lowPriceCondition ? { ...lowPriceCondition } : {}, highPriceCondition ? { ...highPriceCondition } : {}, query ? { ...query } : {}],
-		},
-		select: {
-			id: true,
-			name: true,
-			price: true,
-			images: true,
-			slug: true,
-			category: {
-				select: {
-					name: true,
+	// const products = await prisma.product.findMany({
+	// 	where: {
+	// 		AND: [categoryCondition ? { ...categoryCondition } : {}, lowPriceCondition ? { ...lowPriceCondition } : {}, highPriceCondition ? { ...highPriceCondition } : {}, query ? { ...query } : {}],
+	// 	},
+	// 	select: {
+	// 		id: true,
+	// 		name: true,
+	// 		price: true,
+	// 		images: true,
+	// 		slug: true,
+	// 		category: {
+	// 			select: {
+	// 				name: true,
+	// 			},
+	// 		},
+	// 	},
+	// 	orderBy,
+	// });
+
+	const [total, products] = await prisma.$transaction([
+		prisma.product.count({
+			where: {
+				AND: [
+					categoryCondition ? { ...categoryCondition } : {},
+					lowPriceCondition ? { ...lowPriceCondition } : {},
+					highPriceCondition ? { ...highPriceCondition } : {},
+					query ? { ...query } : {},
+				],
+			},
+		}),
+		prisma.product.findMany({
+			where: {
+				AND: [
+					categoryCondition ? { ...categoryCondition } : {},
+					lowPriceCondition ? { ...lowPriceCondition } : {},
+					highPriceCondition ? { ...highPriceCondition } : {},
+					query ? { ...query } : {},
+				],
+			},
+			select: {
+				id: true,
+				name: true,
+				price: true,
+				images: true,
+				slug: true,
+				category: {
+					select: {
+						name: true,
+					},
 				},
 			},
-		},
-		orderBy,
-	});
+			orderBy,
+			skip,
+			take: ITEMS_PER_PAGE,
+		}),
+	]);
 
-	return products.map((p) => ProductToCardDTOMapper(p));
+	const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+
+	return {
+		data: products.map((p) => ProductToCardDTOMapper(p)),
+		metadata: {
+			hasNextPage: page < totalPages,
+			hasPreviousPage: page > 1,
+			totalPages,
+			currentPage: page,
+			totalItems: total,
+		},
+	};
 }
 
 export async function getFeaturedProducts(): Promise<ProductCardDTO[]> {

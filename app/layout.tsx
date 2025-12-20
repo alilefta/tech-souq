@@ -3,8 +3,10 @@ import { Geist_Mono, Inter, Lora } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { AnnouncementBanner } from "@/components/announcement-banner";
-import { Navbar } from "@/components/navbar";
+import Navbar from "@/components/ui/navbar-v2";
 import { Footer } from "@/components/footer";
+import { AnnouncementBar } from "@/components/announcement-banner-v2";
+import FooterSection from "@/components/footer-section";
 
 const sans = Inter({
 	variable: "--font-inter",
@@ -52,16 +54,24 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<head>
-				<script src="https://tweakcn.com/live-preview.min.js"></script>
-			</head>
-			<body className={`${sans.variable} ${mono.variable}  ${serif.variable} antialiased`}>
-				<ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-					<AnnouncementBanner />
-					<Navbar /> {/* Stays persistent across pages */}
+			<body className={`${sans.variable} ${mono.variable}  ${serif.variable} bg-[#0A0E14] text-[#F5F5F0] antialiased `}>
+				{/* <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+					<AnnouncementBar />
+					<Navbar /> 
 					<main className="min-h-screen">{children}</main>
 					<Footer />
-				</ThemeProvider>
+				</ThemeProvider> */}
+
+				<AnnouncementBar />
+
+				{/* 2. Navbar (Sticky Wrapper) */}
+				<Navbar />
+
+				{/* 3. Main Content */}
+				<main>{children}</main>
+
+				{/* 4. Footer (To be built) */}
+				<FooterSection />
 			</body>
 		</html>
 	);

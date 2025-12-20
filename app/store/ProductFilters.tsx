@@ -16,11 +16,7 @@ export function ProductFilters({ rawCategories }: { rawCategories: CategoryFilte
 	const searchParams = useSearchParams();
 	const urlParams = new URLSearchParams(searchParams.toString());
 
-	const defaultLowPrice = isNaN(Number(urlParams.get("low_price"))) ? 0 : Number(urlParams.get("low_price"));
-
-	const defaultHighPrice = isNaN(Number(urlParams.get("high_price"))) ? 5000 : Number(urlParams.get("high_price"));
-
-	const [priceRange, setPriceRange] = useState([defaultLowPrice, defaultHighPrice]);
+	const [priceRange, setPriceRange] = useState([Number(urlParams.get("low_price")) || 0, Number(urlParams.get("high_price")) || 5000]);
 	const [categories, setCategories] = useState<CategorySelection[]>([
 		...rawCategories.map((cat) => ({
 			...cat,

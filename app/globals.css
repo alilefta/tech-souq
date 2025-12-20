@@ -172,3 +172,7 @@
 		@apply bg-background text-foreground;
 	}
 }
+
+@utility spin-slow {
+	animmation: spin 8s linear infinite;
+}

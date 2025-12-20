@@ -1,21 +1,31 @@
 // app/page.tsx (Server Component)
 import Navbar from "@/components/ui/navbar-v2";
 import HeroVisual from "@/components/home/hero-visual";
-import { Reveal } from "@/components/ui/reveal"; // Our Client Wrapper
+import { Reveal } from "@/components/ui/reveal"; // Our Clien Client Wrapper
 import { ShoppingBag, Zap } from "lucide-react";
 
 export default function HeroSection() {
 	return (
-		<section className="relative min-h-screen w-full bg-[#0A0E14] overflow-hidden flex flex-col items-center justify-center font-sans">
-			{/* BACKGROUND ELEMENTS (Static/Server) */}
+		/* 
+		   1. Added pt-[140px]: This creates a "safe zone" so the text starts 
+		      below the Announcement Bar + Navbar.
+		   2. Changed justify-center to justify-start: Since we added padding, 
+		      starting from the top is more predictable for different screen heights.
+		*/
+		<section className="relative min-h-screen w-full bg-[#0A0E14] overflow-hidden flex flex-col items-center justify-start pt-[60px] md:pt-[80px] font-sans">
+			{/* BACKGROUND ELEMENTS - Keep these absolute so they bleed behind the navbar */}
 			<div className="absolute inset-0 opacity-[0.03] pointer-events-none flex items-center justify-center">
 				<span className="text-[40vw] font-bold text-[#F5F5F0] leading-none select-none">سوق</span>
 			</div>
-			<div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-[#FFB400] opacity-[0.07] blur-[120px] rounded-full" />
 
-			<Navbar />
+			{/* Adjusted Glow: Move it slightly higher so it glows through the navbar's blur */}
+			<div className="absolute top-0 right-[-5%] w-[600px] h-[600px] bg-[#FFB400] opacity-[0.08] blur-[120px] rounded-full" />
 
-			<div className="relative z-10 w-full max-w-7xl px-8 mt-20 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+			{/* 
+			   3. Removed mt-20 entirely. 
+			   The top padding on the parent handles the spacing now.
+			*/}
+			<div className="relative z-10 w-full max-w-7xl px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
 				{/* LEFT COLUMN: SEO CONTENT */}
 				<div className="lg:col-span-7">
 					<Reveal>
@@ -38,7 +48,6 @@ export default function HeroSection() {
 								<span className="relative z-10 flex items-center gap-2 uppercase">
 									Explore the Souq <ShoppingBag size={18} />
 								</span>
-								{/* Visual highlight on hover */}
 								<div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
 							</button>
 
@@ -69,7 +78,11 @@ export default function HeroSection() {
 				</div>
 			</div>
 
-			{/* STATIC SCROLL INDICATOR */}
+			{/* 
+				4. Scroll indicator position check:
+				Because we use justify-start + padding, we must ensure 
+				this is absolute so it stays at the very bottom of the screen.
+			*/}
 			<div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-40">
 				<span className="text-[#94A3B8] text-[10px] uppercase tracking-[0.3em]">Enter Bazaar</span>
 				<div className="w-[1px] h-12 bg-gradient-to-b from-[#FFB400] to-transparent" />
