@@ -1,4 +1,5 @@
 import { prisma } from "@/prisma/prisma";
+import { ProductToCardDTOMapper } from "./products";
 
 export interface CategoryFilterDTO {
 	id: number;

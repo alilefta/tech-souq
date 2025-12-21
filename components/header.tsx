@@ -15,7 +15,7 @@ export function Header() {
 							</div>
 						</Link>
 						<nav className="hidden md:flex items-center gap-6">
-							<Link href="/store" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+							<Link href="/products" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
 								Products
 							</Link>
 							<Link href="/deals" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">

@@ -30,10 +30,10 @@ export async function ProductCard({ product }: { product: ProductCardDTO }) {
 				</div>
 				<div className="p-5 space-y-3">
 					<div className="text-xs font-medium text-orange-600 dark:text-orange-500 uppercase tracking-wide">
-						<Link href={`/categories/${product.category_name}`}>{product.category_name}</Link>
+						<Link href={`/categories/${product.category.slug}`}>{product.category.name}</Link>
 					</div>
 					<h3 className="font-semibold text-foreground text-lg leading-tight text-pretty group-hover:text-orange-600 dark:group-hover:text-orange-500 transition-colors duration-200">
-						<Link href={`/store/${product.slug}`}>{product.name}</Link>
+						<Link href={`/products/${product.slug}`}>{product.name}</Link>
 					</h3>
 					<div className="flex items-center gap-2 mb-6">
 						<div className="flex items-center gap-1">
@@ -44,9 +44,9 @@ export async function ProductCard({ product }: { product: ProductCardDTO }) {
 					</div>
 					<div className="flex items-baseline gap-2">
 						<span className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">${product.price}</span>
-						<span className="text-sm text-zinc-400 dark:text-zinc-500 line-through">${product.original_price}</span>
+						<span className="text-sm text-zinc-400 dark:text-zinc-500 line-through">${product.originalPrice}</span>
 						<span className="ml-auto text-sm font-semibold text-green-600 dark:text-green-500">
-							Save {Math.round(((product.original_price - product.price) / product.original_price) * 100)}%
+							Save {Math.round(((product.originalPrice ?? product.price + 20 - product.price) / (product.originalPrice ?? product.price + 20)) * 100)}%
 						</span>
 					</div>
 				</div>

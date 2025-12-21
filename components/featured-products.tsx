@@ -59,7 +59,7 @@ export async function FeaturedProducts() {
 						<p className="text-lg text-muted-foreground text-pretty max-w-2xl">Handpicked deals on top-rated tech essentials</p>
 					</div>
 					<Button variant="outline" className="hidden sm:flex bg-transparent" asChild>
-						<Link href={"/store"}>
+						<Link href={"/products"}>
 							View All Products
 							<MoveRight />
 						</Link>

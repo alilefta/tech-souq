@@ -5,19 +5,52 @@ import { prisma } from "@/prisma/prisma";
 
 const DEV_RATING = 4.5;
 const DEV_REVIEWS = 312;
-const ITEMS_PER_PAGE = 2;
+const ITEMS_PER_PAGE = 12;
 
+export type ProductSpecs = {
+	id: number;
+	label: string;
+	value: string;
+};
+
+export type ProductCategory = {
+	id: number;
+	name: string;
+	slug: string;
+};
 export interface ProductCardDTO {
 	id: number;
 	name: string;
 	price: number;
-	original_price: number;
+	originalPrice?: number;
 	images: string[];
 	slug: string;
-	category_name: string;
+	category: ProductCategory;
 	rating: number;
 	reviews: number;
-	cover_image: string | null;
+	coverImage: string | null;
+	specs: ProductSpecs[];
+}
+
+export interface ProductDetailsDTO {
+	id: number;
+	name: string;
+	price: number;
+	description: string;
+	originalPrice: number | null;
+	images: string[];
+	slug: string;
+	// rating: number;
+	// reviews: number;
+	coverImage: string | null;
+	brand: string;
+	sku: string;
+	reviewCount: number;
+	averageRating: number;
+	specs: ProductSpecs[];
+	isNew: boolean;
+	isFeatured: boolean;
+	category: ProductCategory;
 }
 
 export async function getAllProducts() {
@@ -31,6 +64,15 @@ export async function getAllProducts() {
 			category: {
 				select: {
 					name: true,
+					id: true,
+					slug: true,
+				},
+			},
+			specs: {
+				select: {
+					id: true,
+					label: true,
+					value: true,
 				},
 			},
 		},
@@ -205,6 +247,15 @@ export async function getFilteredProducts({
 				category: {
 					select: {
 						name: true,
+						id: true,
+						slug: true,
+					},
+				},
+				specs: {
+					select: {
+						id: true,
+						label: true,
+						value: true,
 					},
 				},
 			},
@@ -232,8 +283,9 @@ export async function getFeaturedProducts(): Promise<ProductCardDTO[]> {
 	const products = await prisma.product.findMany({
 		where: {
 			isActive: true,
+			isFeatured: true,
 		},
-		take: 8,
+		take: 4,
 		orderBy: {
 			createdAt: "desc",
 		},
@@ -246,6 +298,15 @@ export async function getFeaturedProducts(): Promise<ProductCardDTO[]> {
 			category: {
 				select: {
 					name: true,
+					id: true,
+					slug: true,
+				},
+			},
+			specs: {
+				select: {
+					id: true,
+					label: true,
+					value: true,
 				},
 			},
 		},
@@ -272,6 +333,15 @@ export async function getLatestProducts(): Promise<ProductCardDTO[]> {
 			category: {
 				select: {
 					name: true,
+					id: true,
+					slug: true,
+				},
+			},
+			specs: {
+				select: {
+					id: true,
+					label: true,
+					value: true,
 				},
 			},
 		},
@@ -294,6 +364,15 @@ export async function getProductsByCategory(category: Category) {
 			category: {
 				select: {
 					name: true,
+					id: true,
+					slug: true,
+				},
+			},
+			specs: {
+				select: {
+					id: true,
+					label: true,
+					value: true,
 				},
 			},
 		},
@@ -305,23 +384,132 @@ export async function getProductsByCategory(category: Category) {
 	return products.map((p) => ProductToCardDTOMapper(p));
 }
 
-function ProductToCardDTOMapper(
+export async function getProductBySlug(slug: string): Promise<ProductDetailsDTO | null> {
+	const product = await prisma.product.findUnique({
+		where: {
+			slug: slug,
+		},
+		select: {
+			id: true,
+			name: true,
+			price: true,
+			images: true,
+			slug: true,
+			isActive: true,
+			description: true,
+			stock: true,
+			specs: {
+				select: {
+					id: true,
+					label: true,
+					value: true,
+				},
+			},
+			brand: true,
+			reviewCount: true,
+			sku: true,
+			originalPrice: true,
+			averageRating: true,
+			isNew: true,
+			isFeatured: true,
+			category: {
+				select: {
+					name: true,
+					id: true,
+					slug: true,
+				},
+			},
+			categoryId: true,
+			createdAt: true,
+			updatedAt: true,
+		},
+	});
+
+	if (!product) {
+		return null;
+	}
+
+	return ProductToDetailsDTOMapper(product);
+}
+
+export async function getRelatedProducts(categoryId: number, currentProductId: number): Promise<ProductCardDTO[]> {
+	const products = await prisma.product.findMany({
+		where: {
+			categoryId: categoryId,
+			isActive: true,
+			id: {
+				not: currentProductId, // DO NOT show the current product
+			},
+		},
+		take: 8, // The elite "sweet spot" for carousels
+		orderBy: {
+			createdAt: "desc", // Show newest related items first
+		},
+		select: {
+			id: true,
+			name: true,
+			price: true,
+			originalPrice: true,
+			images: true,
+			slug: true,
+			category: {
+				select: {
+					name: true,
+					id: true,
+					slug: true,
+				},
+			},
+			specs: true,
+		},
+	});
+
+	return products.map((p) => ProductToCardDTOMapper(p));
+}
+
+// Helpers
+export function ProductToCardDTOMapper(
 	p: Partial<Product> & {
-		category: {
-			name: string;
-		};
+		category: ProductCategory;
+		specs: ProductSpecs[];
 	}
 ): ProductCardDTO {
 	return {
 		id: p.id!,
 		name: p.name!,
 		price: Number(p.price),
-		original_price: Number(p.price) - 10,
+		originalPrice: p.originalPrice ? Number(p.originalPrice) : Number(p.price),
 		slug: p.slug!,
-		category_name: p.category.name,
+		category: p.category,
 		images: p.images!,
 		rating: DEV_RATING,
 		reviews: DEV_REVIEWS,
-		cover_image: p.images && p.images.length > 0 ? p.images[0] : null,
+		coverImage: p.images && p.images.length > 0 ? p.images[0] : null,
+		specs: p.specs,
+	};
+}
+
+export function ProductToDetailsDTOMapper(
+	p: Partial<Product> & {
+		category: ProductCategory;
+		specs: ProductSpecs[];
+	}
+): ProductDetailsDTO {
+	return {
+		id: p.id!,
+		name: p.name ?? "",
+		price: Number(p.price),
+		originalPrice: p.originalPrice ? Number(p.originalPrice) : Number(p.price),
+		slug: p.slug ?? "",
+		images: p.images ?? [],
+		description: p.description ?? "",
+		coverImage: p.images && p.images.length > 0 ? p.images[0] : null,
+		isFeatured: p.isFeatured ?? false,
+		isNew: p.isNew ?? true,
+		averageRating: p.averageRating!,
+		brand: p.brand ?? "",
+		reviewCount: p.reviewCount!,
+		sku: p.sku ?? "",
+		specs: p.specs,
+		category: p.category,
 	};
 }

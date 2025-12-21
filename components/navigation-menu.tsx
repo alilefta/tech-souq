@@ -32,7 +32,7 @@ export function NavigationMenu() {
 							<Link href={"/"} className="text-2xl rtl:text-base">
 								Home
 							</Link>
-							<Link href={"/store"} className="text-2xl rtl:text-base">
+							<Link href={"/products"} className="text-2xl rtl:text-base">
 								Store
 							</Link>
 							{/* <Link href={"/categories"} className="text-2xl rtl:text-base">

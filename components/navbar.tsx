@@ -24,10 +24,10 @@ export function Navbar() {
 	}, []);
 
 	const navLinks = [
-		{ href: "/store?filters=components", label: "Components" },
-		{ href: "/store?filters=laptops", label: "Laptops" },
-		{ href: "/store?filter=peripherals", label: "Peripherals" },
-		{ href: "/store?filter=deals", label: "Deals" },
+		{ href: "/products?filters=components", label: "Components" },
+		{ href: "/products?filters=laptops", label: "Laptops" },
+		{ href: "/products?filter=peripherals", label: "Peripherals" },
+		{ href: "/products?filter=deals", label: "Deals" },
 		{ href: "/build-pc", label: "Build PC" },
 	];
 
