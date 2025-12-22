@@ -7,6 +7,8 @@ import Navbar from "@/components/ui/navbar-v2";
 import { Footer } from "@/components/footer";
 import { AnnouncementBar } from "@/components/announcement-banner-v2";
 import FooterSection from "@/components/footer-section";
+import { CartDrawer } from "@/components/cart/cart-drawer";
+import { CartWrapper } from "@/components/cart-warpper";
 
 const sans = Inter({
 	variable: "--font-inter",
@@ -55,22 +57,10 @@ export default function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body className={`${sans.variable} ${mono.variable}  ${serif.variable} bg-[#0A0E14] text-[#F5F5F0] antialiased `}>
-				{/* <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-					<AnnouncementBar />
-					<Navbar /> 
-					<main className="min-h-screen">{children}</main>
-					<Footer />
-				</ThemeProvider> */}
-
 				<AnnouncementBar />
-
-				{/* 2. Navbar (Sticky Wrapper) */}
 				<Navbar />
-
-				{/* 3. Main Content */}
+				<CartWrapper />
 				<main>{children}</main>
-
-				{/* 4. Footer (To be built) */}
 				<FooterSection />
 			</body>
 		</html>

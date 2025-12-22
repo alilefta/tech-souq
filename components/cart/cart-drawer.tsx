@@ -1,19 +1,24 @@
 "use client";
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
-import { ShoppingBag, Box, Truck, ArrowRight, X } from "lucide-react";
+import { ShoppingBag, Box, Truck, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { CartItem } from "@/components/cart/cart-item";
+import { useCart } from "@/store/useCart";
+import { CartWithItemsDTO } from "@/app/data/cart";
 
-export function CartDrawer({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (val: boolean) => void }) {
+export function CartDrawer({ cart }: { cart: CartWithItemsDTO | null }) {
 	// NOTE: You will replace this with your actual cart state
-	const isEmpty = false;
+
+	const isEmpty = cart === null || cart.items.length === 0;
+	const isOpen = useCart((state) => state.isOpen);
+	const setIsOpen = useCart((state) => state.setIsOpen);
 
 	return (
 		<Sheet open={isOpen} onOpenChange={setIsOpen}>
 			<SheetContent className="w-full sm:max-w-md bg-[#0A0E14] border-l border-white/5 p-0 flex flex-col font-sans">
 				{/* 1. HEADER: Manifest Info */}
-				<SheetHeader className="p-6 border-b border-white/5 bg-white/[0.01]">
+				<SheetHeader className="p-6 border-b border-white/5 bg-white/1">
 					<div className="flex items-center justify-between mb-2">
 						<span className="text-[10px] font-mono text-[#94A3B8] tracking-[0.3em] uppercase">
 							Terminal_Session: {new Date().getHours()}
@@ -41,19 +46,16 @@ export function CartDrawer({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: 
 							</motion.div>
 						) : (
 							<div className="space-y-6">
-								{/* 
-                   You will map your cart items here. 
-                   I'll provide the 'CartItem' UI component next. 
-                */}
-								<CartItem />
-								<CartItem />
+								{cart.items.map((item) => (
+									<CartItem item={item} key={item.id} />
+								))}
 							</div>
 						)}
 					</AnimatePresence>
 				</div>
 
 				{/* 3. FOOTER: Logistics & Checkout */}
-				<SheetFooter className="p-6 bg-white/[0.02] border-t border-white/5 flex flex-col gap-6">
+				<SheetFooter className="p-6 bg-white/2 border-t border-white/5 flex flex-col gap-6">
 					<div className="space-y-3">
 						<div className="flex justify-between text-[10px] font-bold uppercase text-[#94A3B8] tracking-widest">
 							<span>Subtotal</span>

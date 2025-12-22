@@ -1,7 +1,7 @@
 import { ProductCard } from "@/components/product-card-v2";
 import { getFilteredProducts } from "@/app/data/products";
 import { ProductFilters } from "./product-filters";
-import { Grid, LayoutGrid, List, SearchX, SlidersHorizontal, SortDesc } from "lucide-react";
+import { LayoutGrid, List, SearchX, SlidersHorizontal } from "lucide-react";
 import { SortProducts } from "./SortProducts";
 import { getCategoriesForFilters } from "../data/category";
 import { SearchProducts } from "./SearchProducts";
@@ -9,6 +9,8 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { PaginationBar } from "./pagination-bar";
+import { ToggleView } from "@/components/products/toggle-view";
+import { ProductListItem } from "@/components/product-list-item"; // Import the new component
 
 interface PageParams {
 	searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -32,7 +34,7 @@ export default async function ProductsPage({ searchParams }: PageParams) {
 
 	if (parsedParams.error) return null;
 
-	const { category, low_price, high_price, query, sort, page } = parsedParams.data;
+	const { category, low_price, high_price, query, sort, page, view } = parsedParams.data;
 
 	const { data: products, metadata } = await getFilteredProducts({
 		category,
@@ -56,10 +58,10 @@ export default async function ProductsPage({ searchParams }: PageParams) {
 						<div>
 							<div className="flex items-center gap-3 mb-4">
 								<span className="text-[#FFB400] text-[10px] font-black uppercase tracking-[0.4em]">Node: Babylon_Alpha</span>
-								<div className="h-[1px] w-12 bg-[#FFB400]/30" />
+								<div className="h-px w-12 bg-[#FFB400]/30" />
 							</div>
 							<h1 className="text-[#F5F5F0] text-5xl md:text-7xl font-bold tracking-tighter uppercase leading-none">
-								Global <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFB400] to-[#FF8C00]">Registry</span>
+								Global <span className="text-transparent bg-clip-text bg-linear-to-r from-[#FFB400] to-[#FF8C00]">Registry</span>
 							</h1>
 						</div>
 						<div className="flex flex-col items-end gap-2">
@@ -70,21 +72,13 @@ export default async function ProductsPage({ searchParams }: PageParams) {
 				</header>
 
 				{/* 2. COMMAND DECK (Search & Controls) */}
-				<div className="flex flex-col lg:flex-row items-center gap-6 mb-12 bg-white/[0.02] border border-white/5 p-4 rounded-sm">
+				<div className="flex flex-col lg:flex-row items-center gap-6 mb-12 bg-white/2 border border-white/5 p-4 rounded-sm">
 					<div className="w-full lg:flex-1">
 						<SearchProducts />
 					</div>
 
 					<div className="flex items-center gap-6 w-full lg:w-auto">
-						{/* View Toggle (Purely Visual for now) */}
-						<div className="hidden md:flex items-center gap-1 border-r border-white/10 pr-6">
-							<Button className="p-2 text-[#FFB400] bg-white/5 rounded-sm">
-								<LayoutGrid size={18} />
-							</Button>
-							<Button className="p-2 text-[#94A3B8] hover:text-[#F5F5F0] transition-colors">
-								<List size={18} />
-							</Button>
-						</div>
+						<ToggleView />
 
 						<div className="flex items-center gap-3 flex-1 lg:flex-none">
 							<span className="text-[#94A3B8] text-[10px] font-black uppercase tracking-widest whitespace-nowrap">Sort_By:</span>
@@ -117,10 +111,14 @@ export default async function ProductsPage({ searchParams }: PageParams) {
 								</Button>
 							</div>
 						) : (
-							<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3  gap-6">
-								{products.map((product) => (
-									<ProductCard key={product.id} product={product} />
-								))}
+							<div
+								className={
+									view === "list"
+										? "flex flex-col gap-4" // List View Layout
+										: "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6" // Grid View Layout
+								}
+							>
+								{products.map((product) => (view === "list" ? <ProductListItem key={product.id} product={product} /> : <ProductCard key={product.id} product={product} />))}
 							</div>
 						)}
 

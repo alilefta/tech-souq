@@ -4,7 +4,6 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ProductSort, productSortOptions } from "@/lib/data/products";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
 import { Terminal } from "lucide-react";
 
 export function SortProducts() {
@@ -26,7 +25,7 @@ export function SortProducts() {
 
 	return (
 		<Select value={currentSort} onValueChange={handleSortChange}>
-			<SelectTrigger className="w-[200px] bg-white/[0.02] border-white/10 rounded-none h-10 font-mono text-[10px] uppercase tracking-widest focus:ring-0 focus:border-[#FFB400]/40 group">
+			<SelectTrigger className="w-50 bg-white/2 border-white/10 rounded-none h-10 font-mono text-[10px] uppercase tracking-widest focus:ring-0 focus:border-[#FFB400]/40 group">
 				<div className="flex items-center gap-2">
 					<Terminal size={12} className="text-[#FFB400] opacity-40 group-hover:opacity-100 transition-opacity" />
 					<SelectValue placeholder="Protocol_Select" />

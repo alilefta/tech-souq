@@ -46,7 +46,7 @@ export function ProductFilters({ rawCategories }: { rawCategories: CategoryFilte
 	// Auto-apply when categories change
 	useEffect(() => {
 		applyFilters();
-	}, [categories]);
+	}, [categories, priceRange]);
 
 	return (
 		<div className="flex flex-col gap-10">

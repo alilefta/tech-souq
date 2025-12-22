@@ -39,7 +39,7 @@ export function ProductDetailsUI({ product }: { product: ProductDetailsDTO }) {
 						{product.name}
 					</h1>
 
-					<div className="flex items-end gap-6 mt-8">
+					<div className="flex items-end justify-between md:justify-start gap-6 mt-8">
 						<div className="flex flex-col">
 							{product.originalPrice && product.originalPrice > product.price && (
 								<span className="text-[#94A3B8] text-xs line-through opacity-40 font-mono mb-1">${product.originalPrice}</span>

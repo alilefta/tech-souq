@@ -36,15 +36,27 @@ export function ProductGallery({
 				{isNew && <div className="absolute top-6 left-6 z-20 bg-[#FFB400] text-[#0A0E14] text-[10px] font-black px-3 py-1 uppercase tracking-tighter">New Generation</div>}
 
 				<AnimatePresence mode="wait">
-					<motion.div key={activeImage} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }} className="relative w-full h-full p-8 lg:p-12">
+					<motion.div
+						key={activeImage}
+						initial={{ opacity: 0, filter: "grayscale(100%)" }}
+						animate={{ opacity: 1 }}
+						// ELITE MOBILE LOGIC:
+						// Transition to color when the image enters the user's focus zone
+						whileInView={{ filter: "grayscale(0%)" }}
+						viewport={{ once: false, amount: 0.5 }}
+						exit={{ opacity: 0 }}
+						transition={{ duration: 0.6, ease: "easeOut" }}
+						className="relative w-full h-full p-8 lg:p-12"
+					>
 						<SafeImage
 							src={activeImage}
 							alt={name}
 							fill
-							preload // Critical for LCP
+							priority // Critical for LCP on the product page
 							fallbackName={name}
 							sizes="(max-width: 768px) 100vw, 50vw"
-							className="object-contain grayscale group-hover:grayscale-0 transition-all duration-700"
+							// On Desktop: we keep it grayscale until the parent 'group' is hovered
+							className="object-contain transition-all duration-700 md:grayscale md:group-hover:grayscale-0"
 						/>
 					</motion.div>
 				</AnimatePresence>
@@ -62,13 +74,13 @@ export function ProductGallery({
 					{images.map((img: string, i: number) => (
 						<Button
 							key={i}
-							variant="ghost" // Use ghost to avoid default shadcn styles
+							variant="ghost"
 							onClick={() => setActiveImage(img)}
 							className={`relative w-20 h-20 shrink-0 border transition-all overflow-hidden p-0 rounded-none ${
 								activeImage === img ? "border-[#FFB400] opacity-100" : "border-white/5 opacity-40 hover:opacity-70"
 							}`}
 						>
-							<SafeImage src={img} alt={`${name} thumb ${i}`} fill fallbackName={name} sizes="80px" className="object-cover grayscale" />
+							<SafeImage src={img} alt={`${name} thumb ${i}`} fill fallbackName={name} sizes="80px" className="object-cover grayscale hover:grayscale-0 transition-all duration-500" />
 						</Button>
 					))}
 				</div>

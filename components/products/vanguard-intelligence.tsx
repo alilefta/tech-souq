@@ -1,5 +1,5 @@
 // components/products/vanguard-intelligence.tsx
-import { Star, MessageSquare, Terminal, ShieldCheck } from "lucide-react";
+import { Star, MessageSquare, Terminal, ShieldCheck, Activity } from "lucide-react";
 import { ReviewCard } from "@/components/products/review-card";
 
 const reviews = [
@@ -40,44 +40,58 @@ const reviews = [
 
 export default function VanguardIntelligence() {
 	return (
-		<section className="w-full bg-[#0A0E14] py-32 border-t border-white/5 relative overflow-hidden">
-			{/* Background Technical Watermark */}
-			<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-[0.01]">
-				<span className="text-[25vw] font-black italic select-none">REPORTS</span>
+		<section className="w-full bg-[#0A0E14] py-16 lg:py-32 border-t border-white/5 relative overflow-hidden">
+			{/* Background Technical Watermark - Scaled for Mobile */}
+			<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-[0.01] select-none">
+				<span className="text-[40vw] lg:text-[25vw] font-black italic">REPORTS</span>
 			</div>
 
 			<div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
-				{/* Header Terminal */}
-				<div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-20 gap-8">
+				{/* 1. HEADER TERMINAL: Responsive Layout */}
+				<div className="flex flex-col lg:flex-row items-start lg:items-end justify-between mb-12 lg:mb-20 gap-8">
+					{/* Title Module */}
 					<div className="max-w-2xl">
 						<h2 className="text-[#FFB400] text-[10px] font-black uppercase tracking-[0.4em] mb-4 flex items-center gap-3">
-							<Terminal size={14} />
-							Vanguard_Intelligence_Feed
+							<Terminal size={12} />
+							Vanguard_Log_Feed
 						</h2>
-						<h3 className="text-[#F5F5F0] text-4xl md:text-6xl font-bold tracking-tighter uppercase leading-[0.9]">
+						<h3 className="text-[#F5F5F0] text-3xl md:text-5xl lg:text-6xl font-bold tracking-tighter uppercase leading-[0.9]">
 							System <br />
 							<span className="text-transparent bg-clip-text bg-linear-to-r from-[#FFB400] to-[#FF8C00]">Verification</span> Logs
 						</h3>
 					</div>
 
-					<div className="flex flex-col items-end gap-4">
-						<div className="flex items-center gap-6">
-							<div className="text-right">
-								<p className="text-[#94A3B8] text-[9px] font-black uppercase tracking-widest mb-1">Global_Avg_Integrity</p>
-								<p className="text-[#FFB400] text-3xl font-black tracking-tighter">98.4%</p>
+					{/* 2. SYSTEM STATUS BAR (Mobile optimized) */}
+					<div className="w-full lg:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-6 lg:gap-10 p-6 lg:p-0 bg-white/[0.02] lg:bg-transparent border border-white/5 lg:border-none">
+						<div className="flex items-center justify-between sm:flex-col sm:items-start gap-1">
+							<div className="flex items-center gap-2">
+								<Activity size={10} className="text-[#FFB400] opacity-50" />
+								<p className="text-[#94A3B8] text-[8px] lg:text-[9px] font-black uppercase tracking-widest opacity-50">Global_Avg_Integrity</p>
 							</div>
-							<button className="px-8 py-4 bg-[#FFB400] text-[#0A0E14] font-black text-xs uppercase tracking-widest hover:shadow-[0_0_30px_rgba(255,180,0,0.3)] transition-all flex items-center gap-3">
-								Submit_Report <MessageSquare size={16} />
-							</button>
+							<p className="text-[#FFB400] text-2xl lg:text-3xl font-black tracking-tighter font-mono">98.4%</p>
 						</div>
+
+						<button className="flex-1 lg:flex-none px-8 py-4 bg-[#FFB400] text-[#0A0E14] font-black text-[10px] uppercase tracking-[0.2em] hover:bg-white transition-all flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(255,180,0,0.1)]">
+							Submit_Report <MessageSquare size={14} />
+						</button>
 					</div>
 				</div>
 
-				{/* Reviews Grid */}
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/5 border border-white/5">
+				{/* 3. LOGS GRID: Dynamic Column Scaling */}
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/10 border border-white/10 shadow-2xl">
 					{reviews.map((review) => (
 						<ReviewCard key={review.id} review={review} />
 					))}
+				</div>
+
+				{/* Footer Meta (Mobile only detail) */}
+				<div className="mt-8 flex items-center justify-between lg:hidden opacity-30">
+					<span className="text-[7px] font-mono text-[#94A3B8] uppercase tracking-[0.3em]">End_Of_Feed</span>
+					<div className="flex gap-1">
+						{[1, 2, 3].map((i) => (
+							<div key={i} className="w-1 h-1 bg-white/20 rounded-full" />
+						))}
+					</div>
 				</div>
 			</div>
 		</section>

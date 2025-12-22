@@ -4,36 +4,26 @@ import Image, { ImageProps } from "next/image";
 import { useState } from "react";
 import { TechPlaceholder } from "./tech-placeholder";
 
-interface SafeImageProps extends Omit<ImageProps, "onError"> {
+interface SafeImageProps extends Omit<ImageProps, "src" | "onError"> {
+	src: string | null | undefined; // Allow database nulls
 	fallbackName?: string;
 }
 
 export function SafeImage({ src, alt, fallbackName, ...props }: SafeImageProps) {
 	const [error, setError] = useState(false);
-
-	// 1. SYSTEM SYNC: Track the previous source to detect changes
 	const [prevSrc, setPrevSrc] = useState(src);
 
-	// 2. RENDER-PHASE RESET:
-	// If the source has changed since the last render,
-	// reset the error state immediately before the browser paints.
 	if (src !== prevSrc) {
 		setPrevSrc(src);
 		setError(false);
 	}
 
-	// 3. FALLBACK CHECK
-	if (!src || error) {
-		return <TechPlaceholder name={fallbackName || (alt as string) || "Hardware"} />;
+	// 3. THE "ABS-ZERO" GUARD:
+	// If src is null, undefined, an empty string, or has triggered an error
+	// we bail out immediately and return the technical diagnostic placeholder.
+	if (!src || src === "" || error) {
+		return <TechPlaceholder name={fallbackName || (alt as string) || "Hardware_Module"} />;
 	}
 
-	return (
-		<Image
-			{...props}
-			src={src}
-			alt={alt}
-			// If the image fails to load, trigger the diagnostic fallback
-			onError={() => setError(true)}
-		/>
-	);
+	return <Image {...props} src={src} alt={alt} onError={() => setError(true)} />;
 }

@@ -3,7 +3,7 @@ import { ArrowRight, Zap, Shield, Star, Truck, CheckCircle } from "lucide-react"
 import Image from "next/image";
 import { Badge } from "./ui/badge";
 
-export function Hero() {
+export function Hero_old() {
 	return (
 		<section className="relative overflow-hidden bg-white dark:bg-zinc-950 font-sans">
 			<div className="absolute inset-0 bg-linear-to-br from-orange-500/5 via-transparent to-orange-600/10 pointer-events-none" />

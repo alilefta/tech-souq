@@ -18,7 +18,7 @@ export function TechPlaceholder({ name }: { name: string }) {
 					<div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-[#FFB400]" />
 				</div>
 
-				<p className="text-[#94A3B8] text-[10px] font-mono uppercase tracking-[0.3em] text-center max-w-60">Visual_Data_Not_Found</p>
+				<p className="text-[#94A3B8] text-[10px] font-mono uppercase tracking-[0.3em] text-center max-w-60 break-all">Visual_Data_Not_Found</p>
 				<span className="mt-2 text-[#FFB400]/40 text-[8px] font-bold uppercase">{name.substring(0, 15)}...</span>
 			</div>
 

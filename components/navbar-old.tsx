@@ -11,7 +11,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 
-export function Navbar() {
+export function Navbar_old() {
 	const pathname = usePathname();
 	const [isScrolled, setIsScrolled] = useState(false);
 

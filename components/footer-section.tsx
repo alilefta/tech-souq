@@ -1,133 +1,126 @@
 // components/home/footer-section.tsx
 import { FinalCTA } from "@/components/final-cta";
 import { TerminalStatus } from "@/components/terminal-status";
-import { Cpu, Globe, Ship, Github, Instagram, Twitter } from "lucide-react";
+import { Globe, Github, Instagram, Twitter } from "lucide-react";
+import { Logo } from "@/components/ui/logo"; // Import our new logo
 import Link from "next/link";
 
 export default function FooterSection() {
 	return (
-		<footer className="w-full bg-[#0A0E14] pt-20 pb-10 px-8 relative overflow-hidden border-t border-white/5">
-			{/* BACKGROUND DECORATION: Babylonian Technical Grid */}
-			<div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#FFB400] opacity-[0.02] blur-[150px] rounded-full" />
+		<footer className="w-full bg-[#0A0E14] pt-20 pb-10 px-8 relative overflow-hidden border-t border-white/5 selection:bg-[#FFB400] selection:text-[#0A0E14]">
+			{/* BACKGROUND DECORATION: Subtle Mathematical Grid */}
+			<div className="absolute top-0 right-0 w-125 h-125 bg-[#FFB400] opacity-[0.02] blur-[150px] rounded-full" />
 
 			<div className="max-w-7xl mx-auto relative z-10">
 				{/* PART A: THE FINAL CTA */}
 				<FinalCTA />
 
-				{/* PART B: THE LOGISTICS TERMINAL (FOOTER LINKS) */}
+				{/* PART B: THE FOUNDRY TERMINAL */}
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 mb-20">
 					{/* Brand Info (4 Columns) */}
 					<div className="lg:col-span-4 flex flex-col items-start">
-						<div className="flex items-center gap-2 mb-6">
-							<div className="w-8 h-8 bg-[#FFB400] rounded-sm flex items-center justify-center">
-								<Cpu size={20} className="text-[#0A0E14]" />
-							</div>
-							<span className="text-[#F5F5F0] font-bold text-2xl tracking-tighter uppercase italic">
-								TECH<span className="text-[#FFB400]">SOUQ</span>
+						<Link href="/" className="flex items-center gap-3 mb-6 group">
+							<Logo />
+							<span className="text-[#F5F5F0] font-black text-2xl tracking-tighter uppercase leading-none">
+								BASE <span className="text-[#FFB400]">60</span>
 							</span>
-						</div>
-						<p className="text-[#94A3B8] text-sm leading-relaxed mb-8 max-w-xs">
-							Born in Babylon, built for the world. We curate elite hardware from the cradle of innovation to your doorstep.
+						</Link>
+						<p className="text-[#94A3B8] text-sm leading-relaxed mb-8 max-w-xs font-medium">
+							The original source of calculation, engineered for modern performance. We deploy elite hardware modules from our Babylon Foundry to global workstations.
 						</p>
 						<div className="flex gap-4">
-							<Link
-								href="#"
-								className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-[#F5F5F0] hover:border-[#FFB400] hover:text-[#FFB400] transition-all"
-							>
-								<Instagram size={18} />
-							</Link>
-							<Link
-								href="#"
-								className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-[#F5F5F0] hover:border-[#FFB400] hover:text-[#FFB400] transition-all"
-							>
-								<Twitter size={18} />
-							</Link>
-							<Link
-								href="#"
-								className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-[#F5F5F0] hover:border-[#FFB400] hover:text-[#FFB400] transition-all"
-							>
-								<Github size={18} />
-							</Link>
+							{[Instagram, Twitter, Github].map((Icon, i) => (
+								<Link
+									key={i}
+									href="#"
+									className="w-10 h-10 border border-white/5 flex items-center justify-center text-[#94A3B8] hover:border-[#FFB400] hover:text-[#FFB400] transition-all bg-white/2"
+								>
+									<Icon size={18} />
+								</Link>
+							))}
 						</div>
 					</div>
 
-					{/* Navigation (2 Columns) */}
+					{/* Registry Links (2 Columns) */}
 					<div className="lg:col-span-2">
-						<h4 className="text-[#F5F5F0] text-xs font-black uppercase tracking-[0.3em] mb-8">Navigation</h4>
-						<ul className="space-y-4 text-sm text-[#94A3B8]">
+						<h4 className="text-[#F5F5F0] text-[10px] font-black uppercase tracking-[0.3em] mb-8 border-b border-white/5 pb-2">Registry</h4>
+						<ul className="space-y-4 text-[11px] font-bold uppercase tracking-widest text-[#94A3B8]">
 							<li>
-								<Link href="#" className="hover:text-[#FFB400] transition-colors">
+								<Link href="/components" className="hover:text-[#FFB400] transition-colors">
 									Components
 								</Link>
 							</li>
 							<li>
-								<Link href="#" className="hover:text-[#FFB400] transition-colors">
-									Custom Builds
+								<Link href="/builds" className="hover:text-[#FFB400] transition-colors">
+									Assembled_Modules
 								</Link>
 							</li>
 							<li>
-								<Link href="#" className="hover:text-[#FFB400] transition-colors">
-									The Bazaar
+								<Link href="/peripherals" className="hover:text-[#FFB400] transition-colors">
+									Peripherals
 								</Link>
 							</li>
 							<li>
-								<Link href="#" className="hover:text-[#FFB400] transition-colors">
-									Support
+								<Link href="/support" className="hover:text-[#FFB400] transition-colors">
+									Technical_Support
 								</Link>
 							</li>
 						</ul>
 					</div>
 
-					{/* Logistics (2 Columns) */}
+					{/* Transfers Links (2 Columns) */}
 					<div className="lg:col-span-2">
-						<h4 className="text-[#F5F5F0] text-xs font-black uppercase tracking-[0.3em] mb-8">Logistics</h4>
-						<ul className="space-y-4 text-sm text-[#94A3B8]">
+						<h4 className="text-[#F5F5F0] text-[10px] font-black uppercase tracking-[0.3em] mb-8 border-b border-white/5 pb-2">Transfers</h4>
+						<ul className="space-y-4 text-[11px] font-bold uppercase tracking-widest text-[#94A3B8]">
 							<li>
 								<Link href="#" className="hover:text-[#FFB400] transition-colors">
-									Global Shipping
+									Global_Express
 								</Link>
 							</li>
 							<li>
 								<Link href="#" className="hover:text-[#FFB400] transition-colors">
-									Tracking
+									Tracking_Node
 								</Link>
 							</li>
 							<li>
 								<Link href="#" className="hover:text-[#FFB400] transition-colors">
-									Warranty
+									Warranty_Auth
 								</Link>
 							</li>
 							<li>
 								<Link href="#" className="hover:text-[#FFB400] transition-colors">
-									Returns
+									Return_Logistics
 								</Link>
 							</li>
 						</ul>
 					</div>
 
 					{/* Live System Status (4 Columns) */}
-					<div className="lg:col-span-4 bg-white/[0.02] border border-white/5 p-6 rounded-sm">
-						<h4 className="text-[#F5F5F0] text-xs font-black uppercase tracking-[0.3em] mb-6 flex items-center gap-2">
+					<div className="lg:col-span-4 bg-white/1 border border-white/5 p-6 rounded-sm relative overflow-hidden">
+						{/* Subtle Corner Detail */}
+						<div className="absolute top-0 right-0 w-8 h-8 border-t border-r border-[#FFB400]/20" />
+
+						<h4 className="text-[#F5F5F0] text-[10px] font-black uppercase tracking-[0.3em] mb-6 flex items-center gap-2">
 							<Globe size={14} className="text-[#FFB400]" />
-							System Status
+							Foundry_Status_Feed
 						</h4>
 						<TerminalStatus />
 					</div>
 				</div>
 
-				{/* BOTTOM BAR: COPYRIGHT & LEGAL */}
+				{/* BOTTOM BAR: PROTOCOLS */}
 				<div className="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-					<div className="flex items-center gap-6 text-[10px] font-mono text-[#94A3B8] uppercase tracking-widest opacity-40">
-						<span>© 2025 TechSouq_INTL</span>
-						<span>Origin: Babylon_IRQ</span>
-						<span>Security_Protocol: AES-256</span>
+					<div className="flex items-center gap-6 text-[9px] font-mono text-[#94A3B8] uppercase tracking-widest opacity-40">
+						<span>© 2025 BASE_60_FOUNDRY</span>
+						<span className="hidden sm:inline">ORIGIN: BABYLON_IRQ_NODE_01</span>
+						<span className="hidden sm:inline">SEC_PROTOCOL: AES_60_ENCRYPTED</span>
 					</div>
-					<div className="flex gap-8 text-[10px] font-black uppercase tracking-widest text-[#94A3B8]">
+					<div className="flex gap-8 text-[9px] font-black uppercase tracking-widest text-[#94A3B8]">
 						<Link href="#" className="hover:text-[#F5F5F0]">
-							Privacy Policy
+							Privacy_Policy
 						</Link>
 						<Link href="#" className="hover:text-[#F5F5F0]">
-							Terms of Service
+							Terms_Of_Assembly
 						</Link>
 					</div>
 				</div>
