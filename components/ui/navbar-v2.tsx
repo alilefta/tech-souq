@@ -10,6 +10,7 @@ import { CartState, useCart } from "@/store/useCart";
 
 export default function Navbar() {
 	const openCart = useCart((state) => state.setIsOpen);
+	const totalItems = useCart((state) => state.items.length);
 
 	return (
 		<nav className="sticky top-6 w-[95%] max-w-7xl z-50 mx-auto flex items-center justify-between px-6 py-4 bg-[#1E293B]/40 backdrop-blur-xl border border-white/10 rounded-full transition-all duration-500 shadow-2xl">
@@ -44,10 +45,10 @@ export default function Navbar() {
 					<Search size={18} strokeWidth={2.5} />
 				</button>
 
-				<Button className="relative group p-2" onClick={() => openCart(true)}>
+				<button className="relative group p-2" onClick={() => openCart(true)}>
 					<ShoppingBag size={18} strokeWidth={2.5} className="group-hover:text-[#FFB400] transition-colors" />
-					<span className="absolute top-0 right-0 bg-[#FFB400] text-[#0A0E14] text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-[0_0_10px_rgba(255,180,0,0.5)]">0</span>
-				</Button>
+					<span className="absolute top-0 right-0 bg-[#FFB400] text-[#0A0E14] text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-[0_0_10px_rgba(255,180,0,0.5)]">{totalItems}</span>
+				</button>
 
 				{/* Mobile Menu Trigger */}
 				<button type="button" className="md:hidden p-2 text-[#94A3B8]" title="Mobile Menu">

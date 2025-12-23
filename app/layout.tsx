@@ -8,7 +8,8 @@ import { Footer } from "@/components/footer";
 import { AnnouncementBar } from "@/components/announcement-banner-v2";
 import FooterSection from "@/components/footer-section";
 import { CartDrawer } from "@/components/cart/cart-drawer";
-import { CartWrapper } from "@/components/cart-warpper";
+import { CartWrapper } from "@/components/cart/cart-warpper";
+import { Toaster } from "@/components/ui/sonner";
 
 const sans = Inter({
 	variable: "--font-inter",
@@ -55,12 +56,13 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en" suppressHydrationWarning>
+		<html lang="en" suppressHydrationWarning className="dark">
 			<body className={`${sans.variable} ${mono.variable}  ${serif.variable} bg-[#0A0E14] text-[#F5F5F0] antialiased `}>
 				<AnnouncementBar />
 				<Navbar />
 				<CartWrapper />
 				<main>{children}</main>
+				<Toaster position="bottom-left" />
 				<FooterSection />
 			</body>
 		</html>

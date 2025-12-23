@@ -1,17 +1,58 @@
 "use client";
 
 import { motion } from "motion/react";
-import { Plus, Star } from "lucide-react";
+import { Activity, Plus, ShieldCheck, Star } from "lucide-react";
 import Image from "next/image";
 import { ProductCardDTO } from "@/app/data/products";
 import Link from "next/link";
 import { useState } from "react";
 import { TechPlaceholder } from "@/components/ui/tech-placeholder";
+import { toast } from "sonner";
+import { useAction } from "next-safe-action/hooks";
+import { useCart } from "@/store/useCart";
+import { addToCartAction } from "@/app/actions/cart";
 
 export function ProductListItem({ product }: { product: ProductCardDTO }) {
 	const [imgError, setImgError] = useState(false);
 	const coverImage = product.coverImage;
 
+	const addItemOptimistically = useCart((state) => state.addItem);
+	const removeItemOptimistically = useCart((state) => state.removeItem);
+
+	// 2. SERVER ACTION LOGIC (Synchronized with ProductCard)
+	const { executeAsync: executeAddToCart, isPending } = useAction(addToCartAction, {
+		onError({ error }) {
+			if (error.serverError) {
+				toast.error("SIGNAL_INTERRUPT: TRANSMISSION_FAILED", {
+					description: `NODE: BBL_ALPHA // DATA_STREAM_TIMEOUT // ERR_0x60_SYNC`,
+					icon: <Activity className="text-red-500" size={16} />,
+				});
+			}
+
+			if (error.thrownError) {
+				toast.error("SYSTEM_CRITICAL: CALCULATION_ERROR", {
+					description: `SECTOR: 32_NORTH // LOGIC_OVERFLOW // TRACE: ${product.slug.toUpperCase()}`,
+					icon: <Activity className="text-red-500" size={16} />,
+				});
+			}
+
+			// Revert UI on failure
+			removeItemOptimistically(product.id);
+		},
+		onSuccess() {
+			toast.success("PROTOCOL: DEPLOYMENT_SUCCESS", {
+				description: `MODULE: ${product.name.toUpperCase()} // SYNCED_TO_MANIFEST`,
+				icon: <ShieldCheck className="text-[#FFB400]" size={16} />,
+			});
+		},
+	});
+
+	const handleAddToCart = async () => {
+		// Instant UI Update
+		addItemOptimistically(product);
+		// Background Server Sync
+		await executeAddToCart({ productId: product.id, quantity: 1 });
+	};
 	return (
 		<motion.div
 			initial={{ opacity: 0, x: -20 }}
@@ -26,14 +67,9 @@ export function ProductListItem({ product }: { product: ProductCardDTO }) {
 				) : (
 					<motion.div
 						className="relative w-full h-full"
-						// ELITE MOBILE LOGIC:
-						// Activates color when the row enters the focus zone
 						initial={{ filter: "grayscale(100%)" }}
 						whileInView={{ filter: "grayscale(0%)" }}
-						viewport={{
-							once: false,
-							amount: 0.6, // Trigger when 60% of the row is visible
-						}}
+						viewport={{ once: false, amount: 0.6 }}
 						transition={{ duration: 0.8, ease: "easeOut" }}
 					>
 						<Image
@@ -42,8 +78,6 @@ export function ProductListItem({ product }: { product: ProductCardDTO }) {
 							fill
 							sizes="200px"
 							onError={() => setImgError(true)}
-							// On Desktop: remains grayscale until row hover
-							// On Mobile: controlled by the motion.div proximity filter
 							className="object-contain transition-all duration-700 p-4 md:grayscale md:group-hover/item:grayscale-0"
 						/>
 					</motion.div>
@@ -67,7 +101,7 @@ export function ProductListItem({ product }: { product: ProductCardDTO }) {
 					<h4 className="text-[#F5F5F0] text-2xl font-bold tracking-tighter uppercase group-hover/item:text-[#FFB400] transition-colors line-clamp-1">{product.name}</h4>
 				</Link>
 
-				{/* TECH SPECS */}
+				{/* TECH SPECS: Visible in list view */}
 				<div className="flex flex-wrap gap-x-6 gap-y-2">
 					{product.specs?.slice(0, 3).map((spec, i) => (
 						<div key={i} className="flex items-center gap-2">
@@ -97,10 +131,18 @@ export function ProductListItem({ product }: { product: ProductCardDTO }) {
 				<motion.button
 					whileHover={{ scale: 1.02, backgroundColor: "#FFB400", color: "#0A0E14" }}
 					whileTap={{ scale: 0.98 }}
-					className="group/btn flex items-center justify-center gap-3 px-6 py-4 border border-[#FFB400]/40 text-[#FFB400] rounded-none transition-all flex-1 md:flex-none"
+					onClick={handleAddToCart}
+					disabled={isPending}
+					className="group/btn flex items-center justify-center gap-2 px-6 py-4 border border-[#FFB400]/40 text-[#FFB400] rounded-none transition-all flex-1 md:flex-none disabled:opacity-50 disabled:cursor-wait"
 				>
-					<span className="text-[10px] font-black uppercase tracking-widest">Deploy_Module</span>
-					<Plus size={14} strokeWidth={3} className="group-hover/btn:rotate-90 transition-transform" />
+					<span className="text-[10px] font-black uppercase tracking-widest">{isPending ? "SYNCING_LOG..." : "Deploy_Module"}</span>
+					{isPending ? (
+						<motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }}>
+							<Activity size={14} strokeWidth={3} />
+						</motion.div>
+					) : (
+						<Plus size={14} strokeWidth={3} className="group-hover/btn:rotate-90 transition-transform" />
+					)}
 				</motion.button>
 			</div>
 

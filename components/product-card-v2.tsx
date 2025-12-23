@@ -1,30 +1,67 @@
 "use client";
 
 import { motion } from "motion/react";
-import { Plus, ShieldCheck } from "lucide-react";
+import { Activity, Plus, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import { ProductCardDTO } from "@/app/data/products";
 import Link from "next/link";
-
+import { useAction } from "next-safe-action/hooks";
 import { TechPlaceholder } from "@/components/ui/tech-placeholder";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useCart } from "@/store/useCart";
 import { addToCartAction } from "@/app/actions/cart";
+import { toast } from "sonner";
 
 export function ProductCard({ product }: { product: ProductCardDTO }) {
 	const [imgError, setImgError] = useState(false);
-	const [isPending, startTransition] = useTransition();
 	const coverImage = product.coverImage; // Based on your DTO
-	const openCart = useCart((state) => state.setIsOpen);
 
-	const handleAddToCart = () => {
-		startTransition(async () => {
-			// 1. Call Server Action
-			await addToCartAction(product.id, 1);
+	const addItemOptimistically = useCart((state) => state.addItem);
+	const removeItemOptimistically = useCart((state) => state.removeItem);
 
-			// 2. Open Drawer (Data will be fresh because action revalidated!)
-			openCart(true);
-		});
+	const { executeAsync: executeAddToCart, isPending } = useAction(addToCartAction, {
+		onError({ error }) {
+			// 1. NETWORK / SERVER TIMEOUT
+			if (error.serverError) {
+				toast.error("SIGNAL_INTERRUPT: TRANSMISSION_FAILED", {
+					description: `NODE: BBL_ALPHA // DATA_STREAM_TIMEOUT // ERR_0x60_SYNC`,
+					icon: <Activity className="text-red-500" size={16} />,
+				});
+			}
+
+			// 2. UNEXPECTED LOGIC CRASH
+			if (error.thrownError) {
+				toast.error("SYSTEM_CRITICAL: CALCULATION_ERROR", {
+					description: `SECTOR: 32_NORTH // LOGIC_OVERFLOW // TRACE: ${product.sku || "UNK"}`,
+					icon: <Activity className="text-red-500" size={16} />,
+				});
+			}
+
+			// 3. VALIDATION (e.g. Stock limitations)
+			if (error.validationErrors) {
+				toast.error("PROTOCOL_REJECTED: VALIDATION_FAILURE", {
+					description: "MANIFEST_ENTRY_INVALID // CHECK_UNIT_PARAMETERS",
+					icon: <Activity className="text-red-500" size={16} />,
+				});
+			}
+
+			// Revert UI on failure
+			removeItemOptimistically(product.id);
+		},
+		onSuccess() {
+			toast.success("PROTOCOL: DEPLOYMENT_SUCCESS", {
+				description: `MODULE: ${product.name.toUpperCase()} // SYNCED_TO_MANIFEST`,
+				icon: <ShieldCheck className="text-[#FFB400]" size={16} />,
+			});
+		},
+	});
+
+	const handleAddToCart = async () => {
+		// 1. Instant UI Update (Optimistic)
+		addItemOptimistically(product); // Pass the ProductCardDTO directly!
+
+		// 2. Server Action (Background)
+		await executeAddToCart({ productId: product.id, quantity: 1 });
 	};
 
 	return (
@@ -128,10 +165,16 @@ export function ProductCard({ product }: { product: ProductCardDTO }) {
 						whileTap={{ scale: 0.98 }}
 						onClick={handleAddToCart}
 						disabled={isPending}
-						className="group/btn flex items-center justify-center gap-2 px-2 sm:px-4 py-3 sm:py-3 border border-[#FFB400]/40 text-[#FFB400] rounded-none transition-all w-full sm:w-auto"
+						className="group/btn flex items-center justify-center gap-2 px-2 sm:px-4 py-3 sm:py-3 border border-[#FFB400]/40 text-[#FFB400] rounded-none transition-all w-full sm:w-auto disabled:opacity-50 disabled:cursor-wait"
 					>
-						<span className="text-[10px] font-black uppercase tracking-widest">{isPending ? "Syncing..." : "Add_To_Manifest"}</span>
-						<Plus size={14} strokeWidth={3} className="group-hover/btn:rotate-90 transition-transform" />
+						<span className="text-[10px] font-black uppercase tracking-widest">{isPending ? "INITIALIZING_SYNC..." : "Add_To_Manifest"}</span>
+						{isPending ? (
+							<motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }}>
+								<Activity size={14} strokeWidth={3} />
+							</motion.div>
+						) : (
+							<Plus size={14} strokeWidth={3} className="group-hover:btn:rotate-90 transition-transform" />
+						)}
 					</motion.button>
 				</div>
 			</div>

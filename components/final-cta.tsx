@@ -3,6 +3,7 @@
 
 import { motion } from "motion/react";
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export function FinalCTA() {
 	return (
@@ -23,9 +24,11 @@ export function FinalCTA() {
 					whileTap={{ scale: 0.95 }}
 					className="group relative px-12 py-8 bg-[#FFB400] text-[#0A0E14] font-black text-xl uppercase tracking-[0.2em] overflow-hidden shadow-[0_0_50px_rgba(255,180,0,0.1)] hover:shadow-[0_0_80px_rgba(255,180,0,0.4)] transition-all duration-500 rounded-none"
 				>
-					<span className="relative z-20 flex items-center gap-4">
-						Initialize Assembly <ArrowRight size={24} strokeWidth={3} className="group-hover:translate-x-2 transition-transform duration-300" />
-					</span>
+					<Link href={"/products"}>
+						<span className="relative z-20 flex items-center gap-4">
+							Initialize Assembly <ArrowRight size={24} strokeWidth={3} className="group-hover:translate-x-2 transition-transform duration-300" />
+						</span>
+					</Link>
 
 					<div className="absolute inset-0 z-10 pointer-events-none overflow-hidden">
 						<div className="absolute top-0 -inset-full h-full w-1/2 z-10 block transform -skew-x-30 bg-linear-to-r from-transparent via-white/40 to-transparent -translate-x-[150%] group-hover:translate-x-[250%] transition-transform duration-1000 ease-in-out" />
