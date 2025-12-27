@@ -1,6 +1,7 @@
 import { CartWithItemsDTO } from "@/app/data/cart";
 import { ProductCardDTO } from "@/app/data/products";
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 type CartItem = CartWithItemsDTO["items"][0];
 export interface CartState {
@@ -14,8 +15,7 @@ export interface CartState {
 	syncCart: (items: CartItem[]) => void; //down stream sync, server -> client only!
 
 	// 2. OPTIMISTIC ADD: We predict the future
-	addItem: (product: ProductCardDTO) => void;
-
+	addItem: (product: ProductCardDTO, quantity?: number, isReplace?: boolean) => void;
 	// 3. OPTIMISTIC REMOVE/UPDATE (For +/- buttons)
 	updateQuantity: (productId: number, quantity: number) => void;
 	removeItem: (productId: number) => void;
@@ -25,39 +25,42 @@ export const useCart = create<CartState>((set) => ({
 	isOpen: false,
 	items: [],
 	setIsOpen: (val) => set({ isOpen: val }),
-	addItem: (product) =>
+	addItem: (product, quantity = 1, isReplace = false) =>
 		set((state) => {
 			const existingItem = state.items.find((i) => i.productId === product.id);
 
 			if (existingItem) {
 				return {
-					items: state.items.map((i) => (i.productId === product.id ? { ...i, quantity: i.quantity + 1 } : i)),
+					items: state.items.map((i) =>
+						i.productId === product.id
+							? {
+									...i,
+									// If isReplace is true (PDP mode), we set the value.
+									// If false (Product Card mode), we increment.
+									quantity: isReplace ? quantity : i.quantity + quantity,
+							  }
+							: i
+					),
 					isOpen: true,
 				};
 			}
 
-			// C. If new, create a "Mock" CartItem
-			// We fill missing fields (like category ID) with dummy data
-			// The Server Sync will replace this with real data milliseconds later.
+			// Optimistic ID using timestamp to avoid collisions
+			const optimisticId = Date.now();
+
 			const newItem: CartItem = {
-				id: Math.random(),
-				cartId: "optimistic",
+				id: optimisticId,
+				cartId: "optimistic_session",
 				productId: product.id,
-				quantity: 1,
+				quantity: quantity,
 				product: {
-					id: product.id,
-					brand: "base 60",
-					images: product.images,
-					name: product.name,
-					price: product.price,
-					slug: product.slug,
+					...product, // Spreading the DTO keeps it clean
+					brand: "BASE_60", // Hardcoded or from DTO
 					stock: 100,
-					originalPrice: product.originalPrice ?? null,
+					// Mock the relations for the UI
 					category: {
-						id: product.category.id,
+						...product.category,
 						arabicName: null,
-						name: product.category.name,
-						slug: product.category.slug,
 						gridDisplay: "small",
 						createdAt: new Date(),
 						updatedAt: new Date(),
@@ -72,6 +75,7 @@ export const useCart = create<CartState>((set) => ({
 				isOpen: true,
 			};
 		}),
+
 	removeItem: (productId) => {
 		set((state) => ({
 			items: state.items.filter((i) => i.productId !== productId),

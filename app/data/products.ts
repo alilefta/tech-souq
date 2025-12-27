@@ -22,12 +22,12 @@ export interface ProductCardDTO {
 	id: number;
 	name: string;
 	price: number;
-	originalPrice?: number;
+	originalPrice: number | null;
 	images: string[];
 	slug: string;
 	category: ProductCategory;
-	rating: number;
-	reviews: number;
+	rating?: number;
+	reviews?: number;
 	coverImage: string | null;
 	specs: ProductSpecs[];
 	sku?: string;
@@ -52,6 +52,7 @@ export interface ProductDetailsDTO {
 	isNew: boolean;
 	isFeatured: boolean;
 	category: ProductCategory;
+	stock?: number;
 }
 
 export async function getAllProducts() {
@@ -478,12 +479,12 @@ export function ProductToCardDTOMapper(
 		id: p.id!,
 		name: p.name!,
 		price: Number(p.price),
-		originalPrice: p.originalPrice ? Number(p.originalPrice) : Number(p.price),
+		originalPrice: p.originalPrice ? Number(p.originalPrice) : null,
 		slug: p.slug!,
 		category: p.category,
 		images: p.images!,
-		rating: DEV_RATING,
-		reviews: DEV_REVIEWS,
+		rating: p.averageRating,
+		reviews: p.reviewCount,
 		coverImage: p.images && p.images.length > 0 ? p.images[0] : null,
 		specs: p.specs,
 		sku: p.sku,
@@ -513,5 +514,6 @@ export function ProductToDetailsDTOMapper(
 		sku: p.sku ?? "",
 		specs: p.specs,
 		category: p.category,
+		stock: p.stock,
 	};
 }

@@ -1,9 +1,8 @@
 import { Globe, ShieldCheck, Star, Zap } from "lucide-react";
 import { ProductGallery } from "./product-gallery";
-import { QuantitySelector } from "./quantity-selector";
-import { AddToCartButton } from "./add-to-cart-button";
 import { ProductDetailsDTO } from "@/app/data/products";
 import Link from "next/link";
+import { AddToCartWithQTY } from "./add-to-cart-with-qty";
 
 export function ProductDetailsUI({ product }: { product: ProductDetailsDTO }) {
 	return (
@@ -21,7 +20,7 @@ export function ProductDetailsUI({ product }: { product: ProductDetailsDTO }) {
 							<Link href={`/categories/${product.category.slug}`}>
 								<span className="text-[#FFB400] text-[10px] font-black uppercase tracking-[0.3em]">{product.category.name}</span>
 							</Link>
-							<div className="h-[1px] w-6 bg-[#FFB400]/30" />
+							<div className="h-px w-6 bg-[#FFB400]/30" />
 							<span className="text-[#94A3B8] text-[10px] font-mono opacity-60">ID://{product.sku}</span>
 						</div>
 						{/* RATING DISPLAY */}
@@ -63,7 +62,7 @@ export function ProductDetailsUI({ product }: { product: ProductDetailsDTO }) {
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
 					{product.specs && product.specs.length > 0 ? (
 						product.specs.map((spec) => (
-							<div key={spec.id} className="p-4 border border-white/5 bg-white/[0.02] rounded-sm flex flex-col justify-center">
+							<div key={spec.id} className="p-4 border border-white/5 bg-white/2 rounded-sm flex flex-col justify-center">
 								<p className="text-[#94A3B8] text-[8px] font-black uppercase tracking-[0.2em] mb-1 opacity-50">{spec.label}</p>
 								<p className="text-[#F5F5F0] text-sm font-bold tracking-tight">{spec.value}</p>
 							</div>
@@ -76,10 +75,7 @@ export function ProductDetailsUI({ product }: { product: ProductDetailsDTO }) {
 				</div>
 
 				{/* 3. INTERACTIVE ISLANDS */}
-				<div className="flex flex-col sm:flex-row gap-4 mb-12">
-					<QuantitySelector />
-					<AddToCartButton product={product} />
-				</div>
+				<AddToCartWithQTY productDetails={product} />
 
 				{/* 4. TECHNICAL FOOTER (Static Trust) */}
 				<div className="grid grid-cols-3 gap-6 border-t border-white/5 pt-10">
