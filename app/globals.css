@@ -171,6 +171,49 @@
 	body {
 		@apply bg-background text-foreground;
 	}
+
+	input:-webkit-autofill,
+	input:-webkit-autofill:hover,
+	input:-webkit-autofill:focus,
+	input:-webkit-autofill:active {
+		/* This replaces the background with your midnight color (#0A0E14) */
+		-webkit-box-shadow: 0 0 0 1000px #0a0e14 inset !important;
+
+		/* This forces the text color back to your Sand White (#F5F5F0) */
+		-webkit-text-fill-color: #f5f5f0 !important;
+
+		/* Keeps the font consistent */
+		font-family: inherit !important;
+
+		/* Smooth transition to prevent flickering */
+		transition: background-color 5000s ease-in-out 0s;
+
+		border: 1px solid #0a0e14;
+	}
+
+	/* Optional: Make the caret (cursor) Amber to match the brand */
+	input {
+		caret-color: #ffb400;
+	}
+}
+
+@utility no-spinner {
+	&::-webkit-outer-spin-button,
+	&::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+
+	/* Hide arrows in Firefox */
+	& {
+		-moz-appearance: textfield;
+		appearance: none;
+	}
+}
+
+@utility grid-bg {
+	background-image: radial-gradient(#ffb400 0.5px, transparent 0.5px);
+	background-size: 10px 10px;
 }
 
 @utility spin-slow {

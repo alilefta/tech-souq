@@ -1,36 +1,94 @@
 // components/checkout/logistics-form.tsx
 "use client";
 
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { ArrowRight, CreditCard, Landmark, ShieldCheck, Wallet } from "lucide-react";
-import { motion } from "motion/react";
+import { ArrowRight, CreditCard, Landmark, ShieldCheck, Wallet, Lock, Terminal } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react"; // Added AnimatePresence
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import z from "zod/v4";
+import { z } from "zod";
 import { toast } from "sonner";
 import { InputWithLabel } from "../ui/inputs/InputWithLabel";
 import { countries } from "@/lib/data/countries";
 import { ComboboxWithLabel } from "../ui/inputs/ComboboxWithLabel";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { FieldError, FieldSet } from "../ui/field";
+import { ReactNode } from "react";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 const CheckoutFormSchema = z.object({
-	firstName: z.string(),
-	lastName: z.string(),
-	email: z.string(),
-	phoneNumber: z.string(),
-	country: z.string(),
-	city: z.string(),
-	address: z.string(),
-	zipCode: z.number("Zip/Post Code is required."),
-	cardNumber: z.string(),
-	expireDate: z.date(),
-	cvv: z.string(),
+	firstName: z.string().min(1, "Required"),
+	lastName: z.string().min(1, "Required"),
+	email: z.email(),
+	phoneNumber: z
+		.string()
+		.min(1, "Required")
+		.refine(
+			(val) => {
+				// We parse the number. If no country is provided, it checks global formats.
+				const phoneNumber = parsePhoneNumberFromString(val);
+				return phoneNumber?.isValid();
+			},
+			{
+				message: "INVALID_SIGNAL_FORMAT // CHECK_COMM_LINE",
+			}
+		),
+	country: z.string().min(1, "Required"),
+	city: z.string().min(1, "Required"),
+	address: z.string().min(1, "Required"),
+	zipCode: z.preprocess<string, z.core.SomeType>(
+		(val) => String(val),
+		z
+			.string()
+			.regex(/^\d{5}(-\d{4})?$/, "Invalid ZIP code format")
+			.transform((v) => {
+				const n = Number(v);
+				if (n < 1) throw new Error("Zip/Post Code is required");
+				return n;
+			})
+	),
+
+	// Payment fields are optional based on method in a real app,
+	// but for MVP we keep them simple.
+	// In a pro app, use .refine() to make them required only if payment_method === 'card'
+	cardNumber: z.string().optional(),
+	expireDate: z.string().optional(),
+	cvv: z.string().optional(),
+
+	payment_method: z.enum(["card", "paypal", "wire"]),
 });
+
+type PaymentMethod = {
+	label: string;
+	value: "card" | "paypal" | "wire";
+	icon: ReactNode;
+	subtitle: string;
+};
+
+const paymentMethods: PaymentMethod[] = [
+	{
+		label: "Card_Gateway",
+		value: "card",
+		subtitle: "Visa // Mastercard",
+		icon: <CreditCard size={20} className="text-[#94A3B8] group-hover:text-[#FFB400] transition-colors" />,
+	},
+	{
+		label: "PayPal_Node",
+		value: "paypal",
+		subtitle: "Global_Wallet_Sync",
+		icon: <Wallet size={20} className="text-[#94A3B8] group-hover:text-[#FFB400] transition-colors" />,
+	},
+	{
+		label: "Wire_Transfer",
+		value: "wire",
+		subtitle: "Babylon_Direct_Log",
+		icon: <Landmark size={20} className="text-[#94A3B8] group-hover:text-[#FFB400] transition-colors" />,
+	},
+];
 
 type CheckoutFormSchemaType = z.infer<typeof CheckoutFormSchema>;
 
 export function LogisticsForm() {
-	const { handleSubmit, control } = useForm<CheckoutFormSchemaType>({
+	const { handleSubmit, control, watch, formState } = useForm<CheckoutFormSchemaType>({
 		resolver: zodResolver(CheckoutFormSchema),
 		defaultValues: {
 			firstName: "",
@@ -40,29 +98,24 @@ export function LogisticsForm() {
 			country: "",
 			address: "",
 			phoneNumber: "",
-			zipCode: 0,
+			zipCode: 12345,
 			cardNumber: "",
 			cvv: "",
-			expireDate: new Date(),
+			expireDate: "",
+			payment_method: "card",
 		},
 		mode: "onBlur",
 	});
 
+	const selectedMethod = watch("payment_method");
+
 	function onSubmit(data: CheckoutFormSchemaType) {
-		toast("You submitted the following values:", {
-			description: (
-				<pre className="bg-code text-code-foreground mt-2 w-[320px] overflow-x-auto rounded-md p-4">
-					<code>{JSON.stringify(data, null, 2)}</code>
-				</pre>
-			),
-			position: "bottom-right",
-			classNames: {
-				content: "flex flex-col gap-2",
-			},
-			style: {
-				"--border-radius": "calc(var(--radius)  + 4px)",
-			} as React.CSSProperties,
+		// In real app: createOrder(data)
+		toast.success("PAYLOAD_ENCRYPTED", {
+			description: "Transmitting manifest to secure node...",
+			icon: <Lock className="text-[#FFB400]" size={16} />,
 		});
+		console.log(data);
 	}
 
 	return (
@@ -78,213 +131,228 @@ export function LogisticsForm() {
 						<Controller
 							name="firstName"
 							control={control}
-							render={({ field, fieldState }) => (
-								<InputWithLabel<CheckoutFormSchemaType> field={field} fieldState={fieldState} nameInSchema="firstName" fieldTitle={"first_name"} placeholder={"REQUIRED"} />
-							)}
+							render={({ field, fieldState }) => <InputWithLabel field={field} fieldState={fieldState} nameInSchema="firstName" fieldTitle="first_name" placeholder="REQUIRED" />}
 						/>
 						<Controller
 							name="lastName"
 							control={control}
-							render={({ field, fieldState }) => (
-								<InputWithLabel<CheckoutFormSchemaType> field={field} fieldState={fieldState} nameInSchema="lastName" fieldTitle={"last_name"} placeholder={"REQUIRED"} />
-							)}
+							render={({ field, fieldState }) => <InputWithLabel field={field} fieldState={fieldState} nameInSchema="lastName" fieldTitle="last_name" placeholder="REQUIRED" />}
 						/>
 						<Controller
 							name="email"
 							control={control}
-							render={({ field, fieldState }) => (
-								<InputWithLabel<CheckoutFormSchemaType> field={field} fieldState={fieldState} nameInSchema="email" fieldTitle={"contact_email"} placeholder={"SIGNAL_ADDRESS"} />
-							)}
+							render={({ field, fieldState }) => <InputWithLabel field={field} fieldState={fieldState} nameInSchema="email" fieldTitle="contact_email" placeholder="SIGNAL_ADDRESS" />}
 						/>
 						<Controller
 							name="phoneNumber"
 							control={control}
 							render={({ field, fieldState }) => (
-								<InputWithLabel<CheckoutFormSchemaType>
-									field={field}
-									fieldState={fieldState}
-									nameInSchema="phoneNumber"
-									fieldTitle={"Comm_Line (Phone)"}
-									placeholder={"+000 000 000"}
-								/>
+								<InputWithLabel field={field} fieldState={fieldState} nameInSchema="phoneNumber" fieldTitle="Comm_Line (Phone)" placeholder="+000 000 000" />
 							)}
 						/>
 					</div>
 				</div>
 
-				{/* 02. GEOSPATIAL COORDINATES (Address) */}
+				{/* 02. GEOSPATIAL COORDINATES */}
 				<div className="space-y-8">
 					<div className="flex items-center gap-4 border-l-2 border-[#FFB400] pl-4">
 						<h3 className="text-[#F5F5F0] text-xl font-black uppercase tracking-tighter">02. Destination_Node</h3>
 					</div>
 
 					<div className="grid grid-cols-1 md:grid-cols-6 gap-6">
-						{/* Country - Spans full width on mobile, half on desktop */}
 						<Controller
 							name="country"
 							control={control}
 							render={({ field, fieldState }) => (
-								<ComboboxWithLabel<CheckoutFormSchemaType>
+								<ComboboxWithLabel
 									field={field}
 									data={countries}
 									fieldState={fieldState}
 									nameInSchema="country"
-									fieldTitle={"Global_Sector (Country)"}
+									fieldTitle="Global_Sector (Country)"
 									containerClassName="md:col-span-3 space-y-2"
-									placeholder={"SELECT_COUNTRY"}
+									placeholder="SELECT_COUNTRY"
 								/>
 							)}
 						/>
-
-						{/* City */}
 						<Controller
 							name="city"
 							control={control}
 							render={({ field, fieldState }) => (
-								<InputWithLabel<CheckoutFormSchemaType>
+								<InputWithLabel
 									field={field}
 									fieldState={fieldState}
 									nameInSchema="city"
-									fieldTitle={"Hub_Destination (City)"}
+									fieldTitle="Hub_Destination (City)"
 									containerClassName="md:col-span-3 space-y-2"
-									placeholder={"ENTER_CITY"}
+									placeholder="ENTER_CITY"
 								/>
 							)}
 						/>
-
-						{/* Street Address */}
 						<Controller
 							name="address"
 							control={control}
 							render={({ field, fieldState }) => (
-								<InputWithLabel<CheckoutFormSchemaType>
+								<InputWithLabel
 									field={field}
 									fieldState={fieldState}
 									nameInSchema="address"
-									fieldTitle={"Coordinate_String (Address)"}
+									fieldTitle="Coordinate_String (Address)"
 									containerClassName="md:col-span-4 space-y-2"
-									placeholder={"STREET_NAME_AND_UNIT"}
+									placeholder="STREET_NAME_AND_UNIT"
 								/>
 							)}
 						/>
-
-						{/* Zip Code */}
 						<Controller
 							name="zipCode"
 							control={control}
 							render={({ field, fieldState }) => (
-								<InputWithLabel<CheckoutFormSchemaType>
+								<InputWithLabel
 									field={field}
 									fieldState={fieldState}
+									onChange={(e) => {
+										const v = e.currentTarget.value;
+										field.onChange(Number(v));
+									}}
 									nameInSchema="zipCode"
-									fieldTitle={"Routing_Index (Zip)"}
+									fieldTitle="Routing_Index (Zip)"
 									containerClassName="md:col-span-2"
-									placeholder={"000000"}
+									placeholder="000000"
+									type="number"
 								/>
 							)}
 						/>
 					</div>
 				</div>
 
-				{/* 03. TRANSFER PROTOCOL (Payment Selection) */}
+				{/* 03. TRANSFER PROTOCOL */}
 				<div className="space-y-8">
 					<div className="flex items-center gap-4 border-l-2 border-[#FFB400] pl-4">
 						<h3 className="text-[#F5F5F0] text-xl font-black uppercase tracking-tighter">03. Transfer_Protocol</h3>
 					</div>
 
-					<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-						{/* OPTION A: CREDIT/DEBIT CARD */}
-						<label className="relative group cursor-pointer">
-							<input type="radio" name="payment" className="sr-only peer" defaultChecked />
-							<div className="h-full p-6 border border-white/10 bg-white/2 transition-all peer-checked:border-[#FFB400] peer-checked:bg-[#FFB400]/5 group-hover:border-white/20">
-								<div className="flex flex-col gap-4">
-									<div className="flex justify-between items-start">
-										<CreditCard size={20} className="text-[#94A3B8] group-hover:text-[#FFB400] transition-colors" />
-										<div className="flex gap-1">
-											<div className="w-6 h-4 bg-white/10 rounded-[2px]" /> {/* Mini Visa Icon Placeholder */}
-											<div className="w-6 h-4 bg-white/10 rounded-[2px]" /> {/* Mini MC Icon Placeholder */}
+					<Controller
+						name="payment_method"
+						control={control}
+						render={({ field, fieldState }) => (
+							<FieldSet>
+								<RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+									{paymentMethods.map((method) => (
+										<label
+											key={method.value}
+											className={`relative group cursor-pointer h-full p-6 border bg-white/2 transition-all hover:border-white/20 ${
+												field.value === method.value ? "border-[#FFB400] bg-[#FFB400]/5" : "border-white/10"
+											}`}
+										>
+											<RadioGroupItem value={method.value} id={`pg_${method.value}`} className="sr-only" />
+											<div className="flex flex-col gap-4">
+												<div className="flex justify-between items-start">
+													{method.icon}
+													{/* Selection Dot */}
+													<div
+														className={`w-1.5 h-1.5 rounded-full bg-[#FFB400] shadow-[0_0_8px_#FFB400] transition-opacity ${
+															field.value === method.value ? "opacity-100" : "opacity-0"
+														}`}
+													/>
+												</div>
+												<div>
+													<p className="text-[#F5F5F0] text-[10px] font-black uppercase tracking-widest">{method.label}</p>
+													<p className="text-[#94A3B8] text-[8px] font-mono mt-1 opacity-50">{method.subtitle}</p>
+												</div>
+											</div>
+										</label>
+									))}
+								</RadioGroup>
+								{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+							</FieldSet>
+						)}
+					/>
+
+					{/* DYNAMIC VIEWPORT BASED ON SELECTION */}
+					<div className="relative mt-8">
+						<AnimatePresence mode="wait">
+							{selectedMethod === "card" ? (
+								<motion.div
+									key="card-fields"
+									initial={{ opacity: 0, y: 10 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, y: -10 }}
+									className="p-8 border border-white/5 bg-white/1 relative overflow-hidden"
+								>
+									{/* Grid Background */}
+									<div className="absolute inset-0 opacity-[0.1] pointer-events-none grid-bg" />
+
+									<div className="relative z-10 space-y-6">
+										<div className="flex items-center gap-2 mb-4">
+											<div className="w-1 h-1 bg-[#FFB400] rounded-full animate-pulse" />
+											<span className="text-[9px] font-mono text-[#94A3B8] uppercase tracking-widest">Secure_Gateway_Initialized</span>
+										</div>
+
+										<div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+											<Controller
+												name="cardNumber"
+												control={control}
+												render={({ field, fieldState }) => (
+													<InputWithLabel<CheckoutFormSchemaType>
+														field={field}
+														fieldState={fieldState}
+														nameInSchema="cardNumber"
+														fieldTitle="Card_Sequence"
+														placeholder="0000 0000 0000 0000"
+														containerClassName="md:col-span-4"
+													/>
+												)}
+											/>
+											<Controller
+												name="expireDate"
+												control={control}
+												render={({ field, fieldState }) => (
+													<InputWithLabel<CheckoutFormSchemaType>
+														field={field}
+														fieldState={fieldState}
+														nameInSchema="expireDate"
+														fieldTitle="Expiry_Data"
+														placeholder="MM / YY"
+														containerClassName="md:col-span-2"
+													/>
+												)}
+											/>
+											<Controller
+												name="cvv"
+												control={control}
+												render={({ field, fieldState }) => (
+													<InputWithLabel<CheckoutFormSchemaType>
+														field={field}
+														fieldState={fieldState}
+														nameInSchema="cvv"
+														fieldTitle="Security_Bit"
+														placeholder="***"
+														containerClassName="md:col-span-2"
+													/>
+												)}
+											/>
 										</div>
 									</div>
+								</motion.div>
+							) : (
+								<motion.div
+									key="other-fields"
+									initial={{ opacity: 0, y: 10 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, y: -10 }}
+									className="p-12 border border-white/5 bg-white/1 flex flex-col items-center justify-center text-center gap-4"
+								>
+									<Terminal size={32} className="text-[#94A3B8] opacity-20" />
 									<div>
-										<p className="text-[#F5F5F0] text-[10px] font-black uppercase tracking-widest">Card_Gateway</p>
-										<p className="text-[#94A3B8] text-[8px] font-mono mt-1 opacity-50 underline">Visa // Mastercard</p>
+										<p className="text-[#F5F5F0] text-xs font-black uppercase tracking-widest">Protocol_Pending</p>
+										<p className="text-[#94A3B8] text-[10px] font-mono mt-2 opacity-50">
+											The {selectedMethod.toUpperCase()} node is currently undergoing synchronization. <br />
+											Please select Card_Gateway for immediate authorization.
+										</p>
 									</div>
-								</div>
-								{/* Selection Indicator */}
-								<div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#FFB400] opacity-0 peer-checked:opacity-100 shadow-[0_0_8px_#FFB400]" />
-							</div>
-						</label>
-
-						{/* OPTION B: PAYPAL */}
-						<label className="relative group cursor-pointer">
-							<input type="radio" name="payment" className="sr-only peer" />
-							<div className="h-full p-6 border border-white/10 bg-white/2 transition-all peer-checked:border-[#FFB400] peer-checked:bg-[#FFB400]/5 group-hover:border-white/20">
-								<div className="flex flex-col gap-4">
-									<div className="flex justify-between items-start">
-										<Wallet size={20} className="text-[#94A3B8] group-hover:text-[#FFB400] transition-colors" />
-										<div className="w-6 h-4 bg-white/10 rounded-[2px]" /> {/* Mini PayPal Icon Placeholder */}
-									</div>
-									<div>
-										<p className="text-[#F5F5F0] text-[10px] font-black uppercase tracking-widest">PayPal_Node</p>
-										<p className="text-[#94A3B8] text-[8px] font-mono mt-1 opacity-50">Global_Wallet_Sync</p>
-									</div>
-								</div>
-								<div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#FFB400] opacity-0 peer-checked:opacity-100 shadow-[0_0_8px_#FFB400]" />
-							</div>
-						</label>
-
-						{/* OPTION C: BANK TRANSFER (Elite/Professional Option) */}
-						<label className="relative group cursor-pointer">
-							<input type="radio" name="payment" className="sr-only peer" />
-							<div className="h-full p-6 border border-white/10 bg-white/[0.02] transition-all peer-checked:border-[#FFB400] peer-checked:bg-[#FFB400]/5 group-hover:border-white/20">
-								<div className="flex flex-col gap-4">
-									<div className="flex justify-between items-start">
-										<Landmark size={20} className="text-[#94A3B8] group-hover:text-[#FFB400] transition-colors" />
-										<span className="text-[8px] font-mono text-[#FFB400]">PRO_ONLY</span>
-									</div>
-									<div>
-										<p className="text-[#F5F5F0] text-[10px] font-black uppercase tracking-widest">Wire_Transfer</p>
-										<p className="text-[#94A3B8] text-[8px] font-mono mt-1 opacity-50">Babylon_Direct_Log</p>
-									</div>
-								</div>
-								<div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#FFB400] opacity-0 peer-checked:opacity-100 shadow-[0_0_8px_#FFB400]" />
-							</div>
-						</label>
-					</div>
-
-					{/* DYNAMIC CARD INPUT AREA (Appears when Card Gateway is selected) */}
-					<div className="p-8 border border-white/5 bg-white/[0.01] relative overflow-hidden">
-						{/* Technical Grid Background */}
-						<div
-							className="absolute inset-0 opacity-[0.02] pointer-events-none"
-							style={{ backgroundImage: "radial-gradient(#FFB400 0.5px, transparent 0.5px)", backgroundSize: "10px 10px" }}
-						/>
-
-						<div className="relative z-10 space-y-6">
-							<div className="flex items-center gap-2 mb-4">
-								<div className="w-1 h-1 bg-[#FFB400] rounded-full animate-pulse" />
-								<span className="text-[9px] font-mono text-[#94A3B8] uppercase tracking-widest">Secure_Gateway_Initialized</span>
-							</div>
-
-							{/* 
-                PRO TIP: In a real app, you would render 
-                Stripe CardElement or your payment fields here 
-            */}
-							<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-								<div className="md:col-span-4 space-y-2">
-									<Label className="text-[8px] font-black uppercase text-[#94A3B8] tracking-widest">Card_Number_Sequence</Label>
-									<Input className="rounded-none bg-[#0A0E14] border-white/10 h-10 font-mono text-xs" placeholder="0000 0000 0000 0000" />
-								</div>
-								<div className="md:col-span-2 space-y-2">
-									<Label className="text-[8px] font-black uppercase text-[#94A3B8] tracking-widest">Expiry_Data</Label>
-									<Input className="rounded-none bg-[#0A0E14] border-white/10 h-10 font-mono text-xs" placeholder="MM / YY" />
-								</div>
-								<div className="md:col-span-2 space-y-2">
-									<Label className="text-[8px] font-black uppercase text-[#94A3B8] tracking-widest">Security_Bit (CVV)</Label>
-									<Input className="rounded-none bg-[#0A0E14] border-white/10 h-10 font-mono text-xs" placeholder="***" />
-								</div>
-							</div>
-						</div>
+								</motion.div>
+							)}
+						</AnimatePresence>
 					</div>
 				</div>
 
@@ -300,13 +368,13 @@ export function LogisticsForm() {
 						whileTap={{ scale: 0.99 }}
 						type="submit"
 						form="checkout-form"
-						className="group relative w-full bg-[#FFB400] text-[#0A0E14] font-black text-sm uppercase tracking-[0.4em] py-8 flex items-center justify-center gap-4 overflow-hidden transition-all shadow-[0_0_50px_rgba(255,180,0,0.1)] hover:shadow-[0_0_80px_rgba(255,180,0,0.3)]"
+						disabled={formState.isSubmitting}
+						className="group relative w-full bg-[#FFB400] text-[#0A0E14] font-black text-sm uppercase tracking-[0.4em] py-8 flex items-center justify-center gap-4 overflow-hidden transition-all shadow-[0_0_50px_rgba(255,180,0,0.1)] hover:shadow-[0_0_80px_rgba(255,180,0,0.3)] disabled:opacity-50 disabled:grayscale"
 					>
 						<span className="relative z-10 flex items-center gap-4">
-							Deploy Order Manifest <ArrowRight size={20} strokeWidth={3} className="group-hover:translate-x-2 transition-transform" />
+							{formState.isSubmitting ? "TRANSMITTING..." : "DEPLOY ORDER MANIFEST"}
+							{!formState.isSubmitting && <ArrowRight size={20} strokeWidth={3} className="group-hover:translate-x-2 transition-transform" />}
 						</span>
-
-						{/* The Signature Kinetic Beam */}
 						<div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
 							<div className="absolute top-0 -inset-full h-full w-1/2 z-10 block transform -skew-x-30 bg-linear-to-r from-transparent via-white/40 to-transparent -translate-x-[150%] group-hover:translate-x-[250%] transition-transform duration-1000 ease-in-out" />
 						</div>

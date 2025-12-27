@@ -12,10 +12,10 @@ export default function AdminDashboard() {
 						<span className="text-[10px] font-black uppercase tracking-[0.4em]">Initialize_Overseer_Protocol</span>
 					</div>
 					<h1 className="text-4xl lg:text-6xl font-black uppercase tracking-tighter">
-						Foundry <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFB400] to-[#FF8C00]">Metrics</span>
+						Foundry <span className="text-transparent bg-clip-text bg-linear-to-r from-[#FFB400] to-[#FF8C00]">Metrics</span>
 					</h1>
 				</div>
-				<div className="flex items-center gap-4 text-[#94A3B8] text-[10px] font-mono border border-white/5 px-4 py-2 bg-white/[0.01]">
+				<div className="flex items-center gap-4 text-[#94A3B8] text-[10px] font-mono border border-white/5 px-4 py-2 bg-white/1">
 					<span className="animate-pulse text-green-500">●</span> SYSTEM_READY_NODE_01 // BABYLON_IRQ
 				</div>
 			</div>
