@@ -3,7 +3,7 @@
 import { useForm, useFieldArray, Controller, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Plus, Trash2, Image as ImageIcon, Activity, Terminal, ShieldCheck } from "lucide-react";
+import { Plus, Trash2, Activity, Terminal, ShieldCheck } from "lucide-react";
 import { InputWithLabel } from "@/components/ui/inputs/InputWithLabel";
 import { ComboboxWithLabel } from "@/components/ui/inputs/ComboboxWithLabel";
 import { TextareaWithLabel } from "@/components/ui/inputs/TextareaWithLabel"; // Custom styled textarea
@@ -29,7 +29,7 @@ export function ModuleDeploymentForm({ rawCategories }: { rawCategories: Categor
 			price: 0,
 			stock: 0,
 			description: "",
-			images: [""],
+			images: [{ url: "" }],
 			specs: [{ label: "Processor", value: "" }],
 			originalPrice: 0,
 		},
@@ -82,7 +82,7 @@ export function ModuleDeploymentForm({ rawCategories }: { rawCategories: Categor
 
 	const onSubmit = async (data: DeploymentData) => {
 		// Check if images are still uploading (blobs present)
-		const hasUnsyncedAssets = data.images.some((img) => img.startsWith("blob:"));
+		const hasUnsyncedAssets = data.images.some((img) => img.url.startsWith("blob:"));
 
 		if (hasUnsyncedAssets) {
 			toast.error("ASYNC_CONFLICT", {
@@ -304,10 +304,10 @@ export function ModuleDeploymentForm({ rawCategories }: { rawCategories: Categor
 
 							<button
 								type="submit"
-								disabled={!isValid}
+								disabled={!isValid || isExecuting}
 								className="w-full py-5 bg-[#FFB400] text-[#0A0E14] font-black text-xs uppercase tracking-[0.2em] shadow-2xl hover:bg-white transition-all disabled:opacity-20 disabled:grayscale"
 							>
-								Initialize_Deployment
+								{isExecuting ? "Initializing..." : "Initialize_Deployment"}
 							</button>
 						</div>
 					</div>

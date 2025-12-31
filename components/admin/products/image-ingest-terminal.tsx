@@ -2,21 +2,25 @@
 
 import { useCallback } from "react";
 import { useDropzone, FileRejection } from "react-dropzone";
-import { Control, useFieldArray, Controller, useFormContext, FieldValues, FieldPath } from "react-hook-form";
-import { Plus, Trash2, Image as ImageIcon, Link as LinkIcon, Activity, Loader2 } from "lucide-react";
+import { Control, useFieldArray, Controller, useFormContext } from "react-hook-form";
+import { Plus, Trash2, Link as LinkIcon, Activity, Loader2 } from "lucide-react";
 import { SafeImage } from "@/components/ui/safe-image";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useUploadThing } from "@/utils/uploadthing";
+import { addProductSchema } from "@/lib/schemas/product";
+import z from "zod";
+
+type DeploymentData = z.infer<typeof addProductSchema>;
 
 interface ImageIngestProps {
-	control: Control<any>;
+	control: Control<DeploymentData>;
 }
 
 export function ImageIngestTerminal({ control }: ImageIngestProps) {
-	const { setValue, getValues } = useFormContext<S>(); // To update the final URLs
+	const { setValue, getValues } = useFormContext<DeploymentData>(); // To update the final URLs
 	const { fields, append, remove, update } = useFieldArray({ control, name: "images" });
 
 	// 1. UPLOADTHING LOGIC
@@ -29,17 +33,23 @@ export function ImageIngestTerminal({ control }: ImageIngestProps) {
 
 			// REPLACE BLOBs WITH REAL URLs
 			// We find the blob URLs in the current form state and swap them
-			const currentImages = getValues("images") as string[];
-			const updatedImages = [...currentImages];
+			const currentImages = getValues("images");
 
-			res.forEach((file) => {
-				// Find the first occurrence of a blob or empty slot to replace
-				// Or more simply: replace the ones that were just added
-				const index = updatedImages.findIndex((img) => img.startsWith("blob:") || img === "");
-				if (index !== -1) updatedImages[index] = file.url;
+			let replaceCount = 0;
+
+			const nextImages = currentImages.map((img) => {
+				// If this slot is a blob AND we still have uploaded files to assign...
+				if ((img.url.startsWith("blob:") || img.url === "") && replaceCount < res.length) {
+					const newUrl = res[replaceCount].ufsUrl;
+					replaceCount++;
+					return {
+						url: newUrl,
+					};
+				}
+				return img;
 			});
 
-			setValue("images", updatedImages);
+			setValue("images", nextImages);
 		},
 		onUploadError: (error) => {
 			toast.error("UPLOADER_TERMINATED", {
@@ -56,7 +66,7 @@ export function ImageIngestTerminal({ control }: ImageIngestProps) {
 				const previews = acceptedFiles.map((file) => URL.createObjectURL(file));
 
 				// B. Add to Form State immediately
-				previews.forEach((url) => append(url));
+				previews.forEach((url) => append({ url }));
 
 				toast.info("INGESTION_STARTED", {
 					description: `INITIALIZING_TRANSFER_FOR_${acceptedFiles.length}_UNITS`,
@@ -108,7 +118,7 @@ export function ImageIngestTerminal({ control }: ImageIngestProps) {
 
 				<AnimatePresence initial={false}>
 					{fields.map((field, index) => {
-						const isBlob = (field as any).value?.startsWith("blob:");
+						const isBlob = field.id?.startsWith("blob:");
 
 						return (
 							<motion.div
@@ -131,7 +141,7 @@ export function ImageIngestTerminal({ control }: ImageIngestProps) {
 										name={`images.${index}`}
 										render={({ field: imgField }) => (
 											<SafeImage
-												src={imgField.value}
+												src={imgField.value.url}
 												alt="Asset"
 												fill
 												className={cn("object-contain transition-all duration-700 p-4", isBlob ? "grayscale blur-[2px]" : "grayscale-0")}
@@ -146,7 +156,7 @@ export function ImageIngestTerminal({ control }: ImageIngestProps) {
 										<LinkIcon size={10} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8] opacity-30" />
 										<Controller
 											control={control}
-											name={`images.${index}`}
+											name={`images.${index}.url`} // Note the .url
 											render={({ field: inputField }) => (
 												<Input
 													{...inputField}

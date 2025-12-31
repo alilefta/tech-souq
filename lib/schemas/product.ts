@@ -14,6 +14,12 @@ export const addProductSchema = z.object({
 	originalPrice: z.number().optional(),
 	stock: z.number().min(0),
 	description: z.string().min(10, "NARRATIVE_TOO_SHORT"),
-	images: z.array(z.url()).min(1, "VISUAL_REQUIRED"),
+	images: z
+		.array(
+			z.object({
+				url: z.url("Must be a valid URL"),
+			})
+		)
+		.min(1, "VISUAL_REQUIRED"),
 	specs: z.array(productSpecSchema),
 });

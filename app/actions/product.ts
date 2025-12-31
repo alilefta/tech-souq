@@ -1,6 +1,7 @@
 // For writing operations
 "use server";
 
+import { Prisma } from "@/generated/prisma/client";
 import { actionClient } from "@/lib/safe-action";
 import { addProductSchema } from "@/lib/schemas/product";
 import { prisma } from "@/prisma/prisma";
@@ -30,7 +31,7 @@ export const addProduct = actionClient.inputSchema(addProductSchema).action(asyn
 				brand: p.brand,
 				sku: p.sku,
 				originalPrice: p.originalPrice,
-				images: p.images,
+				images: p.images.map((img) => img.url),
 				categoryId: Number(p.categoryId),
 				// NESTED CREATE: This is the proper way to handle relations in one call
 				specs: {
@@ -50,11 +51,20 @@ export const addProduct = actionClient.inputSchema(addProductSchema).action(asyn
 			slug: product.slug,
 			id: product.id,
 		};
-	} catch (error: any) {
+	} catch (error) {
 		// Handle Prisma Unique Constraint Errors specifically
-		if (error.code === "P2002") {
-			throw new Error("UID_COLLISION: SKU or SLUG already exists in the Registry.");
+		if (error instanceof Prisma.PrismaClientKnownRequestError) {
+			// P2002 = Unique Constraint Violation (Slug, SKU, or Code)
+			if (error.code === "P2002") {
+				// Optional: You can see which field failed via error.meta?.target
+				const target = (error.meta?.target as string[])?.join(", ") || "Field";
+				throw new Error(`UID_COLLISION: The ${target} already exists in the Registry.`);
+			}
 		}
+		// 2. Log the unknown error for your internal debugging (Server Logs)
+		console.error("CRITICAL_DB_FAILURE:", error);
+
+		// 3. Throw a generic error for the client (Security: Don't leak DB details)
 		throw new Error("DATABASE_SYNC_FAILURE: Contact System Administrator.");
 	}
 });
