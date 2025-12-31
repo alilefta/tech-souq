@@ -78,6 +78,7 @@ export function AddToCartWithQTY({ productDetails }: { productDetails: ProductDe
 			rating: productDetails.averageRating,
 			slug: productDetails.slug,
 			specs: productDetails.specs,
+			brand: productDetails.brand,
 			originalPrice: productDetails.originalPrice ?? productDetails.price,
 			reviews: productDetails.reviewCount,
 		};
