@@ -11,12 +11,11 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useUploadThing } from "@/utils/uploadthing";
 
-interface ImageIngestProps<S extends FieldValues> {
-	control: Control<S>;
-	nameInSchema: FieldPath<S>;
+interface ImageIngestProps {
+	control: Control<any>;
 }
 
-export function ImageIngestTerminal<S extends FieldValues>({ control, nameInSchema }: ImageIngestProps<S>) {
+export function ImageIngestTerminal({ control }: ImageIngestProps) {
 	const { setValue, getValues } = useFormContext<S>(); // To update the final URLs
 	const { fields, append, remove, update } = useFieldArray({ control, name: "images" });
 
