@@ -1,6 +1,6 @@
 "use client";
 
-import { ControllerFieldState, ControllerRenderProps, FieldValues } from "react-hook-form";
+import { ControllerFieldState, ControllerRenderProps, FieldPath, FieldValues } from "react-hook-form";
 import { Field, FieldError, FieldLabel } from "../field";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../select";
 import { cx } from "class-variance-authority";
@@ -13,7 +13,7 @@ type DataObj = {
 // Generic S for Schema
 type Props<S extends FieldValues> = {
 	fieldTitle: string;
-	nameInSchema: keyof S & string;
+	nameInSchema: FieldPath<S>;
 	placeholder?: string;
 	data: DataObj[];
 	fieldState: ControllerFieldState;

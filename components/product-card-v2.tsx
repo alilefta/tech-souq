@@ -123,7 +123,8 @@ export function ProductCard({ product }: { product: ProductCardDTO }) {
 						<ul className="space-y-3">
 							{product.specs?.slice(0, 3).map((spec, i: number) => (
 								<li key={i} className="text-[#94A3B8] text-xs font-medium flex items-start gap-2 ">
-									<span className="text-[#FFB400] mt-1">/</span> {spec.value}
+									<span className="text-[#FFB400] mt-1">/</span>
+									{spec.label} - {spec.value}
 								</li>
 							))}
 						</ul>

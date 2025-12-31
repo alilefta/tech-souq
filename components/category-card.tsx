@@ -32,11 +32,11 @@ export function CategoryCard({ category, index }: { category: Category; index: n
 			transition={{ delay: index * 0.1 }}
 			className={`${gridClasses} group relative overflow-hidden rounded-xl border border-white/5 bg-[#1E293B]/20 transition-all duration-500 hover:border-[#FFB400]/40`}
 		>
-			<Link href={`/category/${category.slug}`} className="block h-full w-full">
+			<Link href={`/categories/${category.slug}`} className="block h-full w-full">
 				{/* Background Image with Overlay */}
 				<div className="absolute inset-0 z-0 transition-transform duration-700 group-hover:scale-110">
 					<img src={category.image} alt={category.title} className="h-full w-full object-cover opacity-40 grayscale group-hover:grayscale-0 transition-all duration-700" />
-					<div className="absolute inset-0 bg-gradient-to-t from-[#0A0E14] via-[#0A0E14]/60 to-transparent" />
+					<div className="absolute inset-0 bg-linear-to-t from-[#0A0E14] via-[#0A0E14]/60 to-transparent" />
 				</div>
 
 				{/* Content */}

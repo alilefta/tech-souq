@@ -31,6 +31,8 @@ export interface ProductCardDTO {
 	coverImage: string | null;
 	specs: ProductSpecs[];
 	sku?: string;
+	stock?: number;
+	brand: string;
 }
 
 export interface ProductDetailsDTO {
@@ -488,6 +490,8 @@ export function ProductToCardDTOMapper(
 		coverImage: p.images && p.images.length > 0 ? p.images[0] : null,
 		specs: p.specs,
 		sku: p.sku,
+		stock: p.stock,
+		brand: p.brand ?? "Base_60",
 	};
 }
 

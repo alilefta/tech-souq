@@ -1,6 +1,6 @@
 "use client";
 
-import { ControllerFieldState, ControllerRenderProps, FieldValues } from "react-hook-form";
+import { ControllerFieldState, ControllerRenderProps, FieldValues, FieldPath } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { InputHTMLAttributes } from "react";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 // Generic S for Schema
 type Props<S extends FieldValues> = {
 	fieldTitle: string;
-	nameInSchema: keyof S & string;
+	nameInSchema: FieldPath<S>;
 	containerClassName?: string;
 	inputClassName?: string;
 	fieldState: ControllerFieldState;

@@ -58,12 +58,8 @@ export default function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning className="dark">
 			<body className={`${sans.variable} ${mono.variable}  ${serif.variable} bg-[#0A0E14] text-[#F5F5F0] antialiased `}>
-				<AnnouncementBar />
-				<Navbar />
-				<CartWrapper />
 				<main>{children}</main>
 				<Toaster position="bottom-left" />
-				<FooterSection />
 			</body>
 		</html>
 	);
