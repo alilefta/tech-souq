@@ -1,5 +1,5 @@
 // app/(admin)/admin/products/new/page.tsx
-import { getCategoriesForFilters } from "@/app/data/category";
+import { getFlatCategories } from "@/app/data/category";
 import { ModuleDeploymentForm } from "@/components/admin/products/module-deployment-form";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -9,8 +9,7 @@ export const metadata = {
 };
 
 export default async function NewModulePage() {
-	// 1. Fetching Sectors (Categories) from Server
-	const categories = await getCategoriesForFilters();
+	const categories = await getFlatCategories();
 
 	return (
 		<div className="max-w-6xl mx-auto space-y-10">
@@ -33,7 +32,7 @@ export default async function NewModulePage() {
 			</div>
 
 			{/* 2. INJECTING CLIENT FORM */}
-			<ModuleDeploymentForm rawCategories={categories} />
+			<ModuleDeploymentForm rawCategories={categories} isEdit={false} />
 		</div>
 	);
 }

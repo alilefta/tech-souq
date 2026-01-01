@@ -22,4 +22,11 @@ export const addProductSchema = z.object({
 		)
 		.min(1, "VISUAL_REQUIRED"),
 	specs: z.array(productSpecSchema),
+	isActive: z.boolean(),
+	isFeatured: z.boolean(),
+	isNew: z.boolean(),
+});
+
+export const editProductSchema = addProductSchema.extend({
+	id: z.string(),
 });

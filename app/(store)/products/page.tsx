@@ -3,7 +3,7 @@ import { getFilteredProducts } from "@/app/data/products";
 import { ProductFilters } from "./product-filters";
 import { LayoutGrid, List, SearchX, SlidersHorizontal } from "lucide-react";
 import { SortProducts } from "./SortProducts";
-import { getCategoriesForFilters } from "../../data/category";
+import { getFlatCategories } from "../../data/category";
 import { SearchProducts } from "./SearchProducts";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,7 @@ const productsPageParamsSchema = z.object({
 });
 
 export default async function ProductsPage({ searchParams }: PageParams) {
-	const categories = await getCategoriesForFilters();
+	const categories = await getFlatCategories();
 	const p = await searchParams;
 	const parsedParams = z.safeParse(productsPageParamsSchema, p);
 

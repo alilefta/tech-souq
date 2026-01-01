@@ -7,9 +7,9 @@ import { useCallback, useEffect, useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { CategoryFilterDTO } from "../../data/category";
+import { CategoryFlatDTO } from "../../data/category";
 
-export function ProductFilters({ rawCategories }: { rawCategories: CategoryFilterDTO[] }) {
+export function ProductFilters({ rawCategories }: { rawCategories: CategoryFlatDTO[] }) {
 	const pathname = usePathname();
 	const router = useRouter();
 	const searchParams = useSearchParams();

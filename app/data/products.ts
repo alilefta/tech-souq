@@ -3,10 +3,6 @@ import { Category, Product } from "@/generated/prisma/browser";
 import { ProductOrderByWithAggregationInput, ProductWhereInput } from "@/generated/prisma/models";
 import { prisma } from "@/prisma/prisma";
 
-const DEV_RATING = 4.5;
-const DEV_REVIEWS = 312;
-const ITEMS_PER_PAGE = 12;
-
 export type ProductSpecs = {
 	id: number;
 	label: string;
@@ -53,8 +49,11 @@ export interface ProductDetailsDTO {
 	specs: ProductSpecs[];
 	isNew: boolean;
 	isFeatured: boolean;
+	isActive: boolean;
 	category: ProductCategory;
 	stock?: number;
+	createdAt: Date;
+	updatedAt: Date;
 }
 
 export async function getAllProducts() {
@@ -94,16 +93,20 @@ export async function getFilteredProducts({
 	lowPrice,
 	highPrice,
 	sort,
+	allocation,
 	page = 1,
+	take = 8,
 }: {
 	category?: string | string[];
 	searchQuery?: string;
 	lowPrice?: number;
 	highPrice?: number;
 	sort?: string;
+	allocation?: string; // "CRITICAL" | "OUT_OF_STOCK" | "DE_SYNCED" | "ALL"
 	page?: number;
+	take?: number;
 }) {
-	const skip = (page - 1) * ITEMS_PER_PAGE;
+	const skip = (page - 1) * take;
 
 	let categoryCondition: ProductWhereInput | null = null;
 	if (category) {
@@ -184,6 +187,21 @@ export async function getFilteredProducts({
 		};
 	}
 
+	let allocationCondition: ProductWhereInput | null = null;
+	if (allocation && allocation !== "ALL") {
+		switch (allocation) {
+			case "CRITICAL":
+				allocationCondition = { stock: { gt: 0, lt: 10 } };
+				break;
+			case "OUT_OF_STOCK":
+				allocationCondition = { stock: 0 };
+				break;
+			case "DE_SYNCED":
+				allocationCondition = { isActive: false };
+				break;
+		}
+	}
+
 	let orderBy: ProductOrderByWithAggregationInput = { createdAt: "desc" }; // Default
 
 	if (sort) {
@@ -204,72 +222,37 @@ export async function getFilteredProducts({
 	}
 
 	// const products = await prisma.product.findMany({
-	// 	where: {
-	// 		AND: [categoryCondition ? { ...categoryCondition } : {}, lowPriceCondition ? { ...lowPriceCondition } : {}, highPriceCondition ? { ...highPriceCondition } : {}, query ? { ...query } : {}],
-	// 	},
-	// 	select: {
-	// 		id: true,
-	// 		name: true,
-	// 		price: true,
-	// 		images: true,
-	// 		slug: true,
-	// 		category: {
-	// 			select: {
-	// 				name: true,
-	// 			},
-	// 		},
-	// 	},
-	// 	orderBy,
-	// });
+
+	const where: ProductWhereInput = {
+		AND: [categoryCondition || {}, lowPriceCondition || {}, highPriceCondition || {}, query || {}, allocationCondition || {}],
+	};
 
 	const [total, products] = await prisma.$transaction([
 		prisma.product.count({
-			where: {
-				AND: [
-					categoryCondition ? { ...categoryCondition } : {},
-					lowPriceCondition ? { ...lowPriceCondition } : {},
-					highPriceCondition ? { ...highPriceCondition } : {},
-					query ? { ...query } : {},
-				],
-			},
+			where: where,
 		}),
 		prisma.product.findMany({
-			where: {
-				AND: [
-					categoryCondition ? { ...categoryCondition } : {},
-					lowPriceCondition ? { ...lowPriceCondition } : {},
-					highPriceCondition ? { ...highPriceCondition } : {},
-					query ? { ...query } : {},
-				],
-			},
+			where: where,
 			select: {
 				id: true,
 				name: true,
 				price: true,
 				images: true,
 				slug: true,
-				category: {
-					select: {
-						name: true,
-						id: true,
-						slug: true,
-					},
-				},
-				specs: {
-					select: {
-						id: true,
-						label: true,
-						value: true,
-					},
-				},
+				stock: true, // Crucial for admin
+				brand: true,
+				sku: true,
+				isActive: true,
+				category: { select: { name: true, id: true, slug: true } },
+				specs: { select: { id: true, label: true, value: true } },
 			},
 			orderBy,
 			skip,
-			take: ITEMS_PER_PAGE,
+			take: take,
 		}),
 	]);
 
-	const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+	const totalPages = Math.ceil(total / take);
 
 	return {
 		data: products.map((p) => ProductToCardDTOMapper(p)),
@@ -470,6 +453,56 @@ export async function getRelatedProducts(categoryId: number, currentProductId: n
 	return products.map((p) => ProductToCardDTOMapper(p));
 }
 
+export async function getProductById(productId: number): Promise<ProductDetailsDTO | null> {
+	try {
+		const product = await prisma.product.findUnique({
+			where: {
+				id: productId,
+			},
+			select: {
+				id: true,
+				name: true,
+				price: true,
+				images: true,
+				slug: true,
+				isActive: true,
+				description: true,
+				stock: true,
+				specs: {
+					select: {
+						id: true,
+						label: true,
+						value: true,
+					},
+				},
+				brand: true,
+				reviewCount: true,
+				sku: true,
+				originalPrice: true,
+				averageRating: true,
+				isNew: true,
+				isFeatured: true,
+				category: {
+					select: {
+						name: true,
+						id: true,
+						slug: true,
+					},
+				},
+				categoryId: true,
+				createdAt: true,
+				updatedAt: true,
+			},
+		});
+
+		if (!product) return null;
+
+		return ProductToDetailsDTOMapper(product);
+	} catch (error) {
+		throw new Error("Failed to retrieve product data");
+	}
+}
+
 // Helpers
 export function ProductToCardDTOMapper(
 	p: Partial<Product> & {
@@ -496,28 +529,15 @@ export function ProductToCardDTOMapper(
 }
 
 export function ProductToDetailsDTOMapper(
-	p: Partial<Product> & {
+	p: Product & {
 		category: ProductCategory;
 		specs: ProductSpecs[];
 	}
 ): ProductDetailsDTO {
 	return {
-		id: p.id!,
-		name: p.name ?? "",
+		...p,
 		price: Number(p.price),
 		originalPrice: p.originalPrice ? Number(p.originalPrice) : Number(p.price),
-		slug: p.slug ?? "",
-		images: p.images ?? [],
-		description: p.description ?? "",
 		coverImage: p.images && p.images.length > 0 ? p.images[0] : null,
-		isFeatured: p.isFeatured ?? false,
-		isNew: p.isNew ?? true,
-		averageRating: p.averageRating!,
-		brand: p.brand ?? "",
-		reviewCount: p.reviewCount!,
-		sku: p.sku ?? "",
-		specs: p.specs,
-		category: p.category,
-		stock: p.stock,
 	};
 }

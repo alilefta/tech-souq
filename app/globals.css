@@ -233,3 +233,19 @@
 		transform: "translateY(200%)";
 	}
 }
+
+@utility custom-scrollbar {
+	&::-webkit-scrollbar {
+		width: 4px;
+	}
+	&::-webkit-scrollbar-track {
+		background: #0a0e14;
+	}
+	&::-webkit-scrollbar-thumb {
+		background: #1e293b;
+		border-radius: 0px;
+	}
+	&::-webkit-scrollbar-thumb:hover {
+		background: #ffb400;
+	}
+}

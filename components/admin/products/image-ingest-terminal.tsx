@@ -160,7 +160,7 @@ export function ImageIngestTerminal({ control }: ImageIngestProps) {
 											render={({ field: inputField }) => (
 												<Input
 													{...inputField}
-													readOnly={isBlob} // Prevent editing during upload
+													readOnly={true} // Prevent editing during upload
 													className="h-9 bg-transparent border-white/5 rounded-none pl-8 text-[9px] font-mono text-[#94A3B8] focus-visible:border-[#FFB400]/40"
 												/>
 											)}

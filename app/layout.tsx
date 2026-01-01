@@ -1,14 +1,7 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Inter, Lora } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/providers/ThemeProvider";
-import { AnnouncementBanner } from "@/components/announcement-banner";
-import Navbar from "@/components/ui/navbar-v2";
-import { Footer } from "@/components/footer";
-import { AnnouncementBar } from "@/components/announcement-banner-v2";
-import FooterSection from "@/components/footer-section";
-import { CartDrawer } from "@/components/cart/cart-drawer";
-import { CartWrapper } from "@/components/cart/cart-warpper";
+
 import { Toaster } from "@/components/ui/sonner";
 
 const sans = Inter({

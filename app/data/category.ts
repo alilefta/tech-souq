@@ -1,7 +1,7 @@
 import { prisma } from "@/prisma/prisma";
 import { Category } from "@/generated/prisma/client";
 
-export interface CategoryFilterDTO {
+export interface CategoryFlatDTO {
 	id: number;
 	name: string;
 	slug: string;
@@ -22,7 +22,7 @@ export interface CategoryDetailsDTO {
 	};
 }
 
-export async function getCategoriesForFilters(): Promise<CategoryFilterDTO[]> {
+export async function getFlatCategories(): Promise<CategoryFlatDTO[]> {
 	const categories = await prisma.category.findMany({
 		select: {
 			id: true,

@@ -3,36 +3,46 @@
 import { useForm, useFieldArray, Controller, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Plus, Trash2, Activity, Terminal, ShieldCheck } from "lucide-react";
+import { Plus, Trash2, Activity, Terminal, ShieldCheck, RefreshCw, Save, Zap } from "lucide-react";
 import { InputWithLabel } from "@/components/ui/inputs/InputWithLabel";
 import { ComboboxWithLabel } from "@/components/ui/inputs/ComboboxWithLabel";
 import { TextareaWithLabel } from "@/components/ui/inputs/TextareaWithLabel"; // Custom styled textarea
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
-import { CategoryFilterDTO } from "@/app/data/category";
+import { CategoryFlatDTO } from "@/app/data/category";
 import { ImageIngestTerminal } from "./image-ingest-terminal";
-import { addProduct } from "@/app/actions/product";
+import { addProduct, updateProduct } from "@/app/actions/product";
 import { useAction } from "next-safe-action/hooks";
-import { addProductSchema } from "@/lib/schemas/product";
+import { InferSafeActionFnResult } from "next-safe-action";
+import { addProductSchema, editProductSchema } from "@/lib/schemas/product";
+import { useRouter } from "next/navigation";
 
 type DeploymentData = z.infer<typeof addProductSchema>;
+type EditDeploymentData = z.infer<typeof editProductSchema>;
+type AddProductActionResults = InferSafeActionFnResult<typeof addProduct>;
+type EditProductActionResults = InferSafeActionFnResult<typeof addProduct>;
 
-export function ModuleDeploymentForm({ rawCategories }: { rawCategories: CategoryFilterDTO[] }) {
-	const methods = useForm<DeploymentData>({
+export function ModuleDeploymentForm({ rawCategories, initialData, isEdit }: { rawCategories: CategoryFlatDTO[]; initialData?: EditDeploymentData; isEdit: boolean }) {
+	const methods = useForm<DeploymentData | EditDeploymentData>({
 		resolver: zodResolver(addProductSchema),
-		defaultValues: {
-			name: "",
-			brand: "BASE_60",
-			sku: "BBL-",
-			categoryId: "",
-			price: 0,
-			stock: 0,
-			description: "",
-			images: [{ url: "" }],
-			specs: [{ label: "Processor", value: "" }],
-			originalPrice: 0,
-		},
+		defaultValues: isEdit
+			? initialData
+			: {
+					name: "",
+					brand: "BASE_60",
+					sku: "BBL-",
+					categoryId: "",
+					price: 0,
+					stock: 0,
+					description: "",
+					images: [],
+					specs: [{ label: "Processor", value: "" }],
+					originalPrice: 0,
+					isActive: true,
+					isNew: true,
+					isFeatured: false,
+			  },
 		mode: "onChange",
 	});
 
@@ -51,36 +61,62 @@ export function ModuleDeploymentForm({ rawCategories }: { rawCategories: Categor
 		name: "specs",
 	});
 
-	const { executeAsync: executeAddProduct, isExecuting } = useAction(addProduct, {
+	const router = useRouter();
+
+	const { executeAsync: executeAdd, isExecuting: isCreating } = useAction(addProduct, {
 		onSuccess: ({ data }) => {
 			if (data?.success) {
 				toast.success("DEPLOYMENT_SUCCESSFUL", {
-					description: `MODULE_SYNC_COMPLETE // ID: ${data.id}`,
+					description: `NEW_MODULE_SYNCED // ID: ${data.id}`,
 					icon: <ShieldCheck className="text-[#FFB400]" size={16} />,
 				});
-				// Optional: redirect to the new product page or clear form
+				handleRedirect();
 			}
 		},
-		onError: ({ error }) => {
-			// 1. VALIDATION ERRORS (Zod)
-			if (error.validationErrors) {
-				toast.error("PROTOCOL_REJECTED", {
-					description: "INPUT_INTEGRITY_FAILURE // CHECK_REQUIRED_FIELDS",
-					icon: <Activity className="text-red-500" size={16} />,
-				});
-			}
-
-			// 2. SERVER ERRORS (Prisma/Logic)
-			if (error.serverError) {
-				toast.error("SYSTEM_HALT: SERVER_ERROR", {
-					description: error.serverError.toUpperCase(),
-					icon: <Terminal className="text-red-500" size={16} />,
-				});
-			}
-		},
+		onError: ({ error }) => handleActionError(error),
 	});
 
-	const onSubmit = async (data: DeploymentData) => {
+	const { executeAsync: executeUpdate, isExecuting: isUpdating } = useAction(updateProduct, {
+		onSuccess: ({ data }) => {
+			if (data?.success) {
+				toast.success("RECONFIGURATION_COMPLETE", {
+					description: `MODULE_LOGS_UPDATED // ID: ${data.id}`,
+					icon: <RefreshCw className="text-[#FFB400]" size={16} />,
+				});
+				handleRedirect();
+			}
+		},
+		onError: ({ error }) => handleActionError(error),
+	});
+
+	const handleActionError = (error: {
+		serverError?: AddProductActionResults["serverError"] | EditProductActionResults["serverError"];
+		validationErrors?: AddProductActionResults["validationErrors"] | EditProductActionResults["validationErrors"];
+	}) => {
+		if (error.validationErrors) {
+			toast.error("PROTOCOL_REJECTED", {
+				description: "INPUT_INTEGRITY_FAILURE // CHECK_REQUIRED_FIELDS",
+				icon: <Activity className="text-red-500" size={16} />,
+			});
+
+			console.log(error.validationErrors);
+		}
+		if (error.serverError) {
+			toast.error("SYSTEM_HALT", {
+				description: error.serverError.toUpperCase(),
+				icon: <Terminal className="text-red-500" size={16} />,
+			});
+		}
+	};
+
+	const handleRedirect = () => {
+		setTimeout(() => {
+			router.push("/admin/products");
+			router.refresh();
+		}, 1500);
+	};
+
+	const onSubmit = async (data: DeploymentData | EditDeploymentData) => {
 		// Check if images are still uploading (blobs present)
 		const hasUnsyncedAssets = data.images.some((img) => img.url.startsWith("blob:"));
 
@@ -90,9 +126,15 @@ export function ModuleDeploymentForm({ rawCategories }: { rawCategories: Categor
 			});
 			return;
 		}
-
-		await executeAddProduct(data);
+		if (isEdit) {
+			const d: EditDeploymentData = { ...data, id: initialData!.id };
+			await executeUpdate(d);
+		} else {
+			await executeAdd(data as DeploymentData);
+		}
 	};
+
+	const isProcessing = isCreating || isUpdating;
 
 	return (
 		<FormProvider {...methods}>
@@ -277,16 +319,89 @@ export function ModuleDeploymentForm({ rawCategories }: { rawCategories: Categor
 
 						<ImageIngestTerminal control={control} />
 					</section>
+
+					{/* 05. OPERATIONAL LOGIC (Flags) */}
+					<section className="space-y-8">
+						<div className="flex items-center gap-4 border-l-2 border-[#FFB400] pl-4">
+							<span className="text-[#FFB400] font-mono text-xs">05</span>
+							<h3 className="text-[#F5F5F0] text-xl font-black uppercase tracking-tighter">Operational_Logic</h3>
+						</div>
+
+						<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+							{/* ACTIVE STATUS */}
+							<Controller
+								name="isActive"
+								control={control}
+								render={({ field }) => (
+									<div
+										onClick={() => field.onChange(!field.value)}
+										className={cn(
+											"flex items-center justify-between p-4 border cursor-pointer transition-all",
+											field.value ? "border-[#FFB400] bg-[#FFB400]/5" : "border-white/5 bg-white/[0.01] opacity-40"
+										)}
+									>
+										<div className="flex flex-col gap-1">
+											<span className="text-[10px] font-black uppercase text-[#F5F5F0]">Registry_Visibility</span>
+											<span className="text-[8px] font-mono text-[#94A3B8] uppercase">Status: {field.value ? "Active" : "De-Synced"}</span>
+										</div>
+										<div className={cn("w-2 h-2 rounded-full", field.value ? "bg-[#FFB400] animate-pulse" : "bg-[#94A3B8]")} />
+									</div>
+								)}
+							/>
+
+							{/* FEATURED STATUS */}
+							<Controller
+								name="isFeatured"
+								control={control}
+								render={({ field }) => (
+									<div
+										onClick={() => field.onChange(!field.value)}
+										className={cn(
+											"flex items-center justify-between p-4 border cursor-pointer transition-all",
+											field.value ? "border-[#FFB400] bg-[#FFB400]/5" : "border-white/5 bg-white/[0.01] opacity-40"
+										)}
+									>
+										<div className="flex flex-col gap-1">
+											<span className="text-[10px] font-black uppercase text-[#F5F5F0]">Promote_To_Vanguard</span>
+											<span className="text-[8px] font-mono text-[#94A3B8] uppercase">Show_on_Homepage</span>
+										</div>
+										<Zap size={14} className={field.value ? "text-[#FFB400]" : "text-[#94A3B8]"} />
+									</div>
+								)}
+							/>
+
+							{/* NEW GENERATION STATUS */}
+							<Controller
+								name="isNew"
+								control={control}
+								render={({ field }) => (
+									<div
+										onClick={() => field.onChange(!field.value)}
+										className={cn(
+											"flex items-center justify-between p-4 border cursor-pointer transition-all",
+											field.value ? "border-[#FFB400] bg-[#FFB400]/5" : "border-white/5 bg-white/[0.01] opacity-40"
+										)}
+									>
+										<div className="flex flex-col gap-1">
+											<span className="text-[10px] font-black uppercase text-[#F5F5F0]">New_Generation_Tag</span>
+											<span className="text-[8px] font-mono text-[#94A3B8] uppercase">Legacy_Status: New</span>
+										</div>
+										<div className={cn("px-1.5 py-0.5 border text-[7px] font-bold", field.value ? "border-[#FFB400] text-[#FFB400]" : "border-[#94A3B8] text-[#94A3B8]")}>NEW</div>
+									</div>
+								)}
+							/>
+						</div>
+					</section>
 				</div>
 
 				{/* RIGHT: THE STATUS MONITOR */}
 				<aside className="lg:col-span-4">
 					<div className="sticky top-32 space-y-8">
-						{/* VALIDATION HUD */}
 						<div className="bg-[#1E293B]/20 border border-white/10 p-6 space-y-6">
 							<div className="flex items-center justify-between border-b border-white/5 pb-4">
 								<h3 className="text-[10px] font-black uppercase text-[#F5F5F0] tracking-widest flex items-center gap-2">
-									<Activity size={14} className="text-[#FFB400]" /> System_Check
+									<Activity size={14} className="text-[#FFB400]" />
+									{isEdit ? "Reconfig_Status" : "System_Check"}
 								</h3>
 								<div className={cn("w-2 h-2 rounded-full", isValid ? "bg-green-500 shadow-[0_0_10px_#22c55e]" : "bg-red-500 animate-pulse")} />
 							</div>
@@ -298,16 +413,26 @@ export function ModuleDeploymentForm({ rawCategories }: { rawCategories: Categor
 								</div>
 								<div className="flex justify-between text-[#94A3B8]">
 									<span>Protocol:</span>
-									<span>BBL_v60.0</span>
+									<span>{isEdit ? "BBL_UPDATE_v2" : "BBL_INIT_v60.0"}</span>
 								</div>
 							</div>
 
 							<button
 								type="submit"
-								disabled={!isValid || isExecuting}
-								className="w-full py-5 bg-[#FFB400] text-[#0A0E14] font-black text-xs uppercase tracking-[0.2em] shadow-2xl hover:bg-white transition-all disabled:opacity-20 disabled:grayscale"
+								disabled={!isValid || isProcessing}
+								className="group relative w-full py-5 bg-[#FFB400] text-[#0A0E14] font-black text-xs uppercase tracking-[0.2em] shadow-2xl hover:bg-white transition-all disabled:opacity-20 disabled:grayscale overflow-hidden"
 							>
-								{isExecuting ? "Initializing..." : "Initialize_Deployment"}
+								<span className="relative z-10 flex items-center justify-center gap-3">
+									{isProcessing ? "SYNCHRONIZING..." : isEdit ? "Authorize_Reconfig" : "Initialize_Deployment"}
+									{isProcessing ? <Activity size={16} className="animate-spin" /> : <Save size={16} />}
+								</span>
+
+								{/* Kinetic Beam */}
+								{!isProcessing && (
+									<div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+										<div className="absolute top-0 -inset-full h-full w-1/2 z-10 block transform -skew-x-30 bg-linear-to-r from-transparent via-white/40 to-transparent -translate-x-[150%] group-hover:translate-x-[250%] transition-transform duration-1000 ease-in-out" />
+									</div>
+								)}
 							</button>
 						</div>
 					</div>
