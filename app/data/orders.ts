@@ -1,4 +1,4 @@
-import { Order, OrderItem, OrderStatus } from "@/generated/prisma/client";
+import { Order, OrderItem, OrderStatus, Product } from "@/generated/prisma/client";
 import { prisma } from "@/prisma/prisma";
 
 interface OrderItemDTO {
@@ -7,6 +7,7 @@ interface OrderItemDTO {
 	productId: number;
 	quantity: number;
 	priceAt_time: number;
+	product: Pick<Product, "id" | "name">;
 }
 
 export interface OrderDTO {
@@ -28,13 +29,42 @@ export interface OrderDTO {
 	items: OrderItemDTO[];
 }
 
+export async function getOrders(): Promise<OrderDTO[]> {
+	const orders = await prisma.order.findMany({
+		include: {
+			items: {
+				include: {
+					product: {
+						select: {
+							name: true,
+							id: true,
+						},
+					},
+				},
+			},
+		},
+	});
+
+	return orders.map((order) => mapOrderToOrderDTO(order));
+}
+
 export async function getOrderDetails(orderNumber: string) {
 	const order = await prisma.order.findUnique({
 		where: {
 			orderNumber,
 		},
+
 		include: {
-			items: true,
+			items: {
+				include: {
+					product: {
+						select: {
+							id: true,
+							name: true,
+						},
+					},
+				},
+			},
 		},
 	});
 
@@ -43,7 +73,11 @@ export async function getOrderDetails(orderNumber: string) {
 	return mapOrderToOrderDTO(order);
 }
 
-function mapOrderToOrderDTO(order: Order & { items: OrderItem[] }): OrderDTO {
+function mapOrderToOrderDTO(
+	order: Order & {
+		items: (OrderItem & { product: Pick<Product, "id" | "name"> })[];
+	}
+): OrderDTO {
 	return {
 		...order,
 		total: Number(order.total),
@@ -51,6 +85,10 @@ function mapOrderToOrderDTO(order: Order & { items: OrderItem[] }): OrderDTO {
 		items: order.items.map((oi) => ({
 			...oi,
 			priceAt_time: Number(oi.priceAt_time),
+			product: {
+				id: oi.productId,
+				name: oi.product.name,
+			},
 		})),
 	};
 }

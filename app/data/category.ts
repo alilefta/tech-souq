@@ -83,6 +83,32 @@ export async function getCategoryBySlug(slug: string): Promise<CategoryDetailsDT
 	return categoryToDetailsMapper(category);
 }
 
+export async function getCategoryById(cateId: number): Promise<CategoryDetailsDTO | null> {
+	const category = await prisma.category.findUnique({
+		where: {
+			id: cateId,
+		},
+		select: {
+			id: true,
+			name: true,
+			arabicName: true,
+			description: true,
+			gridDisplay: true,
+			imageUrl: true,
+			slug: true,
+			_count: true,
+			createdAt: true,
+			updatedAt: true,
+		},
+	});
+
+	if (!category) {
+		return null;
+	}
+
+	return categoryToDetailsMapper(category);
+}
+
 export function categoryToDetailsMapper(
 	c: Category & {
 		_count: {
