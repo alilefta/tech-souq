@@ -1,8 +1,7 @@
 "use client";
 
-import { Star, ShieldCheck, Trash2, ArrowUpRight, User, Terminal } from "lucide-react";
+import { Trash2, User, Terminal } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { motion } from "motion/react";
 import { useAction } from "next-safe-action/hooks";
 import { archiveReview, authorizeReview } from "@/app/actions/review";
 import { toast } from "sonner";
@@ -22,7 +21,7 @@ export function ReviewRow({ log, onScan }: { log: ReviewDTO; onScan: () => void 
 	};
 
 	return (
-		<tr className="border-b border-white/5 hover:bg-white/[0.02] transition-all group">
+		<tr className="border-b border-white/5 hover:bg-white/2 transition-all group">
 			{/* LOG ID */}
 			<td className="p-5 text-[#FFB400] opacity-40 font-mono text-[9px]">#{log.id}</td>
 
@@ -83,7 +82,12 @@ export function ReviewRow({ log, onScan }: { log: ReviewDTO; onScan: () => void 
 							{isAuthorizing ? "AUTHORIZING..." : "Authorize_Log"}
 						</button>
 					)}
-					<button onClick={() => executeArchive({ id: log.id })} disabled={isArchiving} className="p-2 text-red-500/40 hover:text-red-500 transition-colors disabled:opacity-0">
+					<button
+						title="Archive"
+						onClick={() => executeArchive({ id: log.id })}
+						disabled={isArchiving}
+						className="p-2 text-red-500/40 hover:text-red-500 transition-colors disabled:opacity-0"
+					>
 						<Trash2 size={14} />
 					</button>
 				</div>

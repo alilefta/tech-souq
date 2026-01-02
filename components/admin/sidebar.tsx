@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboard, Box, Layers, Truck, MessageSquare, TrendingUp, ChevronRight, User } from "lucide-react";
+import { LayoutDashboard, Box, Layers, Truck, MessageSquare, TrendingUp, ChevronRight, User, Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/ui/logo";
@@ -14,6 +14,7 @@ const menuItems = [
 	{ name: "Analytics", icon: TrendingUp, path: "/admin/analytics" },
 	{ name: "Intel", icon: MessageSquare, path: "/admin/reviews" },
 	{ name: "Users", icon: User, path: "/admin/users" },
+	{ name: "Settings", icon: Settings, path: "/admin/settings" },
 ];
 
 export function Sidebar() {

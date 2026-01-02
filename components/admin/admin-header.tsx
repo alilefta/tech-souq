@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Search, Bell, User, Terminal, Wifi, Clock } from "lucide-react";
 import { motion } from "motion/react";
+import { HeaderSearch } from "./header-search";
 
 export function AdminHeader() {
 	const [time, setTime] = useState("");
@@ -26,20 +27,7 @@ export function AdminHeader() {
 		<header className="h-20 border-b border-white/5 bg-[#0A0E14] flex items-center justify-between px-8 sticky top-0 z-40 backdrop-blur-md">
 			{/* 1. REGISTRY QUICK SEARCH */}
 			<div className="flex-1 max-w-xl">
-				<div className="relative group">
-					<div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-[#FFB400] opacity-40 group-focus-within:opacity-100 transition-opacity">
-						<Search size={16} />
-					</div>
-					<input
-						type="text"
-						placeholder="QUICK_REGISTRY_LOOKUP (CMD+K)"
-						className="w-full bg-white/[0.02] border border-white/10 rounded-none h-10 pl-10 pr-4 text-[10px] font-mono uppercase tracking-widest placeholder:text-white/10 focus:outline-none focus:border-[#FFB400]/40 transition-all"
-					/>
-					{/* Decorative Terminal Key */}
-					<div className="absolute inset-y-0 right-3 flex items-center">
-						<span className="text-[8px] font-mono text-[#94A3B8] opacity-20 border border-white/10 px-1.5 py-0.5">BBL_CMD</span>
-					</div>
-				</div>
+				<HeaderSearch />
 			</div>
 
 			{/* 2. SYSTEM DATA HUB */}

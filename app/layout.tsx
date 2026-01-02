@@ -1,56 +1,43 @@
+// app/layout.tsx
 import type { Metadata } from "next";
-import { Geist_Mono, Inter, Lora } from "next/font/google";
+import { Geist_Mono, Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-
 import { Toaster } from "@/components/ui/sonner";
 
-const sans = Inter({
-	variable: "--font-inter",
+// 1. SANS: For standard UI and body text
+const fontSans = Inter({
 	subsets: ["latin"],
-	weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+	variable: "--font-sans", // Standard Tailwind naming
 });
 
-const mono = Geist_Mono({
+// 2. MONO: For terminal readouts and data strings
+const fontMono = Geist_Mono({
+	subsets: ["latin"],
 	variable: "--font-mono",
-	subsets: ["latin"],
-	weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+	// adjustFontFallback: 'Arial', // Prevents the "Size Jump" if font takes time to load
 });
-
-const serif = Lora({
-	variable: "--font-serif",
+// 3. DISPLAY: For aggressive "BASE 60" headings
+const fontDisplay = Space_Grotesk({
 	subsets: ["latin"],
-	weight: ["400", "500", "600", "700"],
+	variable: "--font-display",
 });
 
 export const metadata: Metadata = {
-	title: "TechSouq - Your Trusted Tech Marketplace",
-	description: "Discover the latest gadgets, electronics, and tech accessories at unbeatable prices",
-	icons: {
-		icon: [
-			{
-				url: "/icon-light-32x32.png",
-				media: "(prefers-color-scheme: light)",
-			},
-			{
-				url: "/icon-dark-32x32.png",
-				media: "(prefers-color-scheme: dark)",
-			},
-			{
-				url: "/icon.svg",
-				type: "image/svg+xml",
-			},
-		],
-		apple: "/apple-icon.png",
-	},
+	title: "BASE 60 // Global Hardware Foundry",
+	description: "Precision-engineered PC components dispatched from Babylon to the world.",
 };
-export default function RootLayout({
-	children,
-}: Readonly<{
-	children: React.ReactNode;
-}>) {
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang="en" suppressHydrationWarning className="dark">
-			<body className={`${sans.variable} ${mono.variable}  ${serif.variable} bg-[#0A0E14] text-[#F5F5F0] antialiased `}>
+			<body
+				className={`
+				${fontSans.variable} 
+				${fontMono.variable} 
+				${fontDisplay.variable} 
+				bg-[#0A0E14] text-[#F5F5F0] antialiased font-sans dark
+			`}
+			>
 				<main>{children}</main>
 				<Toaster position="bottom-left" />
 			</body>

@@ -21,7 +21,7 @@ export function InputWithLabel<S extends FieldValues>({ fieldTitle, nameInSchema
 	const { type } = props;
 	return (
 		<Field data-invalid={fieldState.invalid} className={cx("space-y-2", containerClassName)}>
-			<FieldLabel htmlFor={nameInSchema} className="text-[9px] font-black uppercase tracking-[0.2em] text-[#94A3B8] mb-0">
+			<FieldLabel htmlFor={nameInSchema} className="text-[9px] font-black uppercase tracking-[0.2em] text-[#94A3B8] mb-0 ">
 				{fieldTitle}
 			</FieldLabel>
 			<Input
