@@ -3,8 +3,23 @@ import { Users, Shield, Globe, Search, Filter, Terminal } from "lucide-react";
 import { UserRegistryClient } from "@/components/admin/users/user-registry-client";
 import { mockUsers } from "@/app/data/user";
 import { FoundrySelect } from "@/components/ui/inputs/foundary-form-select";
+import { UserSearch } from "@/components/admin/users/user-search";
+import { FilterByRank } from "@/components/admin/users/filter-by-rank";
+import z from "zod";
 
-export default async function VanguardRegistryPage() {
+const usersParamSchema = z.object({
+	query: z.string().optional(),
+	rank: z.string().optional(),
+});
+
+interface PageParams {
+	searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export default async function VanguardRegistryPage({ searchParams }: PageParams) {
+	const p = await searchParams;
+	const { query, rank } = usersParamSchema.parse(p);
+
 	// In production: const users = await prisma.user.findMany(...)
 	const users = mockUsers;
 
@@ -35,20 +50,12 @@ export default async function VanguardRegistryPage() {
 			</header>
 
 			{/* 2. COMMAND COMMAND BAR */}
-			<div className="grid grid-cols-1 md:grid-cols-12 gap-px bg-white/5 border border-white/5 p-px h-14">
-				<div className="md:col-span-6 bg-[#0A0E14] flex items-center px-4 gap-4">
-					<Search size={16} className="text-[#94A3B8] opacity-30" />
-					<input placeholder="QUERY_ENTITY_NAME_OR_ID..." className="w-full bg-transparent border-none text-[10px] font-mono uppercase tracking-widest outline-none" />
+			<div className="grid grid-cols-1 md:grid-cols-12 gap-px bg-white/5 border border-white/5 p-px h-12 ">
+				<div className="md:col-span-6 bg-[#0A0E14] flex items-center  border-l">
+					<UserSearch />
 				</div>
-				<div className="md:col-span-3 bg-[#0A0E14] flex items-center border-l border-white/5 px-4">
-					<select
-						title="Select Role"
-						className="bg-[#0A0E14] border-white/10 rounded-none shadow-2xl px-4 z-50 border-none text-[10px] font-mono uppercase text-[#94A3B8] w-full outline-none appearance-none cursor-pointer"
-					>
-						<option>Rank: ALL_LEVELS</option>
-						<option>Rank: MASTER_ARCHITECT</option>
-						<option>Rank: ELITE_BUILDER</option>
-					</select>
+				<div className="md:col-span-3 bg-[#0A0E14]  border-l ">
+					<FilterByRank />
 				</div>
 				<button className="md:col-span-3 bg-[#1E293B] hover:bg-[#FFB400] hover:text-[#0A0E14] text-[10px] font-black uppercase tracking-[0.2em] transition-all">Synchronize_Entities</button>
 			</div>

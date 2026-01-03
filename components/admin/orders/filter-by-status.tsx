@@ -1,7 +1,7 @@
 "use client";
 
 import { FoundrySelect } from "@/components/ui/inputs/foundry-select";
-import { OrderStatus } from "@/generated/prisma/enums";
+// import { OrderStatus } from "@/generated/prisma/enums";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export function FilterByStatus() {

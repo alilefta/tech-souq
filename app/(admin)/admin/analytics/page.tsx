@@ -1,63 +1,100 @@
 // app/(admin)/admin/analytics/page.tsx
 import { CapitalFlowChart } from "@/components/admin/analytics/capital-flow-chart";
 import { SectorAllocationChart } from "@/components/admin/analytics/sector-allocation-chart";
-import { Terminal, Activity, TrendingUp, Zap } from "lucide-react";
+import { UnitSaturationChart } from "@/components/admin/analytics/unit-saturation-chart";
+import { DispatchVelocityChart } from "@/components/admin/analytics/dispatch-velocity-chart";
+import { PerformanceMetrics } from "@/components/admin/analytics/performance-metrics";
+import { LiveFoundryLogs } from "@/components/admin/analytics/live-foundry-logs";
+import { HighYieldRegistry } from "@/components/admin/analytics/high-yield-registry";
+import { Activity, Globe, Terminal, Cpu } from "lucide-react";
 
 export default function AnalyticsHub() {
 	return (
-		<div className="space-y-10 max-w-400 mx-auto">
-			{/* 1. TELEMETRY HEADER */}
-			<header className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-white/5 pb-10">
+		<div className="space-y-8 max-w-[1600px] mx-auto pb-20 selection:bg-[#FFB400] selection:text-[#0A0E14]">
+			{/* 1. MASTER TELEMETRY HEADER */}
+			<header className="flex flex-col xl:flex-row xl:items-end justify-between gap-8 border-b border-white/5 pb-10">
 				<div>
 					<div className="flex items-center gap-3 mb-4">
 						<Activity size={14} className="text-[#FFB400] animate-pulse" />
-						<span className="text-[#FFB400] text-[10px] font-black uppercase tracking-[0.5em]">System_Telemetry: Active</span>
+						<span className="text-[#FFB400] text-[10px] font-black uppercase tracking-[0.5em]">System_Intelligence: Operational</span>
 					</div>
-					<h1 className="text-4xl lg:text-6xl font-black uppercase tracking-tighter text-[#F5F5F0]">
-						Analytics <span className="text-transparent bg-clip-text bg-linear-to-r from-[#FFB400] to-[#FF8C00]">Core</span>
+					<h1 className="text-4xl lg:text-7xl font-black uppercase tracking-tighter text-[#F5F5F0]">
+						Foundry <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFB400] to-[#FF8C00]">Intelligence</span>
 					</h1>
 				</div>
-				<div className="flex items-center gap-4 text-[#94A3B8] text-[10px] font-mono border border-white/5 px-4 py-2 bg-white/1">LOG_STATUS: SYNCED // DATA_STREAMS: 04</div>
+				<div className="flex flex-col md:items-end gap-3">
+					<div className="flex bg-white/[0.02] border border-white/5 p-1">
+						{["60_MIN", "24_HRS", "30_DAYS", "YTD"].map((t) => (
+							<button key={t} className="px-4 py-1.5 text-[8px] font-black text-[#94A3B8] hover:text-[#FFB400] transition-colors">
+								[{t}]
+							</button>
+						))}
+					</div>
+				</div>
 			</header>
 
-			{/* 2. THE MAIN CHARTS GRID */}
+			{/* 2. CORE KPI DECK */}
+			<PerformanceMetrics />
+
+			{/* 3. TRENDS & SATURATION (Primary Row) */}
 			<div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-				{/* CAPITAL FLOW (Large Area Chart) */}
 				<div className="lg:col-span-8 space-y-6">
-					<div className="flex items-center justify-between">
-						<h3 className="text-xs font-black uppercase tracking-[0.3em] text-[#F5F5F0]">Capital_Flow_Telemetry</h3>
-						<span className="text-[9px] font-mono text-[#94A3B8] opacity-40">Period: Last_30_Cycles</span>
-					</div>
+					<h3 className="text-xs font-black uppercase tracking-[0.3em] px-2">Capital_Flow_Oscilloscope</h3>
 					<CapitalFlowChart />
 				</div>
-
-				{/* SECTOR ALLOCATION (Bar Chart) */}
 				<div className="lg:col-span-4 space-y-6">
-					<div className="flex items-center justify-between">
-						<h3 className="text-xs font-black uppercase tracking-[0.3em] text-[#F5F5F0]">Sector_Volume</h3>
-						<Zap size={14} className="text-[#FFB400]" />
+					<h3 className="text-xs font-black uppercase tracking-[0.3em] px-2">Unit_Saturation</h3>
+					<UnitSaturationChart />
+				</div>
+			</div>
+
+			{/* 4. SECTOR & VELOCITY (Distribution Row) */}
+			<div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+				<div className="lg:col-span-6 space-y-6">
+					<div className="flex items-center justify-between px-2">
+						<h3 className="text-xs font-black uppercase tracking-[0.3em]">Sector_Mapping_Load</h3>
+						<Cpu size={14} className="text-[#94A3B8] opacity-20" />
 					</div>
 					<SectorAllocationChart />
 				</div>
+				<div className="lg:col-span-6 space-y-6">
+					<h3 className="text-xs font-black uppercase tracking-[0.3em] px-2">Dispatch_Velocity_Log</h3>
+					<DispatchVelocityChart />
+				</div>
 			</div>
 
-			{/* 3. PERFORMANCE LOGS GRID */}
-			<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-				<MetricCard label="Average_Unit_Value" val="$2,499.12" trend="+0.4%" />
-				<MetricCard label="Logistics_Efficiency" val="94.2%" trend="+2.1%" />
-				<MetricCard label="Registry_Growth" val="+12 Modules" trend="Optimal" />
+			{/* 5. LOGS & YIELD (Activity Row) */}
+			<div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+				<div className="lg:col-span-8 space-y-6">
+					<div className="flex items-center justify-between px-2">
+						<h3 className="text-xs font-black uppercase tracking-[0.3em]">Live_Foundry_Logs</h3>
+						<Terminal size={14} className="text-[#94A3B8] opacity-20" />
+					</div>
+					<LiveFoundryLogs />
+				</div>
+				<div className="lg:col-span-4 space-y-6">
+					<h3 className="text-xs font-black uppercase tracking-[0.3em] px-2">High-Yield_Modules</h3>
+					<HighYieldRegistry />
+				</div>
 			</div>
-		</div>
-	);
-}
 
-function MetricCard({ label, val, trend }: { label: string; val: string; trend: string }) {
-	return (
-		<div className="bg-white/2 border border-white/5 p-6 hover:border-[#FFB400]/20 transition-all group">
-			<p className="text-[8px] font-black uppercase text-[#94A3B8] tracking-widest mb-2">{label}</p>
-			<div className="flex items-end justify-between">
-				<p className="text-3xl font-black text-[#F5F5F0] tracking-tighter">{val}</p>
-				<span className="text-[10px] font-mono text-green-500 mb-1">{trend}</span>
+			{/* 6. GEOSPATIAL FOOTER */}
+			<div className="bg-white/1 border border-white/5 p-8 relative overflow-hidden group">
+				<Globe className="absolute -right-20 -bottom-20 w-64 h-64 text-[#FFB400] opacity-[0.02]" />
+				<h3 className="text-xs font-black uppercase tracking-[0.3em] mb-10 relative z-10">Geospatial_Node_Distribution</h3>
+				<div className="grid grid-cols-1 sm:grid-cols-3 gap-10 relative z-10">
+					{["Baghdad_Central", "London_Node", "Dubai_Hub"].map((hub) => (
+						<div key={hub} className="space-y-4">
+							<div className="flex justify-between items-end">
+								<p className="text-[10px] font-black uppercase text-[#F5F5F0]">{hub}</p>
+								<p className="text-sm font-mono font-black text-[#FFB400]">{Math.floor(Math.random() * 50) + 50}%</p>
+							</div>
+							{/* <div className="h-[1px] w-full bg-white/5">
+								<motion.div initial={{ width: 0 }} whileInView={{ width: "70%" }} className="h-full bg-[#FFB400]" />
+							</div> */}
+						</div>
+					))}
+				</div>
 			</div>
 		</div>
 	);

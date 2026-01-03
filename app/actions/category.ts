@@ -1,6 +1,7 @@
 // app/actions/category.ts
 "use server";
 
+import { handleFoundryError } from "@/lib/action-utils";
 import { actionClient } from "@/lib/safe-action";
 import { deleteSchema, editSectorSchema, sectorSchema } from "@/lib/schemas/category";
 import { prisma } from "@/prisma/prisma";
@@ -49,15 +50,34 @@ export const updateSector = actionClient.inputSchema(editSectorSchema).action(as
 	}
 });
 
+// 1. SAFE DE-SYNC (Deactivate)
+export const deactivateSector = actionClient.inputSchema(deleteSchema).action(async ({ parsedInput }) => {
+	try {
+		await prisma.category.update({
+			where: { id: parsedInput.id },
+			data: {
+				// We'll need to ensure your schema has an isActive field on Category
+				// If not, this action can be used to set a 'visibility' flag
+				description: "DEACTIVATED_SECTOR",
+			},
+		});
+		revalidatePath("/admin/categories");
+		return { success: true };
+	} catch (error) {
+		handleFoundryError(error);
+	}
+});
+
+// 2. REGISTRY WIPE (Delete)
 export const deleteSector = actionClient.inputSchema(deleteSchema).action(async ({ parsedInput }) => {
 	try {
-		// INTEGRITY CHECK: Prevent deletion if sector has products
+		// PRE-FLIGHT CHECK: Verify no modules are allocated
 		const moduleCount = await prisma.product.count({
 			where: { categoryId: parsedInput.id },
 		});
 
 		if (moduleCount > 0) {
-			throw new Error(`INTEGRITY_VIOLATION: ${moduleCount}_MODULES_STILL_ALLOCATED`);
+			throw new Error(`INTEGRITY_VIOLATION: ${moduleCount}_MODULES_ALLOCATED_TO_SECTOR`);
 		}
 
 		await prisma.category.delete({
@@ -67,7 +87,7 @@ export const deleteSector = actionClient.inputSchema(deleteSchema).action(async 
 		revalidatePath("/admin/categories");
 		revalidatePath("/categories");
 		return { success: true };
-	} catch (error: any) {
-		throw new Error(error.message || "WIPE_FAILURE: SECTOR_SYNC_ERROR");
+	} catch (error) {
+		handleFoundryError(error);
 	}
 });

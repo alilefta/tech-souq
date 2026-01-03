@@ -1,5 +1,6 @@
 // app/admin/page.tsx
 import { Terminal, Package, Users, DollarSign, Activity, Truck } from "lucide-react";
+import Link from "next/link";
 
 export default function AdminDashboard() {
 	return (
@@ -48,7 +49,9 @@ export default function AdminDashboard() {
 				<div className="lg:col-span-8 space-y-6">
 					<div className="flex items-center justify-between border-b border-white/5 pb-4">
 						<h3 className="text-xs font-black uppercase tracking-[0.3em]">Recent_Dispatches</h3>
-						<button className="text-[9px] font-black text-[#FFB400] uppercase underline underline-offset-4">View_Registry</button>
+						<Link href={"/admin/orders"} className="text-[9px] font-black text-[#FFB400] uppercase underline underline-offset-4">
+							View_Registry
+						</Link>
 					</div>
 
 					<div className="border border-white/5 bg-white/1">

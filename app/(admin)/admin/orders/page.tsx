@@ -61,9 +61,9 @@ export default async function DispatchHubPage({ searchParams }: PageParams) {
 			<DispatchHeader activeTransfers={orders.length} systemHealth="99.2%" />
 
 			{/* 2. COMMAND FILTER BAR */}
-			<div className="grid grid-cols-1 md:grid-cols-12 gap-px bg-white/5 border border-white/5 p-px h-14 items-stretch">
+			<div className="grid grid-cols-1 md:grid-cols-12 gap-px bg-white/5 border border-white/5 p-px items-stretch">
 				{/* SEARCH TERMINAL */}
-				<div className="md:col-span-5 bg-[#0A0E14]">
+				<div className="md:col-span-5 bg-[#0A0E14] border-l">
 					<DispatchSearch />
 				</div>
 				<div className="md:col-span-3 bg-[#0A0E14] border-l border-white/5">

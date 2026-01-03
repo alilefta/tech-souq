@@ -5,8 +5,39 @@ import { cn } from "@/lib/utils";
 import { Move, Trash2, Globe } from "lucide-react";
 import { CategoryDetailsDTO } from "@/app/data/category";
 import { SafeImage } from "@/components/ui/safe-image"; // Importing the elite fallback system
+import { toast } from "sonner";
+import { useAction } from "next-safe-action/hooks";
+import { deactivateSector, deleteSector } from "@/app/actions/category";
+import { useState } from "react";
+import { KillModuleModal } from "../ui/kill-module-modal";
 
 export function SectorRegistryClient({ initialCategories }: { initialCategories: CategoryDetailsDTO[] }) {
+	const [targetSector, setTargetSector] = useState<CategoryDetailsDTO | null>(null);
+
+	// --- ACTION: DE-SYNC ---
+	const { executeAsync: executeDeactivate, isExecuting: isDeactivating } = useAction(deactivateSector, {
+		onSuccess: () => {
+			toast.success("SECTOR_DE-SYNCED", { description: "COORDINATES_REMOVED_FROM_MAPPING" });
+			setTargetSector(null);
+		},
+		onError: ({ error }) => {
+			toast.error("DE-SYNC_HALTED", { description: error.serverError });
+		},
+	});
+
+	// --- ACTION: WIPE ---
+	const { executeAsync: executeWipe, isExecuting: isWiping } = useAction(deleteSector, {
+		onSuccess: () => {
+			toast.success("REGISTRY_WIPE_COMPLETE", { description: "SECTOR_DATA_PURGED" });
+			setTargetSector(null);
+		},
+		onError: ({ error }) => {
+			toast.error("WIPE_PROTOCOL_BLOCKED", { description: error.serverError });
+		},
+	});
+
+	const isProcessing = isDeactivating || isWiping;
+
 	return (
 		<div className="grid grid-cols-1 xl:grid-cols-12 gap-12">
 			{/* LEFT: THE MANAGEMENT LIST */}
@@ -59,13 +90,23 @@ export function SectorRegistryClient({ initialCategories }: { initialCategories:
 									Configure_Logic
 								</button>
 							</Link>
-							<button title="De-Initialize Sector" className="p-2.5 border border-white/5 text-red-500/30 hover:text-red-500 hover:bg-red-500/5 hover:border-red-500/20 transition-all">
+							<button title="De_sync sector" onClick={() => setTargetSector(sector)} className="p-2 text-red-500/40 hover:text-red-500 transition-colors">
 								<Trash2 size={16} />
 							</button>
 						</div>
 					</div>
 				))}
 			</div>
+			{/* THE KILL TERMINAL */}
+			<KillModuleModal
+				isOpen={!!targetSector}
+				onClose={() => !isProcessing && setTargetSector(null)}
+				title={targetSector?.name || "Sector"}
+				isProcessing={isProcessing}
+				onDeactivate={() => targetSector && executeDeactivate({ id: targetSector.id })}
+				onWipe={() => targetSector && executeWipe({ id: targetSector.id })}
+				isWiping={isWiping}
+			/>
 
 			{/* RIGHT: LIVE MINI-MAP (Preview) */}
 			<aside className="xl:col-span-4 space-y-6">

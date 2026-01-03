@@ -3,8 +3,24 @@ import { getModuleReviews } from "@/app/data/review"; // Create this server acti
 import { IntelHeader } from "@/components/admin/reviews/intel-header";
 import { Search } from "lucide-react";
 import { ReviewRegistryClient } from "@/components/admin/reviews/review-registry-client";
+import { FilterReviews } from "@/components/admin/reviews/filter-reviews";
+import z from "zod";
+import { IntelSearch } from "@/components/admin/reviews/intel-search";
 
-export default async function ReviewIntelPage() {
+const reviewsParamSchema = z.object({
+	query: z.string().optional(),
+	integrity: z.string().optional(),
+});
+
+interface PageParams {
+	searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export default async function ReviewIntelPage({ searchParams }: PageParams) {
+	const p = await searchParams;
+
+	const { query, integrity } = reviewsParamSchema.parse(p);
+
 	const reviews = await getModuleReviews();
 
 	return (
@@ -12,16 +28,12 @@ export default async function ReviewIntelPage() {
 			<IntelHeader totalReports={reviews.length} />
 
 			{/* COMMAND CONTROLS */}
-			<div className="grid grid-cols-1 md:grid-cols-12 gap-px bg-white/5 border border-white/5 p-px h-14">
-				<div className="md:col-span-6 bg-[#0A0E14] flex items-center px-4 gap-4">
-					<Search size={16} className="text-[#94A3B8] opacity-30" />
-					<input placeholder="QUERY_LOG_ID_OR_VANGUARD_ID..." className="w-full bg-transparent border-none text-[10px] font-mono uppercase tracking-widest outline-none" />
+			<div className="grid grid-cols-1 md:grid-cols-12 gap-px bg-white/5 border border-white/5 p-px h-12">
+				<div className="md:col-span-6 bg-[#0A0E14] flex items-center ">
+					<IntelSearch />
 				</div>
-				<div className="md:col-span-3 bg-[#0A0E14] flex items-center border-l border-white/5 px-4">
-					<select title="Filter Reviews" className="bg-transparent border-none text-[10px] font-mono uppercase text-[#94A3B8] w-full outline-none appearance-none">
-						<option>Integrity: ALL_SCORES</option>
-						<option>Integrity: CRITICAL_ONLY</option>
-					</select>
+				<div className="md:col-span-3 bg-[#0A0E14] flex items-center border-l border-white/5">
+					<FilterReviews />
 				</div>
 				<button className="md:col-span-3 bg-[#1E293B] hover:bg-[#FFB400] hover:text-[#0A0E14] text-[10px] font-black uppercase tracking-[0.2em] transition-all">Re-Sync_Logs</button>
 			</div>

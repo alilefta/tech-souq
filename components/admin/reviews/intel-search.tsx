@@ -5,7 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import useDebounce from "@/hooks/useDebounce";
 
-export function DispatchSearch() {
+export function IntelSearch() {
 	const searchParams = useSearchParams();
 	const pathname = usePathname();
 	const router = useRouter();
@@ -25,10 +25,11 @@ export function DispatchSearch() {
 		<div className="relative flex-1 group">
 			<Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94A3B8] opacity-30 group-focus-within:text-[#FFB400] group-focus-within:opacity-100 transition-all" />
 			<input
+				id="intel-search-input"
 				type="text"
 				value={query}
 				onChange={(e) => setQuery(e.target.value)}
-				placeholder="QUERY_MANIFEST_ID_OR_CLIENT..."
+				placeholder="QUERY_LOG_ID_OR_VANGUARD_ID..."
 				className="w-full bg-transparent border-none text-[10px] font-mono uppercase tracking-widest outline-none h-12 pl-12 pr-4 text-[#F5F5F0] placeholder:text-white/5"
 			/>
 			<div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-10 pointer-events-none">

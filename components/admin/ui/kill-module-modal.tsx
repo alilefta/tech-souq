@@ -11,9 +11,10 @@ interface KillModuleModalProps {
 	title: string;
 	isProcessing: boolean;
 	isWiping: boolean;
+	guidanceText?: string;
 }
 
-export function KillModuleModal({ isOpen, onClose, onDeactivate, onWipe, title, isProcessing, isWiping }: KillModuleModalProps) {
+export function KillModuleModal({ isOpen, onClose, onDeactivate, onWipe, title, isProcessing, isWiping, guidanceText }: KillModuleModalProps) {
 	return (
 		<AlertDialog open={isOpen} onOpenChange={onClose}>
 			<AlertDialogContent className="bg-[#0A0E14] border-white/10 rounded-none max-w-xl font-sans">
@@ -26,14 +27,19 @@ export function KillModuleModal({ isOpen, onClose, onDeactivate, onWipe, title, 
 					<AlertDialogTitle className="text-3xl font-black text-[#F5F5F0] uppercase tracking-tighter leading-none">
 						Terminate <span className="text-red-500">{title}</span>?
 					</AlertDialogTitle>
+					<AlertDialogDescription className="sr-only">Terminate Items</AlertDialogDescription>
 
 					<div className="mt-6 p-4 bg-[#FFB400]/5 border border-[#FFB400]/20 flex gap-4">
 						<Info className="text-[#FFB400] shrink-0" size={18} />
 						<div className="space-y-1">
 							<p className="text-[10px] font-black text-[#FFB400] uppercase tracking-widest">Architect_Guidance</p>
-							<p className="text-[11px] text-[#94A3B8] leading-relaxed uppercase font-medium">
-								Wiping is permanent. To preserve history, use <span className="text-[#F5F5F0] font-bold">De-Sync</span>.
-							</p>
+							{guidanceText ? (
+								<p className="text-[11px] text-[#94A3B8] leading-relaxed uppercase font-medium">{guidanceText}</p>
+							) : (
+								<p className="text-[11px] text-[#94A3B8] leading-relaxed uppercase font-medium">
+									Wiping is permanent. To preserve history, use <span className="text-[#F5F5F0] font-bold">De-Sync</span>.
+								</p>
+							)}
 						</div>
 					</div>
 				</AlertDialogHeader>
