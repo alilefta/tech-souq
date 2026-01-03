@@ -7,12 +7,51 @@ import { useRouter } from "next/navigation";
 import { ModulePreview } from "./module-preview";
 import { useState } from "react";
 import { SafeImage } from "@/components/ui/safe-image";
+import { useAction } from "next-safe-action/hooks";
+import { deactivateProduct, deleteProduct } from "@/app/actions/product";
+import { toast } from "sonner";
+import { KillModuleModal } from "../ui/kill-module-modal";
+import { PowerOff, ShieldCheck } from "lucide-react";
 
 export function ModuleRegistryRow({ product, onScan }: { product: ProductCardDTO; onScan: () => void }) {
 	const isLowStock = product.stock !== undefined && product.stock < 10;
 	const [activeScanId, setActiveScanId] = useState<number | null>(null);
+	const [isKillModalOpen, setIsKillModalOpen] = useState(false);
+
+	// 1. DEACTIVATE ACTION (Safe Path)
+	const { executeAsync: executeDeactivate, isExecuting: isDeactivating } = useAction(deactivateProduct, {
+		onSuccess: () => {
+			toast.success("MODULE_DE-SYNCED", {
+				description: `UID: ${product.sku} // REMOVED_FROM_PUBLIC_BAZAAR`,
+				icon: <PowerOff className="text-[#FFB400]" size={16} />,
+			});
+			setIsKillModalOpen(false);
+		},
+		onError: ({ error }) => {
+			toast.error("DE-SYNC_HALTED", {
+				description: error.serverError || "SYSTEM_INTERRUPT",
+			});
+		},
+	});
+
+	// 2. DELETE ACTION (Destructive Path)
+	const { executeAsync: executeWipe, isExecuting: isWiping } = useAction(deleteProduct, {
+		onSuccess: () => {
+			toast.success("REGISTRY_WIPE_COMPLETE", {
+				description: `MODULE: ${product.name} // DATA_TRACES_PURGED`,
+				icon: <ShieldCheck className="text-[#FFB400]" size={16} />,
+			});
+			setIsKillModalOpen(false);
+		},
+		onError: ({ error }) => {
+			toast.error("WIPE_PROTOCOL_BLOCKED", {
+				description: error.serverError || "SECURITY_VIOLATION",
+			});
+		},
+	});
 
 	const router = useRouter();
+	const isProcessing = isDeactivating || isWiping;
 
 	return (
 		<tr className="border-b border-white/5 hover:bg-white/2 transition-all group">
@@ -63,9 +102,18 @@ export function ModuleRegistryRow({ product, onScan }: { product: ProductCardDTO
 				<div className="flex items-center justify-end gap-2">
 					<ModuleAction type="scan" onClick={onScan} />
 					<ModuleAction type="edit" onClick={() => router.push(`/admin/products/${product.id}/edit`)} />
-					<ModuleAction type="kill" onClick={() => console.log("KILL", product.id)} />
+					<ModuleAction type="kill" onClick={() => setIsKillModalOpen(true)} />
 				</div>
-				<ModulePreview productId={activeScanId} isOpen={!!activeScanId} onClose={() => setActiveScanId(null)} />{" "}
+				<ModulePreview productId={activeScanId} isOpen={!!activeScanId} onClose={() => setActiveScanId(null)} />
+				<KillModuleModal
+					isOpen={isKillModalOpen}
+					onClose={() => !isProcessing && setIsKillModalOpen(false)}
+					title={product.name}
+					isProcessing={isProcessing}
+					onDeactivate={() => executeDeactivate({ id: product.id })}
+					onWipe={() => executeWipe({ id: product.id })}
+					isWiping={isWiping}
+				/>
 			</td>
 		</tr>
 	);

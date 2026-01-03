@@ -16,7 +16,7 @@ export function ReviewRegistryClient({ initialReviews }: { initialReviews: Revie
 			<div className="border border-white/5 bg-white/[0.01]">
 				<table className="w-full border-collapse">
 					<thead>
-						<tr className="border-b border-white/5 text-[9px] font-black uppercase text-[#94A3B8] tracking-[0.3em] bg-white/[0.02]">
+						<tr className="border-b border-white/5 text-[9px] font-black uppercase text-[#94A3B8] tracking-[0.3em] bg-white/2">
 							<th className="p-5 text-left">Log_ID</th>
 							<th className="p-5 text-left">Vanguard_Entity</th>
 							<th className="p-5 text-left">Matched_Hardware</th>

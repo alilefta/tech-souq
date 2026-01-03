@@ -2,7 +2,7 @@
 "use server";
 
 import { actionClient } from "@/lib/safe-action";
-import { editSectorSchema, sectorSchema } from "@/lib/schemas/category";
+import { deleteSchema, editSectorSchema, sectorSchema } from "@/lib/schemas/category";
 import { prisma } from "@/prisma/prisma";
 import { revalidatePath } from "next/cache";
 
@@ -46,5 +46,28 @@ export const updateSector = actionClient.inputSchema(editSectorSchema).action(as
 	} catch (error) {
 		console.error("RECONFIG_FAILURE:", error);
 		throw new Error("RECONFIGURATION_FAILURE: SECTOR_SYNC_HALTED");
+	}
+});
+
+export const deleteSector = actionClient.inputSchema(deleteSchema).action(async ({ parsedInput }) => {
+	try {
+		// INTEGRITY CHECK: Prevent deletion if sector has products
+		const moduleCount = await prisma.product.count({
+			where: { categoryId: parsedInput.id },
+		});
+
+		if (moduleCount > 0) {
+			throw new Error(`INTEGRITY_VIOLATION: ${moduleCount}_MODULES_STILL_ALLOCATED`);
+		}
+
+		await prisma.category.delete({
+			where: { id: parsedInput.id },
+		});
+
+		revalidatePath("/admin/categories");
+		revalidatePath("/categories");
+		return { success: true };
+	} catch (error: any) {
+		throw new Error(error.message || "WIPE_FAILURE: SECTOR_SYNC_ERROR");
 	}
 });

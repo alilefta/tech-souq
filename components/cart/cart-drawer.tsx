@@ -82,7 +82,7 @@ export function CartDrawer({ cart }: { cart: CartWithItemsDTO | null }) {
 				<AnimatePresence>
 					{!isEmpty && (
 						<motion.div initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }} transition={{ type: "spring", damping: 25, stiffness: 200 }}>
-							<SheetFooter className="p-6 bg-white/[0.02] border-t border-white/5 flex flex-col gap-6 sm:flex-col">
+							<SheetFooter className="p-6 bg-white/2 border-t border-white/5 flex flex-col gap-6 sm:flex-col">
 								<div className="space-y-4 w-full">
 									<div className="flex justify-between items-center text-[10px] font-bold uppercase text-[#94A3B8] tracking-widest">
 										<span>Subtotal_Value</span>

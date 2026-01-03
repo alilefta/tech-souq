@@ -62,7 +62,7 @@ export function AssemblyScroller() {
 			<div className="sticky top-0 h-screen w-full overflow-hidden flex items-center">
 				{/* REFINED HUD (Glass Sidebar) */}
 				<div className="absolute top-12 lg:top-0 lg:left-0 lg:bottom-0 z-40 w-full lg:w-[30vw] pointer-events-none flex flex-col justify-center px-8 lg:px-16">
-					<div className="absolute inset-y-0 left-0 w-full bg-gradient-to-r from-[#0A0E14] via-[#0A0E14]/80 to-transparent backdrop-blur-sm hidden lg:block" />
+					<div className="absolute inset-y-0 left-0 w-full bg-linear-to-r from-[#0A0E14] via-[#0A0E14]/80 to-transparent backdrop-blur-sm hidden lg:block" />
 
 					<div className="relative">
 						<h2 className="text-[#94A3B8] text-[9px] font-black uppercase tracking-[0.4em] mb-4 flex items-center gap-2">
@@ -71,7 +71,7 @@ export function AssemblyScroller() {
 						</h2>
 						<h3 className="text-[#F5F5F0] text-4xl md:text-6xl font-bold tracking-tighter leading-[0.85] uppercase">
 							Architect <br />
-							<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFB400] to-[#FF8C00]">Builds</span>
+							<span className="text-transparent bg-clip-text bg-linear-to-r from-[#FFB400] to-[#FF8C00]">Builds</span>
 						</h3>
 					</div>
 				</div>

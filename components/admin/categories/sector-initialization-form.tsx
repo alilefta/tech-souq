@@ -3,8 +3,8 @@
 import { useForm, Controller, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { sectorSchema, SectorData } from "@/lib/schemas/category";
-import { InputWithLabel } from "@/components/ui/inputs/InputWithLabel";
-import { TextareaWithLabel } from "@/components/ui/inputs/TextareaWithLabel";
+import { InputWithLabel } from "@/components/ui/inputs/input-with-label";
+import { TextareaWithLabel } from "@/components/ui/inputs/textarea-with-label";
 import { Activity, AlertTriangle, Loader2, RefreshCw, Save } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";

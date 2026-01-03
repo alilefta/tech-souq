@@ -51,7 +51,7 @@ export function UserDeepScan({ user, isOpen, onClose }: { user: UserDTO | null; 
 								{ type: "Intel", id: "#LOG-082", val: "Hardware_Verified", date: "5 days ago" },
 								{ type: "Support", id: "#TK-004", val: "Node_Synchronization", date: "12 days ago" },
 							].map((item, i) => (
-								<div key={i} className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 group hover:border-[#FFB400]/20 transition-all">
+								<div key={i} className="flex items-center justify-between p-4 bg-white/2 border border-white/5 group hover:border-[#FFB400]/20 transition-all">
 									<div className="flex items-center gap-4">
 										<div className="w-8 h-8 bg-white/5 flex items-center justify-center">{item.type === "Order" ? <Package size={14} /> : <MessageSquare size={14} />}</div>
 										<div>

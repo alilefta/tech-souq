@@ -73,6 +73,36 @@ export async function getOrderDetails(orderNumber: string) {
 	return mapOrderToOrderDTO(order);
 }
 
+export async function getFilteredOrders({ query, node, status }: { query?: string; node?: string; status?: string }) {
+	const orders = await prisma.order.findMany({
+		where: {
+			AND: [
+				// 1. Search by Order Number or Client Name
+				query
+					? {
+							OR: [
+								{ orderNumber: { contains: query, mode: "insensitive" } },
+								{ firstName: { contains: query, mode: "insensitive" } },
+								{ lastName: { contains: query, mode: "insensitive" } },
+							],
+					  }
+					: {},
+				// 2. Filter by Node (Country/Sector)
+				node && node !== "ALL" ? { country: node } : {},
+				// 3. Filter by Operational Status
+				status && status !== "ALL" ? { status: status as OrderStatus } : {},
+			],
+		},
+		include: {
+			items: { include: { product: true } },
+		},
+		orderBy: { createdAt: "desc" },
+	});
+
+	return orders.map((o) => mapOrderToOrderDTO(o));
+}
+
+// Helpers
 function mapOrderToOrderDTO(
 	order: Order & {
 		items: (OrderItem & { product: Pick<Product, "id" | "name"> })[];

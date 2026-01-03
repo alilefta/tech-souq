@@ -3,11 +3,12 @@
 import { useForm, Controller, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { foundrySettingsSchema, FoundrySettings } from "@/lib/schemas/settings";
-import { InputWithLabel } from "@/components/ui/inputs/InputWithLabel";
+import { InputWithLabel } from "@/components/ui/inputs/input-with-label";
 import { ShieldAlert, Save, Activity, RefreshCw, Lock, Radio, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
+import { FoundrySelect } from "@/components/ui/inputs/foundary-form-select";
 
 export function SettingsForm() {
 	const methods = useForm<FoundrySettings>({
@@ -135,22 +136,17 @@ export function SettingsForm() {
 									</div>
 								)}
 							/>
-							<div className="space-y-2">
-								<Label className="text-[9px] font-black uppercase tracking-[0.2em] text-[#94A3B8]">Handshake_Mode</Label>
-								<Controller
-									name="handshakeMode"
-									control={control}
-									render={({ field }) => (
-										<select
-											{...field}
-											className="w-full h-12 bg-white/[0.02] border border-white/10 px-4 text-xs font-mono uppercase text-[#F5F5F0] outline-none focus:border-[#FFB400]/40 transition-all"
-										>
-											<option value="SIMULATION">Simulation [Sandbox]</option>
-											<option value="DEPLOYMENT">Deployment [Live]</option>
-										</select>
-									)}
-								/>
-							</div>
+							{/* Select Node */}
+							<FoundrySelect
+								control={control}
+								nameInSchema="handshakeMode"
+								fieldTitle="Handshake_Protocol"
+								placeholder="Select_Mode"
+								options={[
+									{ label: "Simulation [Sandbox]", value: "SIMULATION" },
+									{ label: "Deployment [Live]", value: "DEPLOYMENT" },
+								]}
+							/>
 						</div>
 					</section>
 
@@ -218,19 +214,24 @@ export function SettingsForm() {
 									<InputWithLabel field={field} fieldState={fieldState} nameInSchema="timezoneNode" fieldTitle="Timezone_Coordinate" placeholder="UTC+3 (Babylon)" />
 								)}
 							/>
-							<div className="space-y-2">
-								<Label className="text-[9px] font-black uppercase tracking-[0.2em] text-[#94A3B8]">Foundry_Primary_Lingua</Label>
-								<Controller
-									name="primaryLanguage"
-									control={control}
-									render={({ field }) => (
-										<select {...field} className="w-full h-12 bg-white/[0.02] border border-white/10 px-4 text-xs font-mono uppercase text-[#F5F5F0] outline-none">
-											<option value="EN">English [ENG_v1]</option>
-											<option value="AR">Arabic [ARB_v1]</option>
-										</select>
-									)}
-								/>
-							</div>
+
+							{/* Select Language */}
+							<FoundrySelect
+								control={control}
+								fieldTitle="Foundry_Primary_Lingua"
+								placeholder="Select_Language"
+								nameInSchema="primaryLanguage"
+								options={[
+									{
+										label: "English [ENG_v1]",
+										value: "EN",
+									},
+									{
+										label: "Arabic [ARB_v1]",
+										value: "AR",
+									},
+								]}
+							/>
 						</div>
 					</section>
 				</div>
@@ -282,7 +283,7 @@ export function SettingsForm() {
 								</span>
 								{/* Kinetic Beam */}
 								<div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-									<div className="absolute top-0 -inset-full h-full w-1/2 z-10 block transform -skew-x-30 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-[150%] group-hover:translate-x-[250%] transition-transform duration-1000 ease-in-out" />
+									<div className="absolute top-0 -inset-full h-full w-1/2 z-10 block transform -skew-x-30 bg-linear-to-r from-transparent via-white/40 to-transparent -translate-x-[150%] group-hover:translate-x-[250%] transition-transform duration-1000 ease-in-out" />
 								</div>
 							</button>
 

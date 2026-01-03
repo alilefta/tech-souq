@@ -1,69 +1,76 @@
-// app/(admin)/admin/orders/page.tsx
-import { Search } from "lucide-react";
-import { getOrders, OrderDTO } from "@/app/data/orders"; // Your order fetcher
+import { getFilteredOrders, OrderDTO } from "@/app/data/orders"; // Your order fetcher
 import { DispatchRow } from "@/components/admin/orders/dispatch-row";
 import { DispatchHeader } from "@/components/admin/orders/dispatch-header";
+import z from "zod";
+import { DispatchSearch } from "@/components/admin/orders/dispatch-search";
+import { FilterByNode } from "@/components/admin/orders/filter-by-node";
+import { FilterByStatus } from "@/components/admin/orders/filter-by-status";
 
-export default async function DispatchHubPage() {
-	//const orders = await getOrders(); // Fetch orders from your DB
+const ordersParamSchema = z.object({
+	query: z.string().optional(),
+	node: z.string().optional(),
+	status: z.string().optional(),
+});
 
-	const order: OrderDTO = {
-		firstName: "Jane",
-		lastName: "Doe",
-		email: "jane@example.com",
-		address: "123 Test St",
-		city: "Testville",
-		country: "Testland",
-		total: Number("499.99") * 2 + Number("10.00"),
-		shippingCost: 10.0,
-		status: "PAID",
-		carrier: "Global Express",
-		id: "TEST",
-		items: [
-			{
-				id: 1,
-				quantity: 20,
-				priceAt_time: 200,
-				orderId: "TEST",
-				productId: 13,
-				product: {
-					id: 13,
-					name: "Test Product",
-				},
-			},
-		],
-		discountId: 1,
-		orderNumber: "TEST-T-2",
-		createdAt: new Date(),
-		trackingNumber: "Tracking-T",
-	};
+interface PageParams {
+	searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
 
-	const orders = [order];
+export default async function DispatchHubPage({ searchParams }: PageParams) {
+	const p = await searchParams;
+	const { query, node, status } = ordersParamSchema.parse(p);
+
+	const orders: OrderDTO[] = await getFilteredOrders({ query, node, status });
+
+	// const order: OrderDTO = {
+	// 	firstName: "Jane",
+	// 	lastName: "Doe",
+	// 	email: "jane@example.com",
+	// 	address: "123 Test St",
+	// 	city: "Testville",
+	// 	country: "Testland",
+	// 	total: Number("499.99") * 2 + Number("10.00"),
+	// 	shippingCost: 10.0,
+	// 	status: "PAID",
+	// 	carrier: "Global Express",
+	// 	id: "TEST",
+	// 	items: [
+	// 		{
+	// 			id: 1,
+	// 			quantity: 20,
+	// 			priceAt_time: 200,
+	// 			orderId: "TEST",
+	// 			productId: 13,
+	// 			product: {
+	// 				id: 13,
+	// 				name: "Test Product",
+	// 			},
+	// 		},
+	// 	],
+	// 	discountId: 1,
+	// 	orderNumber: "TEST-T-2",
+	// 	createdAt: new Date(),
+	// 	trackingNumber: "Tracking-T",
+	// };
+
+	//const orders = [order];
 
 	return (
 		<div className="space-y-10 max-w-400 mx-auto">
 			{/* 1. DISPATCH HUD HEADER */}
-			<DispatchHeader activeTransfers={42} systemHealth="94.5%" />
+			<DispatchHeader activeTransfers={orders.length} systemHealth="99.2%" />
 
 			{/* 2. COMMAND FILTER BAR */}
 			<div className="grid grid-cols-1 md:grid-cols-12 gap-px bg-white/5 border border-white/5 p-px h-14 items-stretch">
-				<div className="md:col-span-5 bg-[#0A0E14] flex items-center px-4 gap-4">
-					<Search size={16} className="text-[#94A3B8] opacity-30" />
-					<input type="text" placeholder="QUERY_DISPATCH_ID_OR_CLIENT..." className="w-full bg-transparent border-none text-[10px] font-mono uppercase tracking-widest outline-none" />
+				{/* SEARCH TERMINAL */}
+				<div className="md:col-span-5 bg-[#0A0E14]">
+					<DispatchSearch />
 				</div>
-				<div className="md:col-span-3 bg-[#0A0E14] flex items-center border-l border-white/5 px-4">
-					<select title="Select Sector" className="bg-transparent border-none text-[10px] font-mono uppercase text-[#94A3B8] w-full outline-none appearance-none cursor-pointer">
-						<option>Sector: GLOBAL_ALL</option>
-						<option>Node: BABYLON_HUB</option>
-						<option>Node: LONDON_SYNC</option>
-					</select>
+				<div className="md:col-span-3 bg-[#0A0E14] border-l border-white/5">
+					<FilterByNode />
 				</div>
-				<div className="md:col-span-2 bg-[#0A0E14] flex items-center border-l border-white/5 px-4">
-					<select title="Select Status" className="bg-transparent border-none text-[10px] font-mono uppercase text-[#FFB400] w-full outline-none appearance-none cursor-pointer">
-						<option>Status: ALL_PACKETS</option>
-						<option>Pending_Clearance</option>
-						<option>In_Transit</option>
-					</select>
+				<div className="md:col-span-2 bg-[#0A0E14] border-l border-white/5">
+					<FilterByStatus />
 				</div>
 				<button className="md:col-span-2 bg-[#1E293B] hover:bg-[#FFB400] hover:text-[#0A0E14] text-[10px] font-black uppercase tracking-[0.2em] transition-all">Sync_Registry</button>
 			</div>
@@ -79,7 +86,6 @@ export default async function DispatchHubPage() {
 							<th className="p-5 text-left font-black">Unit_Load</th>
 							<th className="p-5 text-left font-black">Aging_Metric</th>
 							<th className="p-5 text-left font-black">Payload_Value</th>
-							{/* ADD THIS ONE: It was missing */}
 							<th className="p-5 text-left font-black">Logistics_Protocol</th>
 							<th className="p-5 text-left font-black">Logistics_Status</th>
 							<th className="p-5 text-right font-black">Authorize</th>

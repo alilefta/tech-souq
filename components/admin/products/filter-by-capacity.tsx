@@ -2,7 +2,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Layers } from "lucide-react";
+import { FoundrySelect } from "@/components/ui/inputs/foundry-select";
 
 export function FilterByCapacity() {
 	const searchParams = useSearchParams();
@@ -17,22 +17,17 @@ export function FilterByCapacity() {
 	};
 
 	return (
-		<div className="relative flex items-center w-full h-full bg-[#0A0E14] border border-white/10 px-3 group hover:border-[#FFB400]/40 transition-all">
-			<Layers size={12} className="text-[#94A3B8] mr-2" />
-			<select
-				title="Stream_Capacity"
-				value={searchParams.get("take") || "8"}
-				onChange={(e) => handleCapacityChange(e.target.value)}
-				className="w-full bg-[#0A0E14]  border-white/10 px-4 text-[10px] font-mono uppercase text-[#94A3B8] outline-none hover:border-white/20 transition-all cursor-pointer appearance-none"
-			>
-				{[4, 8, 16, 32].map((num) => (
-					<option key={num} value={num}>
-						Buffer: {num}_Units
-					</option>
-				))}
-			</select>
-			{/* Custom arrow detail */}
-			<div className="absolute right-3 pointer-events-none text-[8px] opacity-20 group-hover:opacity-100 transition-opacity">▼</div>
-		</div>
+		<FoundrySelect
+			onValueChange={(value) => handleCapacityChange(value)}
+			placeholder="Stream_Capacity"
+			className="bg-[#0A0E14] w-full"
+			value={searchParams.get("take") || "8"}
+			options={[
+				...[4, 8, 16, 32].map((num) => ({
+					label: `Buffer: ${num}_Units`,
+					value: String(num),
+				})),
+			]}
+		/>
 	);
 }

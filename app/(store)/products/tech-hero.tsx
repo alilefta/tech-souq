@@ -26,7 +26,7 @@ export default function HeroSection() {
 
 						<h1 className="text-[#F5F5F0] text-6xl md:text-8xl font-bold leading-[0.9] mb-8 tracking-tighter">
 							THE FUTURE IS <br />
-							<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFB400] to-[#FF8C00]">ASSEMBLED</span> HERE
+							<span className="text-transparent bg-clip-text bg-linear-to-r from-[#FFB400] to-[#FF8C00]">ASSEMBLED</span> HERE
 						</h1>
 
 						<p className="text-[#94A3B8] text-lg md:text-xl max-w-xl mb-10 leading-relaxed">

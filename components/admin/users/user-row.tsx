@@ -3,17 +3,17 @@
 
 import { UserDTO } from "@/app/data/user";
 import { cn } from "@/lib/utils";
-import { User, ShieldCheck, MapPin, Zap, Activity } from "lucide-react";
+import { User, MapPin, Zap } from "lucide-react";
 
 export function UserRow({ user, onScan }: { user: UserDTO; onScan: () => void }) {
 	return (
-		<tr className="border-b border-white/5 hover:bg-white/[0.02] transition-all group">
+		<tr className="border-b border-white/5 hover:bg-white/2 transition-all group">
 			{/* IDENTITY */}
 			<td className="p-5">
 				<div className="flex items-center gap-4">
 					<div className="w-10 h-10 border border-white/10 bg-white/5 flex items-center justify-center relative overflow-hidden">
 						<User size={20} className="text-[#94A3B8] opacity-20" />
-						<div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#FFB400]/5 to-transparent h-1/2 w-full -translate-y-full group-hover:translate-y-[200%] transition-transform duration-1000" />
+						<div className="absolute inset-0 bg-linear-to-b from-transparent via-[#FFB400]/5 to-transparent h-1/2 w-full -translate-y-full group-hover:translate-y-[200%] transition-transform duration-1000" />
 					</div>
 					<div className="flex flex-col">
 						<span className="text-[#F5F5F0] font-bold tracking-tight uppercase">{user.name}</span>

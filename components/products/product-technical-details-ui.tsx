@@ -88,7 +88,7 @@ export function ProductTechnicalDetailsUI({ product }: { product: ProductDetails
 					{/* Responsive Grid: 1 col mobile, 2 col tablet, 3 col desktop */}
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-white/10 border border-white/10 shadow-2xl">
 						{product.specs.map((spec) => (
-							<div key={spec.id} className="bg-[#0A0E14] p-6 lg:p-8 flex flex-col gap-2 hover:bg-white/[0.02] transition-colors group">
+							<div key={spec.id} className="bg-[#0A0E14] p-6 lg:p-8 flex flex-col gap-2 hover:bg-white/2 transition-colors group">
 								<span className="text-[#FFB400] text-[8px] font-black uppercase tracking-[0.3em] opacity-40 group-hover:opacity-100 transition-opacity">{spec.label}</span>
 								<span className="text-[#F5F5F0] text-base lg:text-lg font-bold tracking-tight">{spec.value}</span>
 							</div>

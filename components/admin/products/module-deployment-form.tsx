@@ -4,9 +4,9 @@ import { useForm, useFieldArray, Controller, FormProvider } from "react-hook-for
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Plus, Trash2, Activity, Terminal, ShieldCheck, RefreshCw, Save, Zap } from "lucide-react";
-import { InputWithLabel } from "@/components/ui/inputs/InputWithLabel";
-import { ComboboxWithLabel } from "@/components/ui/inputs/ComboboxWithLabel";
-import { TextareaWithLabel } from "@/components/ui/inputs/TextareaWithLabel"; // Custom styled textarea
+import { InputWithLabel } from "@/components/ui/inputs/input-with-label";
+import { ComboboxWithLabel } from "@/components/ui/inputs/combobox-with-label";
+import { TextareaWithLabel } from "@/components/ui/inputs/textarea-with-label"; // Custom styled textarea
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";

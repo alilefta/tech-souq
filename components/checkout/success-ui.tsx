@@ -32,7 +32,7 @@ export function SuccessUI({ order }: { order: OrderDTO }) {
 					</div>
 					<h1 className="text-[#F5F5F0] text-5xl md:text-7xl font-black tracking-tighter uppercase leading-[0.85] mb-6">
 						Dispatch <br />
-						<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFB400] to-[#FF8C00]">Initialized</span>
+						<span className="text-transparent bg-clip-text bg-linear-to-r from-[#FFB400] to-[#FF8C00]">Initialized</span>
 					</h1>
 					<p className="text-[#94A3B8] text-sm md:text-base max-w-md mx-auto mb-12 font-medium leading-relaxed">
 						Order manifest <span className="text-[#F5F5F0]">#{order.orderNumber}</span> has been verified. Hardware synchronization complete. Transfer from{" "}
@@ -67,7 +67,7 @@ export function SuccessUI({ order }: { order: OrderDTO }) {
 				</motion.div>
 
 				{/* 5. SYSTEM LOG (Decorative but informative) */}
-				<div className="w-full max-w-xl bg-white/[0.02] border border-white/5 p-6 font-mono text-left mb-12 relative overflow-hidden">
+				<div className="w-full max-w-xl bg-white/2 border border-white/5 p-6 font-mono text-left mb-12 relative overflow-hidden">
 					<div className="flex items-center gap-2 mb-4 text-[#FFB400]/40">
 						<TerminalIcon size={12} />
 						<span className="text-[9px] font-black uppercase tracking-widest">Real-Time_Log_Stream</span>

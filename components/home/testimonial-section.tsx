@@ -48,7 +48,7 @@ export default function TestimonialSection() {
 					<h2 className="text-[#FFB400] text-[10px] font-black uppercase tracking-[0.5em] mb-4">Curator Intelligence</h2>
 					<h3 className="text-[#F5F5F0] text-5xl md:text-7xl font-bold tracking-tighter uppercase leading-none">
 						Voices of the <br />
-						<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFB400] to-[#FF8C00]">Vanguard</span>
+						<span className="text-transparent bg-clip-text bg-linear-to-r from-[#FFB400] to-[#FF8C00]">Vanguard</span>
 					</h3>
 				</div>
 

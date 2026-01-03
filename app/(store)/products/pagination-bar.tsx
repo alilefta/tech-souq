@@ -80,7 +80,7 @@ function PaginationButton({ onClick, disabled, icon }: { onClick: () => void; di
 			onClick={onClick}
 			disabled={disabled}
 			className={`w-10 h-10 flex items-center justify-center border border-white/5 transition-all ${
-				disabled ? "opacity-20 cursor-not-allowed" : "text-[#94A3B8] hover:text-[#FFB400] hover:border-[#FFB400]/40 bg-white/[0.02]"
+				disabled ? "opacity-20 cursor-not-allowed" : "text-[#94A3B8] hover:text-[#FFB400] hover:border-[#FFB400]/40 bg-white/2"
 			}`}
 		>
 			{icon}

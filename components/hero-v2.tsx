@@ -35,7 +35,7 @@ export default function HeroSection() {
 
 						<h1 className="text-[#F5F5F0] text-6xl md:text-8xl font-bold leading-[0.85] mb-8 tracking-tighter uppercase">
 							CALCULATION <br />
-							<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFB400] to-[#FF8C00]">ORIGINATED</span> <br />
+							<span className="text-transparent bg-clip-text bg-linear-to-r from-[#FFB400] to-[#FF8C00]">ORIGINATED</span> <br />
 							HERE.
 						</h1>
 
@@ -50,7 +50,7 @@ export default function HeroSection() {
 									Access the Foundry <ShoppingBag size={18} strokeWidth={2.5} />
 								</span>
 								<div className="absolute inset-0 z-10 pointer-events-none overflow-hidden">
-									<div className="absolute top-0 -inset-full h-full w-1/2 z-10 block transform -skew-x-[30deg] bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-[150%] group-hover:translate-x-[250%] transition-transform duration-1000 ease-in-out" />
+									<div className="absolute top-0 -inset-full h-full w-1/2 z-10 block transform -skew-x-[30deg] bg-linear-to-r from-transparent via-white/40 to-transparent -translate-x-[150%] group-hover:translate-x-[250%] transition-transform duration-1000 ease-in-out" />
 								</div>
 							</Button>
 

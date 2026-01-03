@@ -35,7 +35,7 @@ export function ModulePreviewContent({ product }: { product: ProductDetailsDTO; 
 				{/* 4. ALLOCATION DASHBOARD */}
 				<div className="p-6 space-y-6">
 					<div className="grid grid-cols-2 gap-4">
-						<div className="bg-white/[0.02] border border-white/5 p-4 relative">
+						<div className="bg-white/2 border border-white/5 p-4 relative">
 							<span className="text-[8px] font-black text-[#94A3B8] uppercase tracking-widest opacity-40">Current_Allocation</span>
 							<p className="text-2xl font-black text-[#F5F5F0] tracking-tighter mt-1">
 								{product.stock} <span className="text-xs font-normal opacity-30">Units</span>
@@ -44,7 +44,7 @@ export function ModulePreviewContent({ product }: { product: ProductDetailsDTO; 
 								<div className={cn("h-full transition-all", (product.stock || 0) < 10 ? "bg-red-500" : "bg-[#FFB400]")} style={{ width: `${Math.min(product.stock || 0, 100)}%` }} />
 							</div>
 						</div>
-						<div className="bg-white/[0.02] border border-white/5 p-4">
+						<div className="bg-white/2 border border-white/5 p-4">
 							<span className="text-[8px] font-black text-[#94A3B8] uppercase tracking-widest opacity-40">Foundry_Value</span>
 							<p className="text-2xl font-black text-[#FFB400] tracking-tighter mt-1">${product.price?.toLocaleString()}</p>
 							<p className="text-[8px] font-mono text-[#94A3B8] mt-2">MSRP: ${product.originalPrice || product.price}</p>

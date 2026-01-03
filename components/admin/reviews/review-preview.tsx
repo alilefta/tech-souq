@@ -30,7 +30,7 @@ export function ReviewPreview({ log, isOpen, onClose }: { log: ReviewDTO | null;
 
 				<div className="flex-1 overflow-y-auto custom-scrollbar p-8 space-y-10">
 					{/* 2. ENTITY PROFILE */}
-					<div className="flex items-center gap-6 p-6 bg-white/[0.02] border border-white/5 relative overflow-hidden">
+					<div className="flex items-center gap-6 p-6 bg-white/2 border border-white/5 relative overflow-hidden">
 						<div className="w-16 h-16 rounded-none bg-[#1E293B] border border-white/10 flex items-center justify-center relative">
 							<User size={32} className="text-[#94A3B8] opacity-20" />
 							<div className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#FFB400] flex items-center justify-center">

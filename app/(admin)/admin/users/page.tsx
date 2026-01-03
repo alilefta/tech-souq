@@ -2,13 +2,14 @@
 import { Users, Shield, Globe, Search, Filter, Terminal } from "lucide-react";
 import { UserRegistryClient } from "@/components/admin/users/user-registry-client";
 import { mockUsers } from "@/app/data/user";
+import { FoundrySelect } from "@/components/ui/inputs/foundary-form-select";
 
 export default async function VanguardRegistryPage() {
 	// In production: const users = await prisma.user.findMany(...)
 	const users = mockUsers;
 
 	return (
-		<div className="space-y-10 max-w-[1600px] mx-auto">
+		<div className="space-y-10 max-w-400 mx-auto">
 			{/* 1. IDENTITY HEADER */}
 			<header className="flex flex-col xl:flex-row xl:items-end justify-between gap-8 border-b border-white/5 pb-10 relative overflow-hidden">
 				<div>
@@ -17,16 +18,16 @@ export default async function VanguardRegistryPage() {
 						<span className="text-[#FFB400] text-[10px] font-black uppercase tracking-[0.5em]">Identity_Access: Active</span>
 					</div>
 					<h1 className="text-4xl lg:text-7xl font-black uppercase tracking-tighter text-[#F5F5F0] leading-none">
-						Vanguard <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFB400] to-[#FF8C00]">Registry</span>
+						Vanguard <span className="text-transparent bg-clip-text bg-linear-to-r from-[#FFB400] to-[#FF8C00]">Registry</span>
 					</h1>
 				</div>
 
 				<div className="flex flex-wrap gap-4">
-					<div className="bg-white/[0.02] border border-white/5 px-8 py-4 flex flex-col items-end">
+					<div className="bg-white/2 border border-white/5 px-8 py-4 flex flex-col items-end">
 						<span className="text-[8px] font-black uppercase text-[#94A3B8] tracking-widest">Authorized_Architects</span>
 						<span className="text-3xl font-black text-[#F5F5F0] font-mono tracking-tighter">0{users.length}</span>
 					</div>
-					<div className="bg-white/[0.02] border border-white/5 px-8 py-4 flex flex-col items-end">
+					<div className="bg-white/2 border border-white/5 px-8 py-4 flex flex-col items-end">
 						<span className="text-[8px] font-black uppercase text-[#94A3B8] tracking-widest">Global_Coverage</span>
 						<span className="text-3xl font-black text-green-500 font-mono tracking-tighter">94%</span>
 					</div>
@@ -40,7 +41,10 @@ export default async function VanguardRegistryPage() {
 					<input placeholder="QUERY_ENTITY_NAME_OR_ID..." className="w-full bg-transparent border-none text-[10px] font-mono uppercase tracking-widest outline-none" />
 				</div>
 				<div className="md:col-span-3 bg-[#0A0E14] flex items-center border-l border-white/5 px-4">
-					<select title="Select Role" className="bg-transparent border-none text-[10px] font-mono uppercase text-[#94A3B8] w-full outline-none appearance-none cursor-pointer">
+					<select
+						title="Select Role"
+						className="bg-[#0A0E14] border-white/10 rounded-none shadow-2xl px-4 z-50 border-none text-[10px] font-mono uppercase text-[#94A3B8] w-full outline-none appearance-none cursor-pointer"
+					>
 						<option>Rank: ALL_LEVELS</option>
 						<option>Rank: MASTER_ARCHITECT</option>
 						<option>Rank: ELITE_BUILDER</option>

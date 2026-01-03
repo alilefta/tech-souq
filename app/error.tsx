@@ -36,7 +36,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
 				</motion.div>
 
 				{/* 3. DIAGNOSTIC DATA */}
-				<div className="bg-white/[0.02] border border-white/5 p-6 md:p-8 mb-12 text-left font-mono relative overflow-hidden">
+				<div className="bg-white/2 border border-white/5 p-6 md:p-8 mb-12 text-left font-mono relative overflow-hidden">
 					<div className="flex items-center gap-3 mb-4 text-red-500/50">
 						<TerminalIcon size={14} />
 						<span className="text-[10px] font-black uppercase tracking-[0.3em]">Core_Diagnostic_Report</span>

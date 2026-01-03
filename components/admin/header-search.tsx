@@ -58,7 +58,7 @@ export function HeaderSearch() {
 				onChange={(e) => setQuery(e.target.value)}
 				onBlur={() => setTimeout(() => setIsOpen(false), 200)} // Delay for click selection
 				placeholder="QUICK_REGISTRY_LOOKUP (CMD+K)"
-				className="w-full bg-white/[0.02] border border-white/10 rounded-none h-10 pl-10 pr-4 text-[10px] font-mono uppercase tracking-widest placeholder:text-white/10 focus:outline-none focus:border-[#FFB400]/40 transition-all text-[#F5F5F0]"
+				className="w-full bg-white/2 border border-white/10 rounded-none h-10 pl-10 pr-4 text-[10px] font-mono uppercase tracking-widest placeholder:text-white/10 focus:outline-none focus:border-[#FFB400]/40 transition-all text-[#F5F5F0]"
 			/>
 
 			{/* 3. RESULTS PORTAL */}
@@ -98,7 +98,7 @@ export function HeaderSearch() {
 							))}
 						</div>
 
-						<div className="p-3 bg-white/[0.02] flex justify-between items-center">
+						<div className="p-3 bg-white/2 flex justify-between items-center">
 							<span className="text-[7px] font-mono text-[#94A3B8] opacity-30">ENCRYPTION: AES-256_ACTIVE</span>
 							<Database size={10} className="text-[#94A3B8] opacity-20" />
 						</div>

@@ -13,5 +13,7 @@ export const editSectorSchema = sectorSchema.extend({
 	id: z.number(),
 });
 
+export const deleteSchema = z.object({ id: z.number() });
+
 export type SectorData = z.infer<typeof sectorSchema>;
 export type EditSectorData = z.infer<typeof editSectorSchema>;

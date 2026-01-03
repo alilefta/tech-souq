@@ -62,7 +62,7 @@ export default function VanguardIntelligence() {
 					</div>
 
 					{/* 2. SYSTEM STATUS BAR (Mobile optimized) */}
-					<div className="w-full lg:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-6 lg:gap-10 p-6 lg:p-0 bg-white/[0.02] lg:bg-transparent border border-white/5 lg:border-none">
+					<div className="w-full lg:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-6 lg:gap-10 p-6 lg:p-0 bg-white/2 lg:bg-transparent border border-white/5 lg:border-none">
 						<div className="flex items-center justify-between sm:flex-col sm:items-start gap-1">
 							<div className="flex items-center gap-2">
 								<Activity size={10} className="text-[#FFB400] opacity-50" />

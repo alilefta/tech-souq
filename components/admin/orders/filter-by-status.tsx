@@ -1,17 +1,18 @@
 "use client";
 
 import { FoundrySelect } from "@/components/ui/inputs/foundry-select";
+import { OrderStatus } from "@/generated/prisma/enums";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-export function FilterByAllocation() {
+export function FilterByStatus() {
 	const searchParams = useSearchParams();
 	const pathname = usePathname();
 	const { replace } = useRouter();
 
-	const handleStatusChange = (status: string) => {
+	const handleStatusChange = (slug: string) => {
 		const params = new URLSearchParams(searchParams);
-		if (status === "ALL") params.delete("allocation");
-		else params.set("allocation", status);
+		if (slug === "ALL") params.delete("status");
+		else params.set("status", slug);
 		params.set("page", "1");
 		replace(`${pathname}?${params.toString()}`, { scroll: false });
 	};
@@ -19,26 +20,19 @@ export function FilterByAllocation() {
 	return (
 		<FoundrySelect
 			onValueChange={(value) => handleStatusChange(value)}
-			placeholder="Filter by Allocation"
+			placeholder="Status: ALL"
 			className="bg-[#0A0E14] w-full"
-			value={searchParams.get("allocation") || "ALL"}
+			value={searchParams.get("status") || "ALL"}
 			options={[
 				{
-					label: "Allocation: ALL_STATES",
+					label: "Status: ALL_PACKETS",
 					value: "ALL",
 				},
-				{
-					label: "Critical_Stock (> 10)",
-					value: "CRITICAL",
-				},
-				{
-					label: "Depleted (0)",
-					value: "OUT_OF_STOCK",
-				},
-				{
-					label: "De-Synced (Hidden)",
-					value: "DE_SYNCED",
-				},
+				{ label: "Pending_Clearance", value: "PENDING" },
+				{ label: "Capital_Verified", value: "PAID" },
+				{ label: "In_Transit", value: "SHIPPED" },
+				{ label: "Delivered", value: "DELIVERED" },
+				{ label: "Cancelled", value: "CANCELLED" },
 			]}
 		/>
 	);

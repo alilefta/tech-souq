@@ -77,7 +77,7 @@ export default function Loading() {
 							<div className="w-full h-40 bg-white/[0.01] rounded-sm animate-pulse" />
 						</div>
 						<div className="lg:col-span-5">
-							<div className="w-full h-80 bg-white/[0.02] border border-white/5 rounded-sm animate-pulse" />
+							<div className="w-full h-80 bg-white/2 border border-white/5 rounded-sm animate-pulse" />
 						</div>
 					</div>
 				</div>

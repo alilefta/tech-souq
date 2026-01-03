@@ -26,7 +26,7 @@ export function TextareaWithLabel<S extends FieldValues>({ fieldTitle, nameInSch
 				id={nameInSchema}
 				placeholder={placeholder}
 				className={cn(
-					"w-full min-h-[150px] bg-white/[0.02] border border-white/10 p-4 font-mono text-xs text-[#F5F5F0] outline-none transition-all focus:border-[#FFB400]/40 placeholder:text-white/10 resize-none",
+					"w-full min-h-[150px] bg-white/2 border border-white/10 p-4 font-mono text-xs text-[#F5F5F0] outline-none transition-all focus:border-[#FFB400]/40 placeholder:text-white/10 resize-none",
 					fieldState.invalid && "border-red-500/50"
 				)}
 			/>

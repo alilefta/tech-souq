@@ -19,11 +19,11 @@ export function UserRegistryClient({ initialUsers }: UserRegistryClientProps) {
 	return (
 		<div className="space-y-4">
 			{/* 1. THE REGISTRY TABLE */}
-			<div className="border border-white/5 bg-white/[0.01] overflow-hidden">
+			<div className="border border-white/5 bg-white/1 overflow-hidden">
 				<div className="overflow-x-auto custom-scrollbar">
 					<table className="w-full border-collapse">
 						<thead>
-							<tr className="border-b border-white/5 text-[9px] font-black uppercase text-[#94A3B8] tracking-[0.3em] bg-white/[0.02]">
+							<tr className="border-b border-white/5 text-[9px] font-black uppercase text-[#94A3B8] tracking-[0.3em] bg-white/2">
 								<th className="p-5 text-left font-black">Entity_ID</th>
 								<th className="p-5 text-left font-black">Identity_String</th>
 								<th className="p-5 text-left font-black">Rank_Protocol</th>

@@ -3,11 +3,12 @@
 
 import { Prisma } from "@/generated/prisma/client";
 import { actionClient } from "@/lib/safe-action";
-import { addProductSchema, editProductSchema } from "@/lib/schemas/product";
+import { addProductSchema, deleteSchema, editProductSchema } from "@/lib/schemas/product";
 import { prisma } from "@/prisma/prisma";
 import { revalidatePath } from "next/cache";
 import slugify from "slug";
 import { ProductDetailsDTO, ProductToDetailsDTOMapper } from "../data/products";
+import { handleFoundryError } from "@/lib/action-utils";
 
 export async function getModuleDiagnostic(id: number): Promise<ProductDetailsDTO | null> {
 	try {
@@ -172,5 +173,32 @@ export const updateProduct = actionClient.inputSchema(editProductSchema).action(
 		}
 		console.error("RECONFIG_FAILURE:", error);
 		throw new Error("RECONFIGURATION_FAILURE: DATABASE_SYNC_HALTED");
+	}
+});
+
+// SAFE DE-SYNC (Deactivate)
+export const deactivateProduct = actionClient.inputSchema(deleteSchema).action(async ({ parsedInput }) => {
+	try {
+		await prisma.product.update({
+			where: { id: parsedInput.id },
+			data: { isActive: false },
+		});
+		revalidatePath("/admin/products");
+		return { success: true, message: "MODULE_DE-SYNCED_SUCCESSFULLY" };
+	} catch (error) {
+		handleFoundryError(error);
+	}
+});
+
+// REGISTRY WIPE (Delete)
+export const deleteProduct = actionClient.inputSchema(deleteSchema).action(async ({ parsedInput }) => {
+	try {
+		const product = await prisma.product.delete({
+			where: { id: parsedInput.id },
+		});
+		revalidatePath("/admin/products");
+		return { success: true, message: "REGISTRY_WIPE_COMPLETE" };
+	} catch (error) {
+		handleFoundryError(error);
 	}
 });

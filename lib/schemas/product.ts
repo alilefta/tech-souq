@@ -30,3 +30,5 @@ export const addProductSchema = z.object({
 export const editProductSchema = addProductSchema.extend({
 	id: z.string(),
 });
+
+export const deleteSchema = z.object({ id: z.number() });

@@ -2,6 +2,7 @@
 "use client";
 
 import { CategoryFlatDTO } from "@/app/data/category";
+import { FoundrySelect } from "@/components/ui/inputs/foundry-select";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export function FilterBySector({ categories }: { categories: CategoryFlatDTO[] }) {
@@ -18,18 +19,21 @@ export function FilterBySector({ categories }: { categories: CategoryFlatDTO[] }
 	};
 
 	return (
-		<select
-			title="Sector_Allocation"
+		<FoundrySelect
+			onValueChange={(value) => handleSectorChange(value)}
+			placeholder="Filter by Allocation"
+			className="bg-[#0A0E14] w-full"
 			value={searchParams.get("category") || "ALL"}
-			onChange={(e) => handleSectorChange(e.target.value)}
-			className="w-full bg-[#0A0E14] border border-white/10 h-12 px-4 text-[10px] font-mono uppercase text-[#FFB400] outline-none hover:border-[#FFB400]/40 transition-all cursor-pointer appearance-none"
-		>
-			<option value="ALL">Sector: ALL_REGIONS</option>
-			{categories.map((cat) => (
-				<option key={cat.id} value={cat.slug}>
-					{cat.name}
-				</option>
-			))}
-		</select>
+			options={[
+				{
+					label: "Sector: ALL_REGIONS",
+					value: "ALL",
+				},
+				...categories.map((cat) => ({
+					label: cat.name,
+					value: cat.slug,
+				})),
+			]}
+		/>
 	);
 }

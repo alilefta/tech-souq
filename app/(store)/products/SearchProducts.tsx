@@ -74,7 +74,7 @@ export function SearchProducts() {
 					<Input
 						id="products-search"
 						placeholder="ENTER_IDENTIFIER..."
-						className="w-full bg-white/[0.02] border-white/10 rounded-none h-14 pl-12 pr-4 text-sm font-mono tracking-tight uppercase placeholder:text-white/10 focus-visible:ring-0 focus-visible:border-[#FFB400]/40 transition-all text-[#F5F5F0]"
+						className="w-full bg-white/2 border-white/10 rounded-none h-14 pl-12 pr-4 text-sm font-mono tracking-tight uppercase placeholder:text-white/10 focus-visible:ring-0 focus-visible:border-[#FFB400]/40 transition-all text-[#F5F5F0]"
 						value={query}
 						onChange={(e) => setQuery(e.currentTarget.value)}
 					/>
