@@ -1,12 +1,31 @@
 "use client";
 
+import { authorizeDispatch } from "@/app/actions/order";
 import { OrderDTO } from "@/app/data/orders";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Package, ShieldCheck, Terminal as TerminalIcon } from "lucide-react";
 import { motion } from "motion/react";
+import { useAction } from "next-safe-action/hooks";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export function DispatchAuthorization({ order, isOpen, onClose }: { order: OrderDTO; isOpen: boolean; onClose: () => void }) {
+	const [trackingId, setTrackingId] = useState("");
+
+	const { execute: executeAuthorize, isPending } = useAction(authorizeDispatch, {
+		onSuccess: () => {
+			toast.success("DISPATCH_AUTHORIZED", {
+				description: `UID: ${order.orderNumber} // HANDOFF_COMPLETE`,
+				icon: <ShieldCheck className="text-[#FFB400]" size={16} />,
+			});
+			onClose();
+		},
+		onError: ({ error }) => {
+			toast.error("AUTH_FAILURE", { description: error.serverError });
+		},
+	});
+
 	return (
 		<Sheet open={isOpen} onOpenChange={onClose}>
 			<SheetContent className="w-full sm:max-w-xl bg-[#0A0E14] border-l border-white/5 p-0 flex flex-col font-sans overflow-hidden">
@@ -65,6 +84,8 @@ export function DispatchAuthorization({ order, isOpen, onClose }: { order: Order
 							<input
 								className="w-full bg-white/3 border border-white/10 rounded-none h-14 pl-12 pr-4 text-xs font-mono uppercase tracking-widest focus:border-[#FFB400]/40 outline-none transition-all text-[#F5F5F0]"
 								placeholder="BBL-TRANS-XXXXX"
+								value={trackingId}
+								onChange={(e) => setTrackingId(e.target.value)}
 							/>
 						</div>
 					</div>
@@ -75,9 +96,11 @@ export function DispatchAuthorization({ order, isOpen, onClose }: { order: Order
 					<motion.button
 						whileHover={{ scale: 1.01 }}
 						whileTap={{ scale: 0.99 }}
+						onClick={() => executeAuthorize({ orderNumber: order.orderNumber, trackingNumber: trackingId })}
 						className="w-full py-6 bg-[#FFB400] text-[#0A0E14] font-black text-xs uppercase tracking-[0.4em] shadow-[0_0_50px_rgba(255,180,0,0.1)] hover:shadow-[0_0_80px_rgba(255,180,0,0.3)] transition-all flex items-center justify-center gap-3"
 					>
-						Authorize_Transfer <ShieldCheck size={18} strokeWidth={2.5} />
+						{isPending ? "AUTHORIZING..." : "Authorize_Transfer"}
+						<ShieldCheck size={18} strokeWidth={2.5} />
 					</motion.button>
 					<p className="text-center mt-6 text-[7px] font-mono text-[#94A3B8] uppercase tracking-[0.3em] opacity-30">Final_Signature_Required // Action_Is_Irreversible</p>
 				</div>

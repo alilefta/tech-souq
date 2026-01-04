@@ -16,29 +16,7 @@ export async function getModuleDiagnostic(id: number): Promise<ProductDetailsDTO
 			where: {
 				id: id,
 			},
-			select: {
-				id: true,
-				name: true,
-				price: true,
-				images: true,
-				slug: true,
-				isActive: true,
-				description: true,
-				stock: true,
-				specs: {
-					select: {
-						id: true,
-						label: true,
-						value: true,
-					},
-				},
-				brand: true,
-				reviewCount: true,
-				sku: true,
-				originalPrice: true,
-				averageRating: true,
-				isNew: true,
-				isFeatured: true,
+			include: {
 				category: {
 					select: {
 						name: true,
@@ -46,9 +24,13 @@ export async function getModuleDiagnostic(id: number): Promise<ProductDetailsDTO
 						slug: true,
 					},
 				},
-				categoryId: true,
-				createdAt: true,
-				updatedAt: true,
+				specs: {
+					select: {
+						id: true,
+						label: true,
+						value: true,
+					},
+				},
 			},
 		});
 
@@ -56,7 +38,7 @@ export async function getModuleDiagnostic(id: number): Promise<ProductDetailsDTO
 
 		return ProductToDetailsDTOMapper(product);
 	} catch (error) {
-		throw new Error("Failed to retrieve product data");
+		handleFoundryError(error);
 	}
 }
 
@@ -87,6 +69,7 @@ export const addProduct = actionClient.inputSchema(addProductSchema).action(asyn
 				isActive: p.isActive,
 				isNew: p.isNew,
 				isFeatured: p.isFeatured,
+				compatibility: p.compatibility,
 				// NESTED CREATE: This is the proper way to handle relations in one call
 				specs: {
 					create: p.specs.map((spec) => ({
@@ -106,20 +89,21 @@ export const addProduct = actionClient.inputSchema(addProductSchema).action(asyn
 			id: product.id,
 		};
 	} catch (error) {
-		// Handle Prisma Unique Constraint Errors specifically
-		if (error instanceof Prisma.PrismaClientKnownRequestError) {
-			// P2002 = Unique Constraint Violation (Slug, SKU, or Code)
-			if (error.code === "P2002") {
-				// Optional: You can see which field failed via error.meta?.target
-				const target = (error.meta?.target as string[])?.join(", ") || "Field";
-				throw new Error(`UID_COLLISION: The ${target} already exists in the Registry.`);
-			}
-		}
-		// 2. Log the unknown error for your internal debugging (Server Logs)
-		console.error("CRITICAL_DB_FAILURE:", error);
+		handleFoundryError(error);
+		// // Handle Prisma Unique Constraint Errors specifically
+		// if (error instanceof Prisma.PrismaClientKnownRequestError) {
+		// 	// P2002 = Unique Constraint Violation (Slug, SKU, or Code)
+		// 	if (error.code === "P2002") {
+		// 		// Optional: You can see which field failed via error.meta?.target
+		// 		const target = (error.meta?.target as string[])?.join(", ") || "Field";
+		// 		throw new Error(`UID_COLLISION: The ${target} already exists in the Registry.`);
+		// 	}
+		// }
+		// // 2. Log the unknown error for your internal debugging (Server Logs)
+		// console.error("CRITICAL_DB_FAILURE:", error);
 
-		// 3. Throw a generic error for the client (Security: Don't leak DB details)
-		throw new Error("DATABASE_SYNC_FAILURE: Contact System Administrator.");
+		// // 3. Throw a generic error for the client (Security: Don't leak DB details)
+		// throw new Error("DATABASE_SYNC_FAILURE: Contact System Administrator.");
 	}
 });
 
@@ -146,6 +130,7 @@ export const updateProduct = actionClient.inputSchema(editProductSchema).action(
 				isActive: p.isActive,
 				isNew: p.isNew,
 				isFeatured: p.isFeatured,
+				compatibility: p.compatibility ?? Prisma.JsonNull,
 				// NESTED CREATE: This is the proper way to handle relations in one call
 				specs: {
 					deleteMany: {}, // Clear previous technical parameter,
@@ -166,13 +151,15 @@ export const updateProduct = actionClient.inputSchema(editProductSchema).action(
 			id: product.id,
 		};
 	} catch (error) {
-		if (error instanceof Prisma.PrismaClientKnownRequestError) {
-			if (error.code === "P2002") {
-				throw new Error("UID_COLLISION: SKU or SLUG conflict detected.");
-			}
-		}
-		console.error("RECONFIG_FAILURE:", error);
-		throw new Error("RECONFIGURATION_FAILURE: DATABASE_SYNC_HALTED");
+		handleFoundryError(error);
+
+		// if (error instanceof Prisma.PrismaClientKnownRequestError) {
+		// 	if (error.code === "P2002") {
+		// 		throw new Error("UID_COLLISION: SKU or SLUG conflict detected.");
+		// 	}
+		// }
+		// console.error("RECONFIG_FAILURE:", error);
+		// throw new Error("RECONFIGURATION_FAILURE: DATABASE_SYNC_HALTED");
 	}
 });
 
@@ -193,7 +180,7 @@ export const deactivateProduct = actionClient.inputSchema(deleteSchema).action(a
 // REGISTRY WIPE (Delete)
 export const deleteProduct = actionClient.inputSchema(deleteSchema).action(async ({ parsedInput }) => {
 	try {
-		const product = await prisma.product.delete({
+		await prisma.product.delete({
 			where: { id: parsedInput.id },
 		});
 		revalidatePath("/admin/products");

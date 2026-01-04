@@ -3,12 +3,15 @@
 import "dotenv/config";
 import { defineConfig, env } from "prisma/config";
 
+// apply migration by running: npm run db:migrate -- --name add_orders_table
+const isMigration = process.env.PRISMA_MIGRATION === "true";
+
 export default defineConfig({
 	schema: "prisma/schema.prisma",
 	migrations: {
 		path: "prisma/migrations",
 	},
 	datasource: {
-		url: env("DATABASE_URL"),
+		url: isMigration ? env("MIGRATION_DATABASE_URL") : env("DATABASE_URL"), // For migration, MIGRATION_DATABASE_URL is used for direct DB connection and migrations.
 	},
 });

@@ -1,8 +1,7 @@
 // app/(admin)/admin/users/page.tsx
-import { Users, Shield, Globe, Search, Filter, Terminal } from "lucide-react";
+import { Shield } from "lucide-react";
 import { UserRegistryClient } from "@/components/admin/users/user-registry-client";
 import { mockUsers } from "@/app/data/user";
-import { FoundrySelect } from "@/components/ui/inputs/foundary-form-select";
 import { UserSearch } from "@/components/admin/users/user-search";
 import { FilterByRank } from "@/components/admin/users/filter-by-rank";
 import z from "zod";

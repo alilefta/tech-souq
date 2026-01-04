@@ -2,7 +2,7 @@ import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../generated/prisma/client";
 
-const connectionString = `${process.env.DATABASE_URL}`;
+const connectionString = `${process.env.DATABASE_URL}`; // MIGRATION_DATABASE_URL for migration
 
 const globalForPrisma = global as unknown as {
 	prisma: PrismaClient;

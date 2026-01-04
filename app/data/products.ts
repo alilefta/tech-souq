@@ -1,6 +1,7 @@
 // for fetching operations
 import { Category, Product } from "@/generated/prisma/browser";
 import { ProductOrderByWithAggregationInput, ProductWhereInput } from "@/generated/prisma/models";
+import { CompatibilitySchemaType } from "@/lib/schemas/product";
 import { prisma } from "@/prisma/prisma";
 
 export type ProductSpecs = {
@@ -54,6 +55,7 @@ export interface ProductDetailsDTO {
 	stock?: number;
 	createdAt: Date;
 	updatedAt: Date;
+	compatibility?: CompatibilitySchemaType | null;
 }
 
 export async function getAllProducts() {
@@ -376,29 +378,7 @@ export async function getProductBySlug(slug: string): Promise<ProductDetailsDTO 
 		where: {
 			slug: slug,
 		},
-		select: {
-			id: true,
-			name: true,
-			price: true,
-			images: true,
-			slug: true,
-			isActive: true,
-			description: true,
-			stock: true,
-			specs: {
-				select: {
-					id: true,
-					label: true,
-					value: true,
-				},
-			},
-			brand: true,
-			reviewCount: true,
-			sku: true,
-			originalPrice: true,
-			averageRating: true,
-			isNew: true,
-			isFeatured: true,
+		include: {
 			category: {
 				select: {
 					name: true,
@@ -406,9 +386,13 @@ export async function getProductBySlug(slug: string): Promise<ProductDetailsDTO 
 					slug: true,
 				},
 			},
-			categoryId: true,
-			createdAt: true,
-			updatedAt: true,
+			specs: {
+				select: {
+					id: true,
+					label: true,
+					value: true,
+				},
+			},
 		},
 	});
 
@@ -459,29 +443,7 @@ export async function getProductById(productId: number): Promise<ProductDetailsD
 			where: {
 				id: productId,
 			},
-			select: {
-				id: true,
-				name: true,
-				price: true,
-				images: true,
-				slug: true,
-				isActive: true,
-				description: true,
-				stock: true,
-				specs: {
-					select: {
-						id: true,
-						label: true,
-						value: true,
-					},
-				},
-				brand: true,
-				reviewCount: true,
-				sku: true,
-				originalPrice: true,
-				averageRating: true,
-				isNew: true,
-				isFeatured: true,
+			include: {
 				category: {
 					select: {
 						name: true,
@@ -489,9 +451,13 @@ export async function getProductById(productId: number): Promise<ProductDetailsD
 						slug: true,
 					},
 				},
-				categoryId: true,
-				createdAt: true,
-				updatedAt: true,
+				specs: {
+					select: {
+						id: true,
+						label: true,
+						value: true,
+					},
+				},
 			},
 		});
 
@@ -539,5 +505,6 @@ export function ProductToDetailsDTOMapper(
 		price: Number(p.price),
 		originalPrice: p.originalPrice ? Number(p.originalPrice) : Number(p.price),
 		coverImage: p.images && p.images.length > 0 ? p.images[0] : null,
+		compatibility: p.compatibility as unknown as CompatibilitySchemaType | null,
 	};
 }

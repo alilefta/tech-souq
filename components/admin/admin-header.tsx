@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Bell, User, Terminal, Wifi, Clock } from "lucide-react";
-import { motion } from "motion/react";
+import { Wifi, Clock } from "lucide-react";
 import { HeaderSearch } from "./header-search";
 import { NotificationsTerminal } from "./notifications-terminal";
 import { ProfileTerminal } from "./profile-terminal";

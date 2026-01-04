@@ -17,6 +17,7 @@ import { useAction } from "next-safe-action/hooks";
 import { InferSafeActionFnResult } from "next-safe-action";
 import { addProductSchema, editProductSchema } from "@/lib/schemas/product";
 import { useRouter } from "next/navigation";
+import { CompatibilityLogicModule } from "./compatibility-logic-module";
 
 type DeploymentData = z.infer<typeof addProductSchema>;
 type EditDeploymentData = z.infer<typeof editProductSchema>;
@@ -42,6 +43,7 @@ export function ModuleDeploymentForm({ rawCategories, initialData, isEdit }: { r
 					isActive: true,
 					isNew: true,
 					isFeatured: false,
+					compatibility: undefined,
 			  },
 		mode: "onChange",
 	});
@@ -337,7 +339,7 @@ export function ModuleDeploymentForm({ rawCategories, initialData, isEdit }: { r
 										onClick={() => field.onChange(!field.value)}
 										className={cn(
 											"flex items-center justify-between p-4 border cursor-pointer transition-all",
-											field.value ? "border-[#FFB400] bg-[#FFB400]/5" : "border-white/5 bg-white/[0.01] opacity-40"
+											field.value ? "border-[#FFB400] bg-[#FFB400]/5" : "border-white/5 bg-white/1 opacity-40"
 										)}
 									>
 										<div className="flex flex-col gap-1">
@@ -358,7 +360,7 @@ export function ModuleDeploymentForm({ rawCategories, initialData, isEdit }: { r
 										onClick={() => field.onChange(!field.value)}
 										className={cn(
 											"flex items-center justify-between p-4 border cursor-pointer transition-all",
-											field.value ? "border-[#FFB400] bg-[#FFB400]/5" : "border-white/5 bg-white/[0.01] opacity-40"
+											field.value ? "border-[#FFB400] bg-[#FFB400]/5" : "border-white/5 bg-white/1 opacity-40"
 										)}
 									>
 										<div className="flex flex-col gap-1">
@@ -379,7 +381,7 @@ export function ModuleDeploymentForm({ rawCategories, initialData, isEdit }: { r
 										onClick={() => field.onChange(!field.value)}
 										className={cn(
 											"flex items-center justify-between p-4 border cursor-pointer transition-all",
-											field.value ? "border-[#FFB400] bg-[#FFB400]/5" : "border-white/5 bg-white/[0.01] opacity-40"
+											field.value ? "border-[#FFB400] bg-[#FFB400]/5" : "border-white/5 bg-white/1 opacity-40"
 										)}
 									>
 										<div className="flex flex-col gap-1">
@@ -392,6 +394,9 @@ export function ModuleDeploymentForm({ rawCategories, initialData, isEdit }: { r
 							/>
 						</div>
 					</section>
+
+					{/* NEW: PC BUILDER LOGIC */}
+					<CompatibilityLogicModule />
 				</div>
 
 				{/* RIGHT: THE STATUS MONITOR */}
