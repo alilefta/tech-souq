@@ -28,6 +28,8 @@ export const CaseSchema = z.object({
 	type: z.literal("CASE"),
 	formFactor: z.enum(["ATX", "mATX", "ITX", "E-ATX"]), // Max supported
 	maxGpuLength: z.coerce.number(),
+	maxCpuCoolerHeight: z.coerce.number(),
+	maxRadiatorSupport: z.coerce.number(), // 120, 240, 360mm
 });
 
 export const PsuSchema = z.object({
