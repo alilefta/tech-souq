@@ -2,44 +2,42 @@
 "use client";
 
 import { useGLTF } from "@react-three/drei";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, ReactNode } from "react";
 import * as THREE from "three";
 import gsap from "gsap";
 
-export function PartModel({ path, position }: { path: string; position: [number, number, number] }) {
+interface PartModelProps {
+	modelName: string; // e.g., "cpu", "motherboard"
+	position: [number, number, number];
+	children?: ReactNode;
+}
+
+export function PartModel({ modelName, position, children }: PartModelProps) {
 	const groupRef = useRef<THREE.Group>(null);
-	const fullPath = `/assets/models/${path}.glb`;
 
-	// 1. ASSET HANDSHAKE
-	const { scene } = useGLTF(fullPath);
+	// Load using your specific filenames
+	const { scene } = useGLTF(`/assets/models/${modelName}.glb`);
 
-	// 2. INITIALIZATION PROTOCOL (Animation)
 	useEffect(() => {
 		if (groupRef.current) {
-			// Set initial "Uninitialized" state
+			// INITIALIZE: Scale from 0 for the "Foundry Ingest" effect
 			groupRef.current.scale.set(0, 0, 0);
-			groupRef.current.rotation.y = Math.PI / 4;
 
-			// Trigger "Foundry Ingest" Animation
 			gsap.to(groupRef.current.scale, {
 				x: 1,
 				y: 1,
 				z: 1,
-				duration: 1.2,
-				ease: "elastic.out(1, 0.75)",
-			});
-
-			gsap.to(groupRef.current.rotation, {
-				y: 0,
-				duration: 1.5,
-				ease: "power4.out",
+				duration: 0.6,
+				ease: "back.out(1.2)",
 			});
 		}
-	}, [path]); // Re-run when the hardware model changes
+	}, [modelName]); // Re-animate if the archetype changes
 
 	return (
 		<group ref={groupRef} position={position}>
+			{/* Use a clone to allow multiple instances like RAM/Storage */}
 			<primitive object={scene.clone()} />
+			{children}
 		</group>
 	);
 }

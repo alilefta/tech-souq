@@ -43,7 +43,7 @@ export function ModuleDeploymentForm({ rawCategories, initialData, isEdit }: { r
 					isActive: true,
 					isNew: true,
 					isFeatured: false,
-					compatibility: undefined,
+					compatibility: null,
 			  },
 		mode: "onChange",
 	});

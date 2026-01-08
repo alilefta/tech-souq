@@ -56,25 +56,25 @@ export const addProduct = actionClient.inputSchema(addProductSchema).action(asyn
 		// This ensures product AND specs are created together. If one fails, both roll back.
 		const product = await prisma.product.create({
 			data: {
-				name: p.name,
-				description: p.description,
+				name: p.name.trim(),
+				description: p.description.trim(),
 				price: p.price,
 				slug: finalSlug,
 				stock: p.stock,
-				brand: p.brand,
-				sku: p.sku,
+				brand: p.brand.trim(),
+				sku: p.sku.trim(),
 				originalPrice: p.originalPrice,
 				images: p.images.map((img) => img.url),
 				categoryId: Number(p.categoryId),
 				isActive: p.isActive,
 				isNew: p.isNew,
 				isFeatured: p.isFeatured,
-				compatibility: p.compatibility,
+				compatibility: p.compatibility ?? undefined,
 				// NESTED CREATE: This is the proper way to handle relations in one call
 				specs: {
 					create: p.specs.map((spec) => ({
-						label: spec.label,
-						value: spec.value,
+						label: spec.label.trim(),
+						value: spec.value.trim(),
 					})),
 				},
 			},
@@ -118,12 +118,12 @@ export const updateProduct = actionClient.inputSchema(editProductSchema).action(
 				id: Number(p.id),
 			},
 			data: {
-				name: p.name,
-				description: p.description,
+				name: p.name.trim(),
+				description: p.description.trim(),
 				price: p.price,
 				stock: p.stock,
-				brand: p.brand,
-				sku: p.sku,
+				brand: p.brand.trim(),
+				sku: p.sku.trim(),
 				originalPrice: p.originalPrice,
 				images: p.images.map((img) => img.url),
 				categoryId: Number(p.categoryId),
@@ -135,8 +135,8 @@ export const updateProduct = actionClient.inputSchema(editProductSchema).action(
 				specs: {
 					deleteMany: {}, // Clear previous technical parameter,
 					create: p.specs.map((spec) => ({
-						label: spec.label,
-						value: spec.value,
+						label: spec.label.trim(),
+						value: spec.value.trim(),
 					})),
 				},
 			},

@@ -4,6 +4,7 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FieldPath, FieldValues, Controller, Control } from "react-hook-form";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { cx } from "class-variance-authority";
 
 interface Option {
 	label: string;
@@ -16,9 +17,10 @@ interface FoundrySelectProps<S extends FieldValues> {
 	fieldTitle: string;
 	options: Option[];
 	placeholder?: string;
+	containerClassName?: string;
 }
 
-export function FoundrySelect<S extends FieldValues>({ control, nameInSchema, fieldTitle, options, placeholder }: FoundrySelectProps<S>) {
+export function FoundrySelect<S extends FieldValues>({ control, nameInSchema, fieldTitle, options, placeholder, containerClassName }: FoundrySelectProps<S>) {
 	return (
 		<Field className="space-y-2">
 			<FieldLabel className="text-[9px] font-black uppercase tracking-[0.2em] text-[#94A3B8] mb-0">{fieldTitle}</FieldLabel>
@@ -27,13 +29,13 @@ export function FoundrySelect<S extends FieldValues>({ control, nameInSchema, fi
 				control={control}
 				name={nameInSchema}
 				render={({ field, fieldState }) => (
-					<Select onValueChange={field.onChange} value={field.value}>
+					<Select onValueChange={field.onChange} value={field.value ? String(field.value) : undefined}>
 						<SelectTrigger className="w-full h-12 bg-white/2 border-white/10 rounded-none font-mono text-[10px] uppercase tracking-widest text-[#F5F5F0] focus:ring-0 focus:border-[#FFB400]/40 transition-all">
 							<SelectValue placeholder={placeholder} />
 						</SelectTrigger>
 
 						{/* THIS IS THE PART THAT WAS WHITE - NOW TOTALLY CUSTOMIZED */}
-						<SelectContent className="bg-[#0A0E14] border-white/10 rounded-none shadow-2xl z-50">
+						<SelectContent className={cx("bg-[#0A0E14] border-white/10 rounded-none shadow-2xl z-50", containerClassName)}>
 							{options.map((opt) => (
 								<SelectItem
 									key={opt.value}

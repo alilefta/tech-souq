@@ -28,6 +28,7 @@ export function InputWithLabel<S extends FieldValues>({ fieldTitle, nameInSchema
 				type={type || "text"}
 				{...field}
 				{...props}
+				value={field.value ?? ""}
 				id={nameInSchema}
 				aria-invalid={fieldState.invalid}
 				placeholder={placeholder}

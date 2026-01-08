@@ -1,10 +1,19 @@
 "use client";
 
-import { motion } from "motion/react";
-import { Cpu, Zap, Thermometer, DollarSign, ShieldCheck, Terminal, ArrowRight } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { Cpu, Zap, Thermometer, DollarSign, ShieldCheck, Terminal, ArrowRight, ChevronRight, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { BUILD_STEPS, isStepAuthorized, useBuilderStore } from "@/store/useBuilderStore";
+import { ProductBuilderDTO } from "@/app/data/products";
+import { SafeImage } from "../ui/safe-image";
 
-export function CrucibleHUD() {
+export function CrucibleHUD({ allProducts }: { allProducts: ProductBuilderDTO[] }) {
+	const { currentStep, setStep, manifest, setComponent } = useBuilderStore();
+
+	const activeType = BUILD_STEPS[currentStep];
+
+	// Filter products from the pool that match the current step's technical type
+	const availableModules = allProducts.filter((p) => p.compatibility?.type === (activeType === "STORAGE1" ? "STORAGE" : activeType));
 	return (
 		<div className="h-full w-full flex flex-col justify-between p-6">
 			{/* TOP: SYSTEM IDENTIFIER */}
@@ -29,24 +38,79 @@ export function CrucibleHUD() {
 			</div>
 
 			{/* MIDDLE: THE DUAL SIDEBARS */}
-			<div className="flex-1 flex justify-between items-center my-8">
-				{/* LEFT: PART SELECTOR (The Schematic) */}
-				<aside className="w-80 h-full pointer-events-auto bg-black/40 border border-white/5 backdrop-blur-xl p-6 overflow-y-auto custom-scrollbar">
-					<h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[#94A3B8] mb-6 border-b border-white/5 pb-2">Schematic_Registry</h2>
+			<div className="flex-1 flex justify-between items-stretch my-8 overflow-hidden">
+				{/* LEFT: STEP SELECTOR (Sector Status) */}
+				<aside className="w-64 h-full pointer-events-auto bg-black/60 border border-white/5 backdrop-blur-xl p-4 flex flex-col">
+					<h2 className="text-[9px] font-black uppercase tracking-[0.3em] text-[#94A3B8] mb-6 px-2">Assembly_Chain</h2>
+					<div className="space-y-1 flex-1 overflow-y-auto custom-scrollbar">
+						{BUILD_STEPS.map((step, i) => {
+							const isAuthorized = isStepAuthorized(i, manifest);
+							const isActive = currentStep === i;
 
-					{/* Category Selection Modules */}
-					<div className="space-y-4">
-						{["Chassis", "Logic_Board", "CPU_Core", "Graphics_Node", "Energy_Cell"].map((step, i) => (
-							<div key={step} className="group relative p-4 border border-white/5 bg-white/[0.01] hover:border-[#FFB400]/40 transition-all cursor-pointer">
-								<div className="flex justify-between items-center">
-									<span className="text-[9px] font-mono text-[#FFB400] opacity-40">0{i + 1}</span>
-									<ShieldCheck size={12} className="text-green-500 opacity-20 group-hover:opacity-100 transition-opacity" />
-								</div>
-								<p className="text-xs font-black uppercase text-[#F5F5F0] mt-1">{step}</p>
-							</div>
-						))}
+							return (
+								<button
+									key={step}
+									disabled={!isAuthorized} // Force the lock
+									onClick={() => setStep(i)}
+									className={cn(
+										"w-full text-left p-3 border transition-all flex items-center justify-between group",
+										isActive ? "bg-[#FFB400]/10 border-[#FFB400]/40" : "bg-transparent border-transparent",
+										!isAuthorized ? "opacity-20 cursor-not-allowed" : "hover:bg-white/5"
+									)}
+								>
+									<div className="flex items-center gap-3">
+										{/* Show a Lock icon if not authorized */}
+										{isAuthorized ? (
+											<span className={cn("text-[9px] font-mono", isActive ? "text-[#FFB400]" : "text-[#94A3B8] opacity-40")}>0{i + 1}</span>
+										) : (
+											<Lock size={10} className="text-[#94A3B8]" />
+										)}
+										<span className={cn("text-[10px] font-bold uppercase tracking-tighter", isActive ? "text-[#F5F5F0]" : "text-[#94A3B8]")}>{step.split("1")[0]}</span>
+									</div>
+									{manifest[step] && <ShieldCheck size={12} className="text-green-500" />}
+								</button>
+							);
+						})}
 					</div>
 				</aside>
+
+				{/* CENTER: MODULE SELECTION (The Part Scroller) */}
+				<div className="flex-1 flex flex-col justify-end items-center px-12 pb-12">
+					<div className="w-full max-w-4xl pointer-events-auto">
+						<div className="flex items-center gap-4 mb-4">
+							<span className="text-[10px] font-black uppercase text-[#FFB400] tracking-widest">Compatible_Modules_Detected: [{availableModules.length}]</span>
+							<div className="h-px flex-1 bg-[#FFB400]/20" />
+						</div>
+
+						{/* HORIZONTAL HARDWARE CAROUSEL */}
+						<div className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide snap-x">
+							<AnimatePresence mode="popLayout">
+								{availableModules.map((product) => (
+									<motion.button
+										key={product.id}
+										initial={{ opacity: 0, x: 20 }}
+										animate={{ opacity: 1, x: 0 }}
+										onClick={() => setComponent(activeType, product)}
+										className={cn(
+											"shrink-0 w-48 p-4 border transition-all text-left group snap-start bg-[#0A0E14]/80 backdrop-blur-md",
+											manifest[activeType]?.id === product.id ? "border-[#FFB400] bg-[#FFB400]/5" : "border-white/10 hover:border-white/30"
+										)}
+									>
+										<div className="aspect-square relative mb-4 bg-white/5 flex items-center justify-center">
+											<SafeImage src={product.coverImage} className="w-full h-full object-contain p-4 grayscale group-hover:grayscale-0 transition-all" alt="" fill />
+										</div>
+										<p className="text-[8px] font-black text-[#FFB400] uppercase tracking-widest mb-1">{product.brand}</p>
+										<h4 className="text-[11px] font-bold text-[#F5F5F0] leading-tight uppercase mb-3 line-clamp-2 h-8">{product.name}</h4>
+										<div className="flex justify-between items-center border-t border-white/5 pt-2">
+											<span className="text-[10px] font-black text-[#F5F5F0]">${product.price}</span>
+											<ChevronRight size={14} className="text-[#94A3B8] group-hover:text-[#FFB400]" />
+										</div>
+									</motion.button>
+								))}
+							</AnimatePresence>
+						</div>
+					</div>
+				</div>
 
 				{/* RIGHT: THE TELEMETRY HUB */}
 				<aside className="w-80 h-full pointer-events-auto flex flex-col gap-6">
@@ -76,8 +140,16 @@ export function CrucibleHUD() {
 			<div className="flex items-center gap-6 pointer-events-auto">
 				<div className="flex-1 h-14 bg-white/[0.02] border border-white/5 backdrop-blur-md flex items-center px-6">
 					<div className="flex gap-4">
-						<span className="text-[9px] font-mono text-[#94A3B8] uppercase">LOG: </span>
-						<span className="text-[9px] font-mono text-[#F5F5F0] uppercase animate-pulse">Awaiting_Graphics_Node_Allocation...</span>
+						<span className="text-[9px] font-mono text-[#94A3B8] uppercase tracking-widest">System_Message: </span>
+						<span className={cn("text-[9px] font-mono uppercase", !isStepAuthorized(currentStep, manifest) ? "text-red-500 animate-pulse" : "text-[#F5F5F0]")}>
+							{!manifest.CHASSIS
+								? "CRITICAL: Initialize_Chassis_To_Begin_Assembly"
+								: !manifest.MOTHERBOARD && activeType !== "MOTHERBOARD" && activeType !== "PSU"
+								? "PROTOCOL_ERROR: Logic_Board_Node_Required_For_Component_Sync"
+								: manifest[activeType]
+								? `Identified: ${manifest[activeType]?.name} // Registry_Synced`
+								: `Awaiting_${activeType}_Allocation...`}
+						</span>
 					</div>
 				</div>
 
@@ -89,7 +161,7 @@ export function CrucibleHUD() {
 	);
 }
 
-function TelemetryBar({ label, current, max, unit, color }: any) {
+function TelemetryBar({ label, current, max, unit, color }: { label: string; current: number; max: number; unit: string; color: string }) {
 	const percent = (current / max) * 100;
 	return (
 		<div className="space-y-2">

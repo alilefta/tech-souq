@@ -1,5 +1,6 @@
 // for fetching operations
 import { Category, Product } from "@/generated/prisma/browser";
+import { Prisma } from "@/generated/prisma/client";
 import { ProductOrderByWithAggregationInput, ProductWhereInput } from "@/generated/prisma/models";
 import { CompatibilitySchemaType } from "@/lib/schemas/product";
 import { prisma } from "@/prisma/prisma";
@@ -30,6 +31,19 @@ export interface ProductCardDTO {
 	sku?: string;
 	stock?: number;
 	brand: string;
+	compatibility?: CompatibilitySchemaType | null;
+}
+
+export interface ProductBuilderDTO {
+	id: number;
+	name: string;
+	price: number;
+	images: string[];
+	slug: string;
+	coverImage: string | null;
+	sku?: string;
+	brand: string;
+	compatibility?: CompatibilitySchemaType | null;
 }
 
 export interface ProductDetailsDTO {
@@ -40,8 +54,6 @@ export interface ProductDetailsDTO {
 	originalPrice: number | null;
 	images: string[];
 	slug: string;
-	// rating: number;
-	// reviews: number;
 	coverImage: string | null;
 	brand: string;
 	sku: string;
@@ -469,7 +481,34 @@ export async function getProductById(productId: number): Promise<ProductDetailsD
 	}
 }
 
-// Helpers
+/**
+ * Fetches all hardware modules equipped with Crucible_Logic mapping.
+ * Returns them grouped by their internal hardware type.
+ */
+export async function getBuilderProducts() {
+	const products = await prisma.product.findMany({
+		where: {
+			isActive: true,
+			compatibility: {
+				not: Prisma.JsonNull, // Only get parts that have the logic module enabled
+			},
+		},
+		select: {
+			id: true,
+			name: true,
+			price: true,
+			brand: true,
+			images: true,
+			slug: true,
+			sku: true,
+			compatibility: true, // This contains the { type: "CPU", socket: "...", ... }
+		},
+	});
+
+	return products.map((p) => ProductToBuilderDTOMapper(p));
+}
+
+// ====================== Helpers =======================
 export function ProductToCardDTOMapper(
 	p: Partial<Product> & {
 		category: ProductCategory;
@@ -491,6 +530,21 @@ export function ProductToCardDTOMapper(
 		sku: p.sku,
 		stock: p.stock,
 		brand: p.brand ?? "Base_60",
+		compatibility: p.compatibility as unknown as CompatibilitySchemaType | null,
+	};
+}
+
+export function ProductToBuilderDTOMapper(p: Pick<Product, "id" | "name" | "price" | "brand" | "images" | "slug" | "sku" | "compatibility">): ProductBuilderDTO {
+	return {
+		id: p.id,
+		name: p.name,
+		price: Number(p.price),
+		slug: p.slug!,
+		images: p.images,
+		coverImage: p.images && p.images.length > 0 ? p.images[0] : null,
+		sku: p.sku,
+		brand: p.brand ?? "Base_60",
+		compatibility: p.compatibility as unknown as CompatibilitySchemaType | null,
 	};
 }
 
