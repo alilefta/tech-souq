@@ -1,5 +1,7 @@
 // lib/builder/resolver.ts
 import { BuilderState } from "@/store/useBuilderStore";
+import { CpuSchema, MotherboardSchema, GpuSchema, ChassisSchema, PsuSchema, RamSchema, StorageSchema, CoolerSchema } from "@/lib/schemas/product";
+import z from "zod";
 
 export type ProtocolAlert = {
 	code: string;
@@ -7,108 +9,159 @@ export type ProtocolAlert = {
 	severity: "CRITICAL" | "WARNING" | "STABLE";
 };
 
+// Types extracted from schema for strict logic
+type CPU = z.infer<typeof CpuSchema>;
+type MB = z.infer<typeof MotherboardSchema>;
+type GPU = z.infer<typeof GpuSchema>;
+type CHASSIS = z.infer<typeof ChassisSchema>;
+type PSU = z.infer<typeof PsuSchema>;
+type RAM = z.infer<typeof RamSchema>;
+type STORAGE = z.infer<typeof StorageSchema>;
+type COOLER = z.infer<typeof CoolerSchema>;
+
 export function resolveCompatibility(manifest: BuilderState["manifest"]): ProtocolAlert[] {
 	const alerts: ProtocolAlert[] = [];
 	const { CPU, MOTHERBOARD, RAM, PSU, GPU, CHASSIS, COOLER, STORAGE1, STORAGE2 } = manifest;
 
-	// 1. SOCKET HANDSHAKE (CPU vs MOTHERBOARD)
-	if (CPU?.compatibility?.type === "CPU" && MOTHERBOARD?.compatibility?.type === "MOTHERBOARD") {
-		if (CPU.compatibility.socket !== MOTHERBOARD.compatibility.socket) {
+	const c = CPU?.compatibility as CPU;
+	const m = MOTHERBOARD?.compatibility as MB;
+	const g = GPU?.compatibility as GPU;
+	const cs = CHASSIS?.compatibility as CHASSIS;
+	const p = PSU?.compatibility as PSU;
+	const r = RAM?.compatibility as RAM;
+	const cl = COOLER?.compatibility as COOLER;
+
+	// 1. CPU <-> MOTHERBOARD (The Brain Handshake)
+	if (c && m) {
+		if (c.socket !== m.socket) {
 			alerts.push({
 				code: "SOCKET_MISMATCH",
-				message: `CPU Socket [${CPU.compatibility.socket}] is incompatible with Motherboard [${MOTHERBOARD.compatibility.socket}]`,
+				message: `Critical: CPU Socket [${c.socket}] is incompatible with Motherboard [${m.socket}]`,
 				severity: "CRITICAL",
 			});
 		}
-	}
-
-	// 2. MEMORY PROTOCOL (RAM vs MOTHERBOARD)
-	if (RAM?.compatibility?.type === "RAM" && MOTHERBOARD?.compatibility?.type === "MOTHERBOARD") {
-		if (RAM.compatibility.memoryType !== MOTHERBOARD.compatibility.memoryType) {
+		if (c.chipsetSupport && !c.chipsetSupport.includes(m.chipset)) {
 			alerts.push({
-				code: "MEMORY_CONFLICT",
-				message: `DDR Standard Mismatch: MB requires ${MOTHERBOARD.compatibility.memoryType}`,
-				severity: "CRITICAL",
-			});
-		}
-	}
-
-	// 3. ENERGY DEFICIT (PSU vs TDP)
-	const totalTdp = (CPU?.compatibility?.type === "CPU" ? CPU.compatibility.tdp : 0) + (GPU?.compatibility?.type === "GPU" ? GPU.compatibility.tdp : 0);
-
-	if (PSU?.compatibility?.type === "PSU" && totalTdp > 0) {
-		if (totalTdp > PSU.compatibility.wattage * 0.8) {
-			alerts.push({
-				code: "ENERGY_DEFICIT",
-				message: `Combined Load (${totalTdp}W) exceeds 80% of PSU capacity. Risk of system instability.`,
+				code: "CHIPSET_CONFLICT",
+				message: `Warning: Chipset ${m.chipset} may require a BIOS update to support this CPU.`,
 				severity: "WARNING",
 			});
 		}
 	}
 
-	if (MOTHERBOARD?.compatibility?.type === "MOTHERBOARD" && CHASSIS?.compatibility?.type === "CASE") {
-		const formFactorOrder = ["ITX", "mATX", "ATX", "E-ATX"];
-		const mbIndex = formFactorOrder.indexOf(MOTHERBOARD.compatibility.formFactor);
-		const caseIndex = formFactorOrder.indexOf(CHASSIS.compatibility.formFactor);
-
-		if (mbIndex > caseIndex) {
+	// 2. MEMORY PROTOCOLS (Motherboard + CPU + RAM)
+	if (r && m) {
+		if (r.memoryType !== m.memoryType) {
 			alerts.push({
-				code: "CHASSIS_INCOMPATIBILITY",
-				message: `Chassis only supports up to ${CHASSIS.compatibility.formFactor}. ${MOTHERBOARD.compatibility.formFactor} board detected.`,
+				code: "DDR_MISMATCH",
+				message: `Critical: Motherboard requires ${m.memoryType}, but ${r.memoryType} modules were selected.`,
+				severity: "CRITICAL",
+			});
+		}
+		if (r.modules > m.memorySlots) {
+			alerts.push({
+				code: "DIMM_OVERFLOW",
+				message: `Critical: Selected ${r.modules} sticks, but Motherboard only has ${m.memorySlots} slots.`,
+				severity: "CRITICAL",
+			});
+		}
+		if (r.capacity > m.maxMemoryCapacity) {
+			alerts.push({
+				code: "CAPACITY_OVERFLOW",
+				message: `Critical: ${r.capacity}GB exceeds Motherboard's max capacity of ${m.maxMemoryCapacity}GB.`,
 				severity: "CRITICAL",
 			});
 		}
 	}
 
-	// 5. GPU CLEARANCE
-	if (GPU?.compatibility?.type === "GPU" && CHASSIS?.compatibility?.type === "CASE") {
-		if (GPU.compatibility.length > CHASSIS.compatibility.maxGpuLength) {
+	// 3. ENERGY GRID (Total TDP vs PSU)
+	if (p) {
+		const cpuTdp = c?.tdp || 0;
+		const gpuTdp = g?.tdp || 0;
+		const totalTdp = cpuTdp + gpuTdp + 100; // 100W overhead for peripherals/fans
+
+		if (totalTdp > p.wattage) {
 			alerts.push({
-				code: "PHYSICAL_OVERFLOW",
-				message: `GPU Length (${GPU.compatibility.length}mm) exceeds Chassis clearance (${CHASSIS.compatibility.maxGpuLength}mm).`,
+				code: "ENERGY_FAILURE",
+				message: `System Failure: Estimated draw (${totalTdp}W) exceeds PSU capacity (${p.wattage}W).`,
 				severity: "CRITICAL",
 			});
-		}
-	}
-
-	if (COOLER?.compatibility?.type === "COOLER" && CHASSIS?.compatibility?.type === "CASE") {
-		if (COOLER?.compatibility?.height !== CHASSIS.compatibility.maxCpuCoolerHeight) {
+		} else if (totalTdp > p.wattage * 0.8) {
 			alerts.push({
-				code: "THERMAL_WIDTH_VIOLATION",
-				message: `Structural_Alert: Regulator height [165mm] exceeds Chassis depth.`,
+				code: "ENERGY_STRAIN",
+				message: `Telemetry Alert: Power draw is near PSU limit. 80% threshold exceeded.`,
 				severity: "WARNING",
 			});
 		}
 	}
 
-	if (COOLER?.compatibility?.type === "COOLER" && CHASSIS?.compatibility?.type === "CASE") {
-		if (COOLER?.compatibility?.coolerType === "LIQUID" && COOLER?.compatibility?.radiatorSize !== CHASSIS.compatibility.maxRadiatorSupport) {
+	// 4. POWER CONNECTORS (PSU vs MB/GPU Pins)
+	if (p && m) {
+		const hasRequiredCpuPins = m.cpuPowerConnectors.every((pin) => p.cpuPowerConnectors.includes(pin));
+		if (!hasRequiredCpuPins) {
 			alerts.push({
-				code: "RADIATOR_SYNC_FAILURE",
-				message: `Cooler Radiator Size (${COOLER.compatibility?.radiatorSize}mm) exceeds max Chassis clearance (${CHASSIS?.compatibility?.maxRadiatorSupport}).`,
-				severity: "WARNING",
-			});
-		}
-	}
-
-	if (MOTHERBOARD?.compatibility?.type === "MOTHERBOARD") {
-		const m2Drives = [STORAGE1, STORAGE2].filter((s) => s?.compatibility?.type === "STORAGE" && s.compatibility.formFactor === "M.2").length;
-		if (m2Drives > (MOTHERBOARD.compatibility.m2Slots || 0)) {
-			alerts.push({
-				code: "SLOT_EXHAUSTION",
-				message: `Insufficient M.2 slots. Selected: ${m2Drives}, Available: ${MOTHERBOARD.compatibility.m2Slots}`,
+				code: "CPU_POWER_CONFLICT",
+				message: `Critical: PSU lacks required CPU power connectors [${m.cpuPowerConnectors.join(", ")}].`,
 				severity: "CRITICAL",
 			});
 		}
 	}
 
-	if (MOTHERBOARD?.compatibility?.type === "MOTHERBOARD" && RAM?.compatibility?.type === "RAM") {
-		const slots = MOTHERBOARD?.compatibility?.memorySlots;
-		const memModules = RAM?.compatibility?.modules;
-		if (memModules > slots) {
+	// 5. GEOMETRIC CLEARANCE (Case Constraints)
+	if (cs) {
+		// GPU Length
+		if (g && g.length > cs.maxGpuLength) {
 			alerts.push({
-				code: "SLOT_EXHAUSTION",
-				message: `Insufficient Memory slots. Selected: ${memModules}, Available: ${slots}`,
+				code: "GPU_PHYSICAL_OVERFLOW",
+				message: `Structural Alert: GPU length (${g.length}mm) exceeds Chassis clearance (${cs.maxGpuLength}mm).`,
+				severity: "CRITICAL",
+			});
+		}
+		// Cooler Height
+		if (cl && cl.coolerType === "AIR" && cl.height > cs.maxCpuCoolerHeight) {
+			alerts.push({
+				code: "THERMAL_HEIGHT_VIOLATION",
+				message: `Structural Alert: Cooler height (${cl.height}mm) exceeds Chassis depth (${cs.maxCpuCoolerHeight}mm).`,
+				severity: "CRITICAL",
+			});
+		}
+		// Radiator Size
+		if (cl && cl.coolerType === "LIQUID" && cl.radiatorSize) {
+			if (!cs.radiatorSupport.includes(cl.radiatorSize as CHASSIS["radiatorSupport"][0])) {
+				alerts.push({
+					code: "RADIATOR_SYNC_FAILURE",
+					message: `Structural Alert: Chassis does not support ${cl.radiatorSize}mm radiators.`,
+					severity: "CRITICAL",
+				});
+			}
+		}
+	}
+
+	// 6. STORAGE LOGISTICS (Motherboard slots)
+	if (m) {
+		const m2Drives = [STORAGE1, STORAGE2].filter((s) => (s?.compatibility as STORAGE)?.formFactor === "M.2").length;
+		if (m2Drives > m.m2Slots.length) {
+			alerts.push({
+				code: "M2_SLOT_EXHAUSTION",
+				message: `Resource Alert: Insufficient M.2 slots. Required: ${m2Drives}, Available: ${m.m2Slots.length}.`,
+				severity: "CRITICAL",
+			});
+		}
+	}
+
+	// 7. THERMAL SYNC (Cooler vs CPU)
+	if (cl && c) {
+		if (!cl.socket.includes(c.socket)) {
+			alerts.push({
+				code: "COOLER_SOCKET_MISMATCH",
+				message: `Critical: Cooler bracket does not support ${c.socket} architecture.`,
+				severity: "CRITICAL",
+			});
+		}
+		if (cl.maxTdp < c.tdp) {
+			alerts.push({
+				code: "THERMAL_DEFICIT",
+				message: `Critical: Cooler capacity (${cl.maxTdp}W) is insufficient for CPU TDP (${c.tdp}W).`,
 				severity: "CRITICAL",
 			});
 		}

@@ -54,7 +54,7 @@ export function DispatchAuthorization({ order, isOpen, onClose }: { order: Order
 										<div className="w-8 h-8 bg-white/5 flex items-center justify-center">
 											<Package size={14} className="text-[#94A3B8] group-hover:text-[#FFB400]" />
 										</div>
-										<p className="text-xs font-bold text-[#F5F5F0] uppercase tracking-tight">{item.product.name}</p>
+										<p className="text-xs font-bold text-[#F5F5F0] uppercase tracking-tight md:max-w-sm max-w-xs">{item.product.name}</p>
 									</div>
 									<span className="text-[10px] font-mono text-[#FFB400]">QTY: {item.quantity}</span>
 								</div>

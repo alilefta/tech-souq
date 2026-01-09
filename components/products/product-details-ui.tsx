@@ -40,7 +40,7 @@ export function ProductDetailsUI({ product }: { product: ProductDetailsDTO }) {
 
 					<div className="flex items-end justify-between md:justify-start gap-6 mt-8">
 						<div className="flex flex-col">
-							{product.originalPrice && product.originalPrice > product.price && (
+							{product.originalPrice !== null && product.originalPrice > product.price && (
 								<span className="text-[#94A3B8] text-xs line-through opacity-40 font-mono mb-1">${product.originalPrice}</span>
 							)}
 							<span className="text-[#F5F5F0] text-5xl font-black tracking-tighter leading-none">

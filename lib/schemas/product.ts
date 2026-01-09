@@ -68,8 +68,8 @@ export const GpuSchema = z.object({
 	powerConnectors: z.array(z.enum(["6-pin", "8-pin", "12VHPWR"])), // PSU must provide all required connectors
 });
 
-export const CaseSchema = z.object({
-	type: z.literal("CASE"),
+export const ChassisSchema = z.object({
+	type: z.literal("CHASSIS"),
 	// ── Motherboard compatibility ─────────────────────
 	formFactor: z.enum(["ATX", "mATX", "ITX", "E-ATX"]), // Must support Motherboard.formFactor
 
@@ -149,7 +149,7 @@ export const CoolerSchema = z.object({
 });
 
 // 2. The Master Union
-export const CompatibilitySchema = z.discriminatedUnion("type", [CpuSchema, MotherboardSchema, GpuSchema, CaseSchema, PsuSchema, RamSchema, StorageSchema, CoolerSchema]);
+export const CompatibilitySchema = z.discriminatedUnion("type", [CpuSchema, MotherboardSchema, GpuSchema, ChassisSchema, PsuSchema, RamSchema, StorageSchema, CoolerSchema]);
 
 export const productSpecSchema = z.object({
 	label: z.string().min(1, "Required"),

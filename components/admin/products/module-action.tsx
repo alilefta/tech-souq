@@ -17,7 +17,7 @@ export function ModuleAction({ type, onClick }: ModuleActionProps) {
 
 	return (
 		<button onClick={onClick} className={cn("px-3 py-1.5 border text-[9px] font-black uppercase tracking-widest transition-all", styles[type])}>
-			{type === "scan" ? "[ Scan_Module ]" : type === "kill" ? "Kill_Process" : "Edit_Logic"}
+			{type === "scan" ? "[Scan]" : type === "kill" ? "Kill_Process" : "Edit_Logic"}
 		</button>
 	);
 }

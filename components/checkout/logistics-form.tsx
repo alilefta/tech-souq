@@ -1,7 +1,7 @@
 // components/checkout/logistics-form.tsx
 "use client";
 
-import { ArrowRight, CreditCard, Landmark, ShieldCheck, Wallet, Lock, Terminal } from "lucide-react";
+import { ArrowRight, CreditCard, Landmark, ShieldCheck, Wallet, Lock, Terminal, Activity } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react"; // Added AnimatePresence
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,6 +14,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { FieldError, FieldSet } from "../ui/field";
 import { ReactNode } from "react";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
+import { useAction } from "next-safe-action/hooks";
+import { createOrderAction } from "@/app/actions/order";
+import { useRouter } from "next/navigation";
 
 const CheckoutFormSchema = z.object({
 	firstName: z.string().min(1, "Required"),
@@ -107,10 +110,34 @@ export function LogisticsForm() {
 		mode: "onBlur",
 	});
 
+	const router = useRouter();
+
+	// 1. INITIALIZE ACTION HOOK
+	const { executeAsync: executeOrder, isExecuting } = useAction(createOrderAction, {
+		onSuccess: ({ data }) => {
+			if (data?.success) {
+				toast.success("AUTHORIZATION_GRANTED", {
+					description: "ORDER_MANIFEST_DEPLOYED_SUCCESSFULLY",
+					icon: <ShieldCheck className="text-[#FFB400]" size={16} />,
+				});
+				// Navigate to cinematic success page
+				router.push(`/checkout/success/${data.orderNumber}`);
+			}
+		},
+		onError: ({ error }) => {
+			toast.error("DEPLOYMENT_HALTED", {
+				description: error.serverError || "SYSTEM_LOGIC_CONFLICT",
+				icon: <Activity className="text-red-500" size={16} />,
+			});
+		},
+	});
+
 	const selectedMethod = watch("payment_method");
 
-	function onSubmit(data: CheckoutFormSchemaType) {
+	async function onSubmit(data: CheckoutFormSchemaType) {
 		// In real app: createOrder(data)
+		await executeOrder(data);
+
 		toast.success("PAYLOAD_ENCRYPTED", {
 			description: "Transmitting manifest to secure node...",
 			icon: <Lock className="text-[#FFB400]" size={16} />,
@@ -367,17 +394,27 @@ export function LogisticsForm() {
 						whileHover={{ scale: 1.01 }}
 						whileTap={{ scale: 0.99 }}
 						type="submit"
-						form="checkout-form"
-						disabled={formState.isSubmitting}
-						className="group relative w-full bg-[#FFB400] text-[#0A0E14] font-black text-sm uppercase tracking-[0.4em] py-8 flex items-center justify-center gap-4 overflow-hidden transition-all shadow-[0_0_50px_rgba(255,180,0,0.1)] hover:shadow-[0_0_80px_rgba(255,180,0,0.3)] disabled:opacity-50 disabled:grayscale"
+						disabled={isExecuting || !formState.isValid}
+						className="group relative w-full bg-[#FFB400] text-[#0A0E14] font-black text-sm uppercase tracking-[0.4em] py-8 flex items-center justify-center gap-4 overflow-hidden transition-all shadow-[0_0_50px_rgba(255,180,0,0.1)] hover:shadow-[0_0_80px_rgba(255,180,0,0.3)] disabled:opacity-20 disabled:grayscale"
 					>
 						<span className="relative z-10 flex items-center gap-4">
-							{formState.isSubmitting ? "TRANSMITTING..." : "DEPLOY ORDER MANIFEST"}
-							{!formState.isSubmitting && <ArrowRight size={20} strokeWidth={3} className="group-hover:translate-x-2 transition-transform" />}
+							{isExecuting ? (
+								<>
+									INITIALIZING_DISPATCH... <Activity size={18} className="animate-spin" />
+								</>
+							) : (
+								<>
+									Deploy Order Manifest <ArrowRight size={20} strokeWidth={3} />
+								</>
+							)}
 						</span>
-						<div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-							<div className="absolute top-0 -inset-full h-full w-1/2 z-10 block transform -skew-x-30 bg-linear-to-r from-transparent via-white/40 to-transparent -translate-x-[150%] group-hover:translate-x-[250%] transition-transform duration-1000 ease-in-out" />
-						</div>
+
+						{/* Kinetic Beam (Hidden during execution for visual focus) */}
+						{!isExecuting && (
+							<div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+								<div className="absolute top-0 -inset-full h-full w-1/2 z-10 block transform -skew-x-30 bg-linear-to-r from-transparent via-white/40 to-transparent -translate-x-[150%] group-hover:translate-x-[250%] transition-transform duration-1000 ease-in-out" />
+							</div>
+						)}
 					</motion.button>
 				</div>
 			</div>

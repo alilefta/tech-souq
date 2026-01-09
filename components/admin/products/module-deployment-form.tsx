@@ -172,6 +172,7 @@ export function ModuleDeploymentForm({ rawCategories, initialData, isEdit }: { r
 										fieldState={fieldState}
 										nameInSchema="categoryId"
 										fieldTitle="Sector_Allocation"
+										placeholder="Select_Sector"
 										data={rawCategories.map((c) => ({ label: c.name, value: String(c.id) }))}
 									/>
 								)}

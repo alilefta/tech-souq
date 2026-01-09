@@ -87,7 +87,7 @@ export function SuccessUI({ order }: { order: OrderDTO }) {
 						</p>
 					</div>
 					{/* Subtle scanline */}
-					<div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#FFB400]/5 to-transparent h-[20%] w-full animate-scan pointer-events-none" />
+					<div className="absolute inset-0 bg-linear-to-b from-transparent via-[#FFB400]/5 to-transparent h-[20%] w-full animate-scan pointer-events-none" />
 				</div>
 
 				{/* 6. NEXT STEPS */}

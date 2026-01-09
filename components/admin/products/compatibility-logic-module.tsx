@@ -6,7 +6,7 @@ import { InputWithLabel } from "@/components/ui/inputs/input-with-label";
 import { FoundrySelect as FoundarySelectField } from "@/components/ui/inputs/foundary-form-select";
 import { FoundrySelect } from "@/components/ui/inputs/foundry-select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { AddProductSchemaType, CaseSchema, CompatibilitySchemaType, CoolerSchema, CpuSchema, GpuSchema, MotherboardSchema, RamSchema, StorageSchema } from "@/lib/schemas/product";
+import { AddProductSchemaType, ChassisSchema, CompatibilitySchemaType, CoolerSchema, CpuSchema, GpuSchema, MotherboardSchema, RamSchema, StorageSchema } from "@/lib/schemas/product";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 import z from "zod";
@@ -22,7 +22,7 @@ const COMPATIBILITY_TYPES: CompatibilityTypesUISchema[] = [
 	{ label: "Central_Processor (CPU)", value: "CPU", icon: Cpu },
 	{ label: "Logic_Board (Motherboard)", value: "MOTHERBOARD", icon: Layout },
 	{ label: "Graphics_Node (GPU)", value: "GPU", icon: Activity },
-	{ label: "Foundry_Chassis (Case)", value: "CASE", icon: Box },
+	{ label: "Foundry_Chassis (Chassis)", value: "CHASSIS", icon: Box },
 	{ label: "Energy_Cell (PSU)", value: "PSU", icon: Zap },
 	{ label: "Memory_Module (RAM)", value: "RAM", icon: MemoryStick },
 	{ label: "Storage_Node (Drive)", value: "STORAGE", icon: Database },
@@ -283,10 +283,11 @@ export function CompatibilityLogicModule() {
 											name="compatibility.cpuPowerConnectors"
 											control={control}
 											render={({ field }) => {
-												const options = ["4-pin", "8-pin"] as const;
+												type T = z.infer<typeof MotherboardSchema>["cpuPowerConnectors"];
+												const options = ["4-pin", "8-pin"] satisfies T;
 												const currentValues = field.value || [];
 
-												const toggleOption = (val: string) => {
+												const toggleOption = (val: T[0]) => {
 													const next = currentValues.includes(val) ? currentValues.filter((v: string) => v !== val) : [...currentValues, val];
 													field.onChange(next);
 												};
@@ -359,10 +360,12 @@ export function CompatibilityLogicModule() {
 														title="remove_slot"
 														onClick={() => {
 															const current = watch("compatibility.m2Slots");
-															setValue(
-																"compatibility.m2Slots",
-																current.filter((_, i) => i !== index)
-															);
+
+															if (current)
+																setValue(
+																	"compatibility.m2Slots",
+																	current.filter((_, i) => i !== index)
+																);
 														}}
 														className="mb-2 text-[#94A3B8] hover:text-red-500"
 													>
@@ -460,10 +463,11 @@ export function CompatibilityLogicModule() {
 											name="compatibility.psuFormFactor"
 											control={control}
 											render={({ field }) => {
-												const options = ["ATX", "SFX", "SFX-L"] satisfies z.infer<typeof CaseSchema>["psuFormFactor"];
+												type T = z.infer<typeof ChassisSchema>["psuFormFactor"];
+												const options = ["ATX", "SFX", "SFX-L"] satisfies T;
 												const currentValues = field.value || [];
 
-												const toggleOption = (val: string) => {
+												const toggleOption = (val: T[0]) => {
 													const next = currentValues.includes(val) ? currentValues.filter((v: string) => v !== val) : [...currentValues, val];
 													field.onChange(next);
 												};
@@ -493,8 +497,8 @@ export function CompatibilityLogicModule() {
 								</>
 							)}
 
-							{/* CASE FIELDS */}
-							{compatibility.type === "CASE" && (
+							{/* CHASSIS FIELDS */}
+							{compatibility.type === "CHASSIS" && (
 								<>
 									<FoundarySelectField
 										control={control}
@@ -508,8 +512,8 @@ export function CompatibilityLogicModule() {
 												{ label: "mATX", value: "mATX" },
 												{ label: "ITX", value: "ITX" },
 											] satisfies {
-												label: z.infer<typeof CaseSchema>["formFactor"];
-												value: z.infer<typeof CaseSchema>["formFactor"];
+												label: string;
+												value: z.infer<typeof ChassisSchema>["formFactor"];
 											}[]
 										}
 									/>
@@ -549,10 +553,11 @@ export function CompatibilityLogicModule() {
 											name="compatibility.radiatorSupport"
 											control={control}
 											render={({ field }) => {
-												const options = ["120", "240", "280", "360"] as const;
+												type T = z.infer<typeof ChassisSchema>["radiatorSupport"];
+												const options = ["120", "240", "280", "360"] satisfies T;
 												const currentValues = field.value || [];
 
-												const toggleOption = (val: string) => {
+												const toggleOption = (val: T[0]) => {
 													const next = currentValues.includes(val) ? currentValues.filter((v: string) => v !== val) : [...currentValues, val];
 													field.onChange(next);
 												};
