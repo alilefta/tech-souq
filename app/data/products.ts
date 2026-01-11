@@ -44,6 +44,7 @@ export interface ProductBuilderDTO {
 	sku?: string;
 	brand: string;
 	compatibility?: CompatibilitySchemaType | null;
+	specs: ProductSpecs[];
 }
 
 export interface ProductDetailsDTO {
@@ -502,6 +503,7 @@ export async function getBuilderProducts() {
 			slug: true,
 			sku: true,
 			compatibility: true, // This contains the { type: "CPU", socket: "...", ... }
+			specs: true,
 		},
 	});
 
@@ -534,7 +536,11 @@ export function ProductToCardDTOMapper(
 	};
 }
 
-export function ProductToBuilderDTOMapper(p: Pick<Product, "id" | "name" | "price" | "brand" | "images" | "slug" | "sku" | "compatibility">): ProductBuilderDTO {
+export function ProductToBuilderDTOMapper(
+	p: Pick<Product, "id" | "name" | "price" | "brand" | "images" | "slug" | "sku" | "compatibility"> & {
+		specs: ProductSpecs[];
+	}
+): ProductBuilderDTO {
 	return {
 		id: p.id,
 		name: p.name,
@@ -545,6 +551,7 @@ export function ProductToBuilderDTOMapper(p: Pick<Product, "id" | "name" | "pric
 		sku: p.sku,
 		brand: p.brand ?? "Base_60",
 		compatibility: p.compatibility as unknown as CompatibilitySchemaType | null,
+		specs: p.specs,
 	};
 }
 

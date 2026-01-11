@@ -30,6 +30,8 @@ export function resolveCompatibility(manifest: BuilderState["manifest"]): Protoc
 	const p = PSU?.compatibility as PSU;
 	const r = RAM?.compatibility as RAM;
 	const cl = COOLER?.compatibility as COOLER;
+	const s1 = STORAGE1?.compatibility as STORAGE;
+	const s2 = STORAGE2?.compatibility as STORAGE;
 
 	// 1. CPU <-> MOTHERBOARD (The Brain Handshake)
 	if (c && m) {

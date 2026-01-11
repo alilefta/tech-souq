@@ -4,7 +4,7 @@ import { persist } from "zustand/middleware";
 
 export type BuildComponentType = "CPU" | "GPU" | "PSU" | "MOTHERBOARD" | "RAM" | "CHASSIS" | "STORAGE1" | "STORAGE2" | "COOLER";
 
-type BuildManifest = Record<BuildComponentType, ProductBuilderDTO | null>;
+export type BuildManifest = Record<BuildComponentType, ProductBuilderDTO | null>;
 
 export interface BuilderState {
 	currentStep: number;
