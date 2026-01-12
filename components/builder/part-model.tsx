@@ -6,7 +6,7 @@ import * as THREE from "three";
 import gsap from "gsap";
 import { MODEL_CALIBRATION } from "@/lib/builder/model-config";
 import { BuildComponentType } from "@/store/useBuilderStore";
-
+import { SkeletonUtils } from "three-stdlib";
 // Add Draco decoder URL for your compressed files
 const DRACO_URL = "https://www.gstatic.com/draco/versioned/decoders/1.5.5/";
 
@@ -22,7 +22,7 @@ export function PartModel({ modelName, type, position, children }: PartModelProp
 
 	// 1. Load Compressed Model
 	const { scene } = useGLTF(`/assets/models/${modelName}.glb`, DRACO_URL);
-	const clone = useMemo(() => scene.clone(), [scene]);
+	const clone = useMemo(() => SkeletonUtils.clone(scene), [scene]);
 
 	// 2. Get Calibration Data
 	// Check specific model name first, then fallback to category type

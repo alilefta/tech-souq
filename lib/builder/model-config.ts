@@ -15,13 +15,13 @@ export const MODEL_CALIBRATION: Record<string, ModelConfig> = {
 
 	// SPECIFIC OVERRIDES (Applied by specific model filename if needed)
 	gpu: {
-		scale: [0.01, 0.01, 0.01], // FIX: Shrink by 100x (cm to m) or 1000x (mm to m)
-		rotation: [0, 0, 0],
+		scale: [0.25, 0.3, 0.3], // FIX: Shrink by 100x (cm to m) or 1000x (mm to m)
+		rotation: [4.7, 0, 0],
 		centered: true,
 	},
 	cpu: {
-		scale: [0.001, 0.001, 0.001], // CPUs are tiny, likely mm export
-		rotation: [0, 0, 0],
+		scale: [0.0012, 0.0012, 0.0012], // CPUs are tiny, likely mm export
+		rotation: [1.56, 4.7, 0],
 		centered: true,
 	},
 	cooler: {

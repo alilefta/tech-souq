@@ -26,9 +26,9 @@ export function ModuleStage() {
 					) : (
 						/* Ghost Placeholder for PSU */
 						<mesh position={FOUNDRY_ANCHORS.CHASSIS.psu_dock ?? [0, -0.4, -0.1]}>
-							<boxGeometry args={[0.2, 0.1, 0.2]} />
+							<boxGeometry args={[0.5, 0.5, 0.5]} />
 							<meshBasicMaterial color="#94A3B8" wireframe opacity={0.1} transparent />
-							<ARLabel text="PSU_SLOT_EMPTY" status="missing" />
+							<ARLabel text="PSU_SLOT_EMPTY" status="missing" position={[0, 0, 0]} />
 						</mesh>
 					)}
 
@@ -37,8 +37,8 @@ export function ModuleStage() {
 						<PartModel modelName={CATEGORY_MODEL_MAP.MOTHERBOARD} position={FOUNDRY_ANCHORS.CHASSIS.mb_dock ?? [0, 0.1, -0.1]} type="MOTHERBOARD">
 							{/* 4. CPU */}
 							{manifest.CPU ? (
-								<PartModel modelName={CATEGORY_MODEL_MAP.CPU} position={FOUNDRY_ANCHORS.MOTHERBOARD.cpu_socket ?? [0, 0.1, 0]} type="CPU">
-									{hasError("CPU") && <ARLabel text="SOCKET_CONFLICT" status="warning" />}
+								<PartModel modelName={CATEGORY_MODEL_MAP.CPU} position={FOUNDRY_ANCHORS.MOTHERBOARD.cpu_socket ?? [0, 0, 0]} type="CPU">
+									{hasError("CPU") && <ARLabel text="SOCKET_CONFLICT" status="warning" position={[0, 0.6, -0.4]} />}
 								</PartModel>
 							) : (
 								<group position={FOUNDRY_ANCHORS.MOTHERBOARD.cpu_socket ?? [0, 0.1, 0]}>

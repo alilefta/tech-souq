@@ -3,9 +3,9 @@
 import { Html } from "@react-three/drei";
 import { cn } from "@/lib/utils";
 
-export function ARLabel({ text, status = "active" }: { text: string; status?: "active" | "warning" | "missing" }) {
+export function ARLabel({ text, position, status = "active" }: { text: string; status?: "active" | "warning" | "missing"; position?: [x: number, y: number, z: number] }) {
 	return (
-		<Html distanceFactor={10} zIndexRange={[100, 0]}>
+		<Html distanceFactor={10} zIndexRange={[100, 0]} position={position}>
 			<div
 				className={cn(
 					"px-2 py-1 border backdrop-blur-md flex items-center gap-2 transition-all select-none pointer-events-none",
