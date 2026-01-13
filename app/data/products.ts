@@ -45,6 +45,11 @@ export interface ProductBuilderDTO {
 	brand: string;
 	compatibility?: CompatibilitySchemaType | null;
 	specs: ProductSpecs[];
+	category: ProductCategory;
+	originalPrice: number | null;
+	rating?: number;
+	reviews?: number;
+	stock?: number;
 }
 
 export interface ProductDetailsDTO {
@@ -478,7 +483,7 @@ export async function getProductById(productId: number): Promise<ProductDetailsD
 
 		return ProductToDetailsDTOMapper(product);
 	} catch (error) {
-		throw new Error("Failed to retrieve product data");
+		throw new Error(`Failed to retrieve product data, ${error}`);
 	}
 }
 
@@ -504,6 +509,11 @@ export async function getBuilderProducts() {
 			sku: true,
 			compatibility: true, // This contains the { type: "CPU", socket: "...", ... }
 			specs: true,
+			category: true,
+			originalPrice: true,
+			reviewCount: true,
+			averageRating: true,
+			stock: true,
 		},
 	});
 
@@ -537,11 +547,16 @@ export function ProductToCardDTOMapper(
 }
 
 export function ProductToBuilderDTOMapper(
-	p: Pick<Product, "id" | "name" | "price" | "brand" | "images" | "slug" | "sku" | "compatibility"> & {
+	p: Pick<Product, "id" | "name" | "price" | "brand" | "images" | "slug" | "sku" | "compatibility" | "stock" | "originalPrice" | "averageRating" | "reviewCount"> & {
 		specs: ProductSpecs[];
+		category: ProductCategory;
 	}
 ): ProductBuilderDTO {
 	return {
+		originalPrice: p.originalPrice ? Number(p.originalPrice) : null,
+		rating: p.averageRating,
+		reviews: p.reviewCount,
+		stock: p.stock,
 		id: p.id,
 		name: p.name,
 		price: Number(p.price),
@@ -552,6 +567,7 @@ export function ProductToBuilderDTOMapper(
 		brand: p.brand ?? "Base_60",
 		compatibility: p.compatibility as unknown as CompatibilitySchemaType | null,
 		specs: p.specs,
+		category: p.category,
 	};
 }
 

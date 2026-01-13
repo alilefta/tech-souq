@@ -1,7 +1,7 @@
 // components/builder/module-stage.tsx
 "use client";
 
-import { useBuilderStore, BUILD_STEPS, BuildComponentType, BuildManifest } from "@/store/useBuilderStore";
+import { useBuilderStore, BuildComponentType, BuildManifest } from "@/store/useBuilderStore";
 import { PartModel } from "./part-model";
 import { FOUNDRY_ANCHORS } from "@/lib/builder/anchor-registry";
 import { CATEGORY_MODEL_MAP } from "@/lib/builder/model-map";

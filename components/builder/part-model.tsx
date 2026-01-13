@@ -24,6 +24,8 @@ export function PartModel({ modelName, type, position, children }: PartModelProp
 	const { scene } = useGLTF(`/assets/models/${modelName}.glb`, DRACO_URL);
 	const clone = useMemo(() => SkeletonUtils.clone(scene), [scene]);
 
+	console.log("Scale:", scene.scale);
+
 	// 2. Get Calibration Data
 	// Check specific model name first, then fallback to category type
 	const config = MODEL_CALIBRATION[modelName] || (type ? MODEL_CALIBRATION[type] : { scale: [1, 1, 1], rotation: [0, 0, 0], centered: true });

@@ -314,3 +314,24 @@
 		background: #ffb400;
 	}
 }
+
+@utility pb-safe {
+	padding-bottom: env(safe-area-inset-bottom);
+}
+
+@utility pt-safe {
+	padding-top: env(safe-area-inset-top);
+}
+
+@utility scrollbar-hide {
+	-ms-overflow-style: none; /* IE and Edge */
+	scrollbar-width: none; /* Firefox */
+
+	&::-webkit-scrollbar {
+		display: none; /* Chrome, Safari and Opera */
+	}
+}
+
+@utility min-h-safe {
+	min-height: 100dvh;
+}
