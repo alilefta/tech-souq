@@ -3,8 +3,7 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { ProductBuilderDTO } from "@/app/data/products";
 import { SafeImage } from "../ui/safe-image";
-import { Terminal, ShieldCheck, Cpu, Zap, ArrowRight } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Terminal, Cpu, Zap, ArrowRight } from "lucide-react";
 import { LogicValue } from "./logic-formatter";
 
 interface ModuleInspectionProps {
@@ -36,7 +35,7 @@ export function ModuleInspectionSheet({ product, isOpen, onClose, onSelect }: Mo
 
 				<div className="flex-1">
 					{/* 2. VISUAL SCAN */}
-					<div className="aspect-square relative bg-white/[0.02] border-b border-white/5  flex items-center justify-center">
+					<div className="aspect-square relative bg-white/2 border-b border-white/5  flex items-center justify-center">
 						<SafeImage src={product.coverImage} fill className="object-contain p-8" alt={product.name} />
 						{/* Price Tag Overlay */}
 						<div className="absolute bottom-4 right-4 bg-[#FFB400] px-3 py-1 text-[#0A0E14]">
@@ -62,7 +61,7 @@ export function ModuleInspectionSheet({ product, isOpen, onClose, onSelect }: Mo
 					{/* 4. COMPATIBILITY LOGIC (Raw View) */}
 					{product.compatibility && (
 						<div className="px-8 pb-8">
-							<div className="p-4 bg-white/[0.02] border border-white/5 font-mono text-[9px] text-[#94A3B8] uppercase leading-relaxed">
+							<div className="p-4 bg-white/2 border border-white/5 font-mono text-[9px] text-[#94A3B8] uppercase leading-relaxed">
 								<div className="flex items-center gap-2 text-[#FFB400] mb-4 pb-2 border-b border-white/5">
 									<Zap size={12} />
 									<span className="tracking-[0.2em] font-black">Foundry_Logic_Map</span>

@@ -7,45 +7,43 @@ import gsap from "gsap";
 import { MODEL_CALIBRATION } from "@/lib/builder/model-config";
 import { BuildComponentType } from "@/store/useBuilderStore";
 import { SkeletonUtils } from "three-stdlib";
-// Add Draco decoder URL for your compressed files
+
 const DRACO_URL = "https://www.gstatic.com/draco/versioned/decoders/1.5.5/";
 
 interface PartModelProps {
 	modelName: string;
-	type?: BuildComponentType; // Pass the type to look up defaults
+	type?: BuildComponentType;
 	position: [number, number, number];
 	children?: ReactNode;
+	disableCenter?: boolean;
 }
 
-export function PartModel({ modelName, type, position, children }: PartModelProps) {
+export function PartModel({ modelName, type, position, children, disableCenter = false }: PartModelProps) {
 	const groupRef = useRef<THREE.Group>(null);
-
-	// 1. Load Compressed Model
 	const { scene } = useGLTF(`/assets/models/${modelName}.glb`, DRACO_URL);
 	const clone = useMemo(() => SkeletonUtils.clone(scene), [scene]);
 
-	console.log("Scale:", scene.scale);
-
-	// 2. Get Calibration Data
-	// Check specific model name first, then fallback to category type
 	const config = MODEL_CALIBRATION[modelName] || (type ? MODEL_CALIBRATION[type] : { scale: [1, 1, 1], rotation: [0, 0, 0], centered: true });
 
+	// Convert Euler rotation to Quaternion for gimbal-free rotation
+	const quaternion = useMemo(() => {
+		const euler = new THREE.Euler(config.rotation[0], config.rotation[1], config.rotation[2], "XYZ");
+		return new THREE.Quaternion().setFromEuler(euler);
+	}, [config.rotation]);
+
 	useEffect(() => {
-		// Material Optimization Protocol
 		clone.traverse((child) => {
 			if ((child as THREE.Mesh).isMesh) {
 				const mesh = child as THREE.Mesh;
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 				if (mesh.material) {
-					// Fix "dark models" by boosting environment reflection
 					(mesh.material as THREE.MeshStandardMaterial).envMapIntensity = 1.8;
 					(mesh.material as THREE.MeshStandardMaterial).roughness = 0.5;
 				}
 			}
 		});
 
-		// Intro Animation
 		if (groupRef.current) {
 			groupRef.current.scale.set(0, 0, 0);
 			gsap.to(groupRef.current.scale, {
@@ -58,21 +56,13 @@ export function PartModel({ modelName, type, position, children }: PartModelProp
 		}
 	}, [clone]);
 
+	const ModelContent = <primitive object={clone} scale={config.scale} quaternion={quaternion} />;
+
 	return (
 		<group ref={groupRef} position={position}>
-			{/* 3. THE NORMALIZATION WRAPPER */}
-			<group scale={config.scale} rotation={new THREE.Euler(...config.rotation)}>
-				{config.centered ? (
-					<Center top>
-						{" "}
-						{/* <Center> recalculates the pivot to the middle of geometry */}
-						<primitive object={clone} />
-					</Center>
-				) : (
-					<primitive object={clone} />
-				)}
+			<group scale={config.scale} quaternion={quaternion}>
+				{config.centered && !disableCenter ? <Center top>{ModelContent}</Center> : ModelContent}
 			</group>
-
 			{children}
 		</group>
 	);

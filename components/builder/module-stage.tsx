@@ -7,6 +7,7 @@ import { FOUNDRY_ANCHORS } from "@/lib/builder/anchor-registry";
 import { CATEGORY_MODEL_MAP } from "@/lib/builder/model-map";
 import { ARLabel } from "./ar-label";
 import { resolveCompatibility } from "@/lib/builder/resolver";
+import { CalibrationRig } from "./calibration-rig";
 
 export function ModuleStage() {
 	const manifest = useBuilderStore((state) => state.manifest);
@@ -19,7 +20,7 @@ export function ModuleStage() {
 		<group>
 			{/* 1. THE CHASSIS: Root */}
 			{manifest.CHASSIS ? (
-				<PartModel modelName={CATEGORY_MODEL_MAP.CHASSIS} type="CHASSIS" position={[2, -0.5, 0]}>
+				<PartModel modelName={CATEGORY_MODEL_MAP.CHASSIS} type="CHASSIS" position={[0, 0, 0]}>
 					{/* 2. PSU */}
 					{manifest.PSU ? (
 						<PartModel modelName={CATEGORY_MODEL_MAP.PSU} type="PSU" position={FOUNDRY_ANCHORS.CHASSIS.psu_dock ?? [0, -0.4, -0.1]} />
@@ -28,7 +29,7 @@ export function ModuleStage() {
 						<mesh position={FOUNDRY_ANCHORS.CHASSIS.psu_dock ?? [0, -0.4, -0.1]}>
 							<boxGeometry args={[0.5, 0.5, 0.5]} />
 							<meshBasicMaterial color="#94A3B8" wireframe opacity={0.1} transparent />
-							<ARLabel text="PSU_SLOT_EMPTY" status="missing" position={[0, 0, 0]} />
+							<ARLabel text="PSU_SLOT_EMPTY" status="missing" position={[0, 1, -0.6]} />
 						</mesh>
 					)}
 
@@ -112,7 +113,7 @@ function StagingRack({ manifest }: { manifest: BuildManifest }) {
 	}
 
 	return (
-		<group position={[3, 0, 0]}>
+		<group position={[1, 0, 0]}>
 			{orphans.map((item, index) => (
 				<group key={item.type} position={[0, index * 0.5, 0]}>
 					<PartModel modelName={item.model} type={item.type} position={[0, 0, 0]} />
