@@ -6,11 +6,12 @@ import { InputWithLabel } from "@/components/ui/inputs/input-with-label";
 import { FoundrySelect as FoundarySelectField } from "@/components/ui/inputs/foundary-form-select";
 import { FoundrySelect } from "@/components/ui/inputs/foundry-select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { AddProductSchemaType, ChassisSchema, CompatibilitySchemaType, CoolerSchema, CpuSchema, GpuSchema, MotherboardSchema, RamSchema, StorageSchema } from "@/lib/schemas/product";
+import { AddProductSchemaType, ChassisSchema, CompatibilitySchemaType, CoolerSchema, CpuSchema, GpuSchema, MotherboardSchema, PsuSchema, RamSchema, StorageSchema } from "@/lib/schemas/product";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 import z from "zod";
 import { Label } from "@/components/ui/label";
+import { PowerMatrix } from "./power-matrix";
 
 interface CompatibilityTypesUISchema {
 	label: string;
@@ -249,9 +250,9 @@ export function CompatibilityLogicModule() {
 										placeholder="PCI_Bus_Gen"
 										options={
 											[
-												{ label: "Gen_3", value: "PCIE_3" },
-												{ label: "Gen_4", value: "PCIE_4" },
-												{ label: "Gen_5", value: "PCIE_5" },
+												{ label: "PCIE_3", value: "PCIE_3" },
+												{ label: "PCIE_4", value: "PCIE_4" },
+												{ label: "PCIE_5", value: "PCIE_5" },
 											] satisfies { label: string; value: z.infer<typeof MotherboardSchema>["pcieVersion"] }[]
 										}
 									/>
@@ -340,9 +341,9 @@ export function CompatibilityLogicModule() {
 														fieldTitle={`Slot_0${index + 1}_Bus`}
 														nameInSchema={`compatibility.m2Slots.${index}.interface`}
 														options={[
-															{ label: "Gen_3", value: "PCIE_3" },
-															{ label: "Gen_4", value: "PCIE_4" },
-															{ label: "Gen_5", value: "PCIE_5" },
+															{ label: "PCIE_3", value: "PCIE_3" },
+															{ label: "PCIE_4", value: "PCIE_4" },
+															{ label: "PCIE_5", value: "PCIE_5" },
 														]}
 													/>
 													<FoundarySelectField
@@ -416,9 +417,9 @@ export function CompatibilityLogicModule() {
 										placeholder="PCI_Bus_Gen"
 										options={
 											[
-												{ label: "Gen_3", value: "PCIE_3" },
-												{ label: "Gen_4", value: "PCIE_4" },
-												{ label: "Gen_5", value: "PCIE_5" },
+												{ label: "PCIE_3", value: "PCIE_3" },
+												{ label: "PCIE_4", value: "PCIE_4" },
+												{ label: "PCIE_5", value: "PCIE_5" },
 											] satisfies { label: string; value: z.infer<typeof GpuSchema>["pcieVersion"] }[]
 										}
 									/>
@@ -493,6 +494,12 @@ export function CompatibilityLogicModule() {
 												);
 											}}
 										/>
+									</div>
+
+									{/* NEW: POWER MATRIX */}
+									<div className="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-white/5 pt-6 mt-4">
+										<PowerMatrix name="compatibility.cpuPowerConnectors" label="CPU_Power_Ports (EPS)" options={["4-pin", "8-pin"]} />
+										<PowerMatrix name="compatibility.gpuPowerConnectors" label="GPU_Power_Ports (PCIe)" options={["6-pin", "8-pin", "12VHPWR"]} />
 									</div>
 								</>
 							)}
@@ -735,6 +742,21 @@ export function CompatibilityLogicModule() {
 											/>
 										)}
 									/>
+
+									<FoundarySelectField
+										control={control}
+										fieldTitle="Interface_Bus"
+										nameInSchema="compatibility.interface"
+										placeholder="PCI_Bus_Gen"
+										options={
+											[
+												{ label: "SATA", value: "SATA" },
+												{ label: "PCIE_3", value: "PCIE_3" },
+												{ label: "PCIE_4", value: "PCIE_4" },
+												{ label: "PCIE_5", value: "PCIE_5" },
+											] satisfies { label: string; value: z.infer<typeof StorageSchema>["interface"] }[]
+										}
+									/>
 								</>
 							)}
 
@@ -775,6 +797,14 @@ export function CompatibilityLogicModule() {
 												fieldTitle="Module_Height (mm)"
 												placeholder="e.g. 155"
 											/>
+										)}
+									/>
+
+									<Controller
+										name="compatibility.maxTdp"
+										control={control}
+										render={({ field, fieldState }) => (
+											<InputWithLabel type="number" field={field} fieldState={fieldState} nameInSchema="compatibility.maxTdp" fieldTitle="Max_TDP (W)" placeholder="e.g. 350" />
 										)}
 									/>
 									{coolerType === "LIQUID" && (

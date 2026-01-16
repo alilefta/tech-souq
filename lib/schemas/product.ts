@@ -102,6 +102,8 @@ export const PsuSchema = z.object({
 	cpuPowerConnectors: z.array(z.enum(["4-pin", "8-pin"])), // Must satisfy Motherboard.cpuPowerConnectors
 
 	gpuPowerConnectors: z.array(z.enum(["6-pin", "8-pin", "12VHPWR"])), // Must satisfy GPU.powerConnectors
+
+	sataConnectors: z.coerce.number().optional(), // For drives
 });
 
 export const RamSchema = z.object({

@@ -7,7 +7,6 @@ import { FOUNDRY_ANCHORS } from "@/lib/builder/anchor-registry";
 import { CATEGORY_MODEL_MAP } from "@/lib/builder/model-map";
 import { ARLabel } from "./ar-label";
 import { resolveCompatibility } from "@/lib/builder/resolver";
-import { CalibrationRig } from "./calibration-rig";
 
 export function ModuleStage() {
 	const manifest = useBuilderStore((state) => state.manifest);
@@ -59,7 +58,11 @@ export function ModuleStage() {
 
 							{/* ... RAM / Storage ... */}
 							{manifest.RAM && (
-								<PartModel modelName={CATEGORY_MODEL_MAP.GPU} position={FOUNDRY_ANCHORS.MOTHERBOARD.ram_slots ?? [0, -0.1, 0.1]} type="RAM">
+								<PartModel
+									modelName={CATEGORY_MODEL_MAP.GPU}
+									position={(FOUNDRY_ANCHORS.MOTHERBOARD.ram_slots && FOUNDRY_ANCHORS.MOTHERBOARD.ram_slots[0]) ?? [0, -0.1, 0.1]}
+									type="RAM"
+								>
 									{hasError("RAM") && <ARLabel text="CLEARANCE_ERROR" status="warning" />}
 								</PartModel>
 							)}

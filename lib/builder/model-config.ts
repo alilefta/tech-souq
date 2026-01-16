@@ -10,22 +10,49 @@ interface ModelConfig {
 export const MODEL_CALIBRATION: Record<string, ModelConfig> = {
 	// CATEGORY DEFAULTS (Applied by type)
 	chassis: { scale: [1, 1, 1], rotation: [0, 0, 0], centered: false },
-	motherboard: { scale: [1.05, 1.05, 1.05], rotation: [0, 5.5, 0], centered: false },
+	motherboard: { scale: [1, 1, 1], rotation: [0, 0, 0], centered: false },
 
 	// SPECIFIC OVERRIDES (Applied by specific model filename if needed)
 	gpu: {
 		scale: [1, 1, 1], // FIX: Shrink by 100x (cm to m) or 1000x (mm to m)
-		rotation: [0, 5.5, 0], // rotation by radians
+		rotation: [0, 0, 0], // rotation by radians
 		centered: false,
 	},
 	cpu: {
-		scale: [0.0012, 0.0012, 0.0012], // CPUs are tiny, likely mm export
-		rotation: [1.56, 4.7, 0],
-		centered: true,
-	},
-	cooler: {
-		scale: [0.1, 0.1, 0.1],
+		scale: [1, 1, 1], // CPUs are tiny, likely mm export
 		rotation: [0, 0, 0],
 		centered: true,
+	},
+	// RAM: Standard Stick
+	ram: {
+		scale: [1, 1, 1],
+		rotation: [0, 0, 0], // Should be upright if exported correctly
+		centered: false,
+	},
+
+	// STORAGE (M.2 NVMe)
+	storage1: {
+		scale: [1, 1, 1],
+		rotation: [Math.PI / 2, 0, 0], // M.2 drives usually lie flat against the board
+		centered: false,
+	},
+	storage2: {
+		scale: [1, 1, 1],
+		rotation: [Math.PI / 2, 0, 0],
+		centered: false,
+	},
+
+	// COOLER (AIO Pump Block)
+	cooler: {
+		scale: [1, 1, 1],
+		rotation: [0, 0, 0],
+		centered: false,
+	},
+
+	// PSU (Power Supply)
+	psu: {
+		scale: [1, 1, 1],
+		rotation: [0, Math.PI, 0], // Often needs 180 spin to face fan down/out
+		centered: false,
 	},
 };
