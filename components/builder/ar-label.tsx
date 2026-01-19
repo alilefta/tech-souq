@@ -38,10 +38,10 @@ export function ARLabel({
 						? "bg-[#FFB400]/10 border-[#FFB400] text-[#FFB400]"
 						: status === "warning"
 							? "bg-red-500/10 border-red-500 text-red-500"
-							: "bg-white/5 border-white/20 text-[#94A3B8]"
+							: "bg-white/5 border-white/20 text-[#94A3B8]",
 				)}
 			>
-				<div className={cn("w-1 h-1 rounded-full flex-shrink-0", status === "active" ? "bg-[#FFB400]" : status === "warning" ? "bg-red-500 animate-pulse" : "bg-[#94A3B8]")} />
+				<div className={cn("w-1 h-1 rounded-full shrink-0", status === "active" ? "bg-[#FFB400]" : status === "warning" ? "bg-red-500 animate-pulse" : "bg-[#94A3B8]")} />
 				<span className="text-[7px] font-mono font-bold uppercase tracking-wider whitespace-nowrap">{text}</span>
 			</div>
 
@@ -52,12 +52,12 @@ export function ARLabel({
 					transformOrigin: "center top",
 				}}
 				className={cn(
-					"absolute top-full left-1/2 w-[1px] h-6 -translate-x-1/2",
+					"absolute top-full left-1/2 w-px h-6 -translate-x-1/2",
 					status === "active"
-						? "bg-gradient-to-b from-[#FFB400] to-transparent"
+						? "bg-linear-to-b from-[#FFB400] to-transparent"
 						: status === "warning"
-							? "bg-gradient-to-b from-red-500 to-transparent"
-							: "bg-gradient-to-b from-[#94A3B8]/60 to-transparent"
+							? "bg-linear-to-b from-red-500 to-transparent"
+							: "bg-linear-to-b from-[#94A3B8]/60 to-transparent",
 				)}
 			/>
 		</Html>

@@ -29,12 +29,14 @@ export const FOUNDRY_ANCHORS: Record<string, HardwareAnchors> = {
 		// Stick 1: Closer to CPU
 		// Stick 2: Further Right
 		ram_slots: [
-			[0.08, 0.08, 0.01],
-			[0.1, 0.08, 0.01],
-		] as [[number, number, number], [number, number, number]], // Cast as any or define proper type for array of points
+			[0.05, 0.36, 0.036],
+			[0.05, 0.36, 0.048],
+			[0.05, 0.36, 0.06],
+			[0.05, 0.36, 0.071],
+		] as [number, number, number][], // Cast as any or define proper type for array of points
 
 		// Storage M.2 Slots
-		m2_slot_1: [0, -0.02, 0.005] as [number, number, number], // Between CPU and GPU
+		m2_slot_1: [0, 0.19, 0.015] as [number, number, number], // Between CPU and GPU
 		storage2: [0, -0.15, 0.005] as [number, number, number], // Bottom of board
 	},
 };

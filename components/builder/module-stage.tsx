@@ -28,7 +28,7 @@ export function ModuleStage() {
 						<mesh position={FOUNDRY_ANCHORS.CHASSIS.psu_dock ?? [0, -0.4, -0.1]}>
 							<boxGeometry args={[0.1, 0.1, 0.1]} />
 							<meshBasicMaterial color="#94A3B8" wireframe opacity={0.1} transparent />
-							<ARLabel text="PSU_SLOT_EMPTY" status="missing" position={[-0.04, 0.2, -0.02]} />
+							<ARLabel text="PSU_SLOT_EMPTY" status="missing" position={[-0.04, 0.2, -0.02]} scale={0.2} />
 						</mesh>
 					)}
 
@@ -42,7 +42,7 @@ export function ModuleStage() {
 								</PartModel>
 							) : (
 								<group position={FOUNDRY_ANCHORS.MOTHERBOARD.cpu_socket ?? [0, 0, 0]}>
-									<ARLabel text="CPU_SOCKET_OPEN" status="missing" position={[0, 0, 0]} />
+									<ARLabel text="CPU_SOCKET_OPEN" status="missing" position={[0, 0.2, 0]} scale={0.3} />
 								</group>
 							)}
 
@@ -58,13 +58,23 @@ export function ModuleStage() {
 
 							{/* ... RAM / Storage ... */}
 							{manifest.RAM && (
-								<PartModel
-									modelName={CATEGORY_MODEL_MAP.GPU}
-									position={(FOUNDRY_ANCHORS.MOTHERBOARD.ram_slots && FOUNDRY_ANCHORS.MOTHERBOARD.ram_slots[0]) ?? [0, -0.1, 0.1]}
-									type="RAM"
-								>
-									{hasError("RAM") && <ARLabel text="CLEARANCE_ERROR" status="warning" />}
-								</PartModel>
+								<>
+									{/* We always render into Slot 2 (Index 1) and Slot 4 (Index 3) for optimal aesthetics */}
+									{[1, 3].map((slotIndex, i) => (
+										<PartModel
+											key={`ram-${i}`}
+											modelName={CATEGORY_MODEL_MAP.RAM}
+											type="RAM"
+											// Access the specific slot coordinates from the registry
+											position={(FOUNDRY_ANCHORS.MOTHERBOARD.ram_slots as [x: number, y: number, z: number][])[slotIndex] ?? [0, 0, 0]}
+											// Stagger the animation: First stick lands, then 100ms later, second stick lands
+											delay={i * 0.1}
+										>
+											{/* Only attach the error label to the first stick to reduce UI clutter */}
+											{hasError("RAM") && i === 0 && <ARLabel text="MEMORY_PROTOCOL_MISMATCH" status="warning" />}
+										</PartModel>
+									))}
+								</>
 							)}
 							{manifest.STORAGE1 && (
 								<PartModel modelName={CATEGORY_MODEL_MAP.STORAGE1} position={FOUNDRY_ANCHORS.MOTHERBOARD.m2_slot_1 ?? [0, -0.1, 0.1]} type="STORAGE1">
@@ -79,8 +89,8 @@ export function ModuleStage() {
 						</PartModel>
 					) : (
 						/* Ghost Placeholder for Motherboard */
-						<group position={[0, 0.5, 0]}>
-							<ARLabel text="LOGIC_BOARD_REQUIRED" status="missing" />
+						<group position={[0.05, 0.5, 0]}>
+							<ARLabel text="LOGIC_BOARD_REQUIRED" status="missing" scale={0.2} />
 						</group>
 					)}
 				</PartModel>

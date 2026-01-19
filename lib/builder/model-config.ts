@@ -26,14 +26,14 @@ export const MODEL_CALIBRATION: Record<string, ModelConfig> = {
 	// RAM: Standard Stick
 	ram: {
 		scale: [1, 1, 1],
-		rotation: [0, 0, 0], // Should be upright if exported correctly
+		rotation: [0, 0, 5.5], // Should be upright if exported correctly
 		centered: false,
 	},
 
 	// STORAGE (M.2 NVMe)
 	storage1: {
 		scale: [1, 1, 1],
-		rotation: [Math.PI / 2, 0, 0], // M.2 drives usually lie flat against the board
+		rotation: [0, 0, 0], // M.2 drives usually lie flat against the board
 		centered: false,
 	},
 	storage2: {

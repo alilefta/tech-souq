@@ -16,14 +16,16 @@ interface PartModelProps {
 	position: [number, number, number];
 	children?: ReactNode;
 	disableCenter?: boolean;
+	delay?: number; // New prop
 }
 
-export function PartModel({ modelName, type, position, children, disableCenter = false }: PartModelProps) {
+export function PartModel({ modelName, type, position, children, disableCenter = false, delay = 0 }: PartModelProps) {
 	const groupRef = useRef<THREE.Group>(null);
 	const { scene } = useGLTF(`/assets/models/${modelName}.glb`, DRACO_URL);
 	const clone = useMemo(() => SkeletonUtils.clone(scene), [scene]);
 
 	const config = MODEL_CALIBRATION[modelName] || (type ? MODEL_CALIBRATION[type] : { scale: [1, 1, 1], rotation: [0, 0, 0], centered: true });
+	console.log("Current Model:", modelName, "Config", config, "Type", type);
 
 	// Convert Euler rotation to Quaternion for gimbal-free rotation
 	const quaternion = useMemo(() => {
@@ -55,6 +57,22 @@ export function PartModel({ modelName, type, position, children, disableCenter =
 			});
 		}
 	}, [clone]);
+
+	useEffect(() => {
+		if (groupRef.current) {
+			groupRef.current.scale.set(0, 0, 0);
+
+			// Pass the delay to GSAP
+			gsap.to(groupRef.current.scale, {
+				x: 1,
+				y: 1,
+				z: 1,
+				duration: 0.6,
+				delay: delay, // Wait before popping in
+				ease: "back.out(1.2)",
+			});
+		}
+	}, [modelName]);
 
 	const ModelContent = <primitive object={clone} scale={config.scale} quaternion={quaternion} />;
 

@@ -15,7 +15,7 @@ export function Scene3D() {
 				// Position: [X, Y, Z] -> [1.2, 0.8, 1.8]
 				// This places the "lens" about 1.5 meters away and slightly above.
 				// FOV: 45 is a standard "Human Eye" lens (35mm-50mm equivalent).
-				camera={{ position: [1.2, 0.8, 1.8], fov: 45 }}
+				camera={{ position: [1.2, 0.9, 1.8], fov: 45 }}
 				gl={{
 					antialias: true,
 					alpha: true,
