@@ -174,8 +174,8 @@ export function CrucibleHUD({ allProducts }: { allProducts: ProductBuilderDTO[] 
 
 			{/* 3. MOBILE CONFIGURATION DECK */}
 			{mobileView === "CONFIG" && (
-				<div className="lg:hidden absolute inset-x-0 top-24 bottom-24 z-40 bg-[#0A0E14]/95 backdrop-blur-xl pointer-events-auto overflow-y-auto custom-scrollbar p-4 border-y border-white/10">
-					<div className="space-y-3 pb-8">
+				<div className="lg:hidden absolute inset-0 z-40 bg-[#0A0E14]/95 backdrop-blur-xl pointer-events-auto overflow-y-auto custom-scrollbar p-4">
+					<div className="space-y-3 pb-32">
 						<h3 className="text-[9px] font-black uppercase tracking-[0.3em] text-[#94A3B8] mb-4">Assembly_Sequence</h3>
 						{BUILD_STEPS.map((step, i) => (
 							<div key={step} className="space-y-2">
@@ -284,7 +284,7 @@ export function CrucibleHUD({ allProducts }: { allProducts: ProductBuilderDTO[] 
 			</div>
 
 			{/* 4. MOBILE FOOTER (Flex Item) */}
-			<div className="lg:hidden flex-none bg-[#0A0E14] border-t border-white/10 p-4 z-50 pointer-events-auto flex flex-col gap-3 pb-safe">
+			{/* <div className="lg:hidden flex-none bg-[#0A0E14] border-t border-white/10 p-4 z-50 pointer-events-auto flex flex-col gap-3 pb-safe">
 				<div className="relative h-0">
 					<div className="absolute bottom-4 left-0 right-0">
 						<SystemAlertTicker alerts={alerts} />
@@ -297,7 +297,7 @@ export function CrucibleHUD({ allProducts }: { allProducts: ProductBuilderDTO[] 
 				<button onClick={handleAuthorize} className="w-full h-12 bg-[#FFB400] text-[#0A0E14] font-black uppercase text-xs tracking-[0.2em] flex items-center justify-center gap-3 shadow-lg">
 					Authorize <ArrowRight size={16} />
 				</button>
-			</div>
+			</div> */}
 
 			{/* MODALS */}
 			<ModuleInspectionSheet product={inspectedModule} isOpen={!!inspectedModule} onClose={() => setInspectedModule(null)} onSelect={(p) => setComponent(activeType, p)} />
