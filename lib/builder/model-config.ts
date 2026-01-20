@@ -38,21 +38,21 @@ export const MODEL_CALIBRATION: Record<string, ModelConfig> = {
 	},
 	storage2: {
 		scale: [1, 1, 1],
-		rotation: [Math.PI / 2, 0, 0],
+		rotation: [0, 0, 0],
 		centered: false,
 	},
 
 	// COOLER (AIO Pump Block)
 	cooler: {
-		scale: [1, 1, 1],
-		rotation: [0, 0, 0],
+		scale: [0.9, 0.9, 0.9],
+		rotation: [0, Math.PI / 2, 0],
 		centered: false,
 	},
 
 	// PSU (Power Supply)
 	psu: {
-		scale: [1, 1, 1],
-		rotation: [0, Math.PI, 0], // Often needs 180 spin to face fan down/out
+		scale: [1, 1, 0.97],
+		rotation: [0, Math.PI / 2, 0], // Often needs 180 spin to face fan down/out
 		centered: false,
 	},
 };

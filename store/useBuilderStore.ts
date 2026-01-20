@@ -1,6 +1,5 @@
 import { ProductBuilderDTO } from "@/app/data/products";
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 
 export type BuildComponentType = "CPU" | "GPU" | "PSU" | "MOTHERBOARD" | "RAM" | "CHASSIS" | "STORAGE1" | "STORAGE2" | "COOLER";
 
@@ -30,7 +29,7 @@ const initialManifest: BuildManifest = {
 	COOLER: null,
 };
 
-export const BUILD_STEPS: BuildComponentType[] = ["CHASSIS", "MOTHERBOARD", "CPU", "RAM", "GPU", "STORAGE1", "COOLER", "PSU"];
+export const BUILD_STEPS: BuildComponentType[] = ["CHASSIS", "MOTHERBOARD", "CPU", "RAM", "GPU", "STORAGE1", "STORAGE2", "COOLER", "PSU"];
 
 export const isStepAuthorized = (stepIndex: number, manifest: BuildManifest): boolean => {
 	const stepType = BUILD_STEPS[stepIndex];
@@ -52,8 +51,6 @@ export const useBuilderStore = create<BuilderState>((set) => ({
 	// UNIFIED ACTION: setComponent handles both add and update
 	setComponent: (type, product) =>
 		set((state) => {
-			console.log("STATE=", state.manifest);
-
 			return {
 				manifest: {
 					...state.manifest,

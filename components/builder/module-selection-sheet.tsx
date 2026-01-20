@@ -73,14 +73,14 @@ export function ModuleSelectionSheet({ isOpen, onClose, category, products, onSe
 									}}
 									className={cn(
 										"relative group flex flex-col text-left border transition-all p-3 bg-[#0A0E14]",
-										currentSelectionId === product.id ? "border-[#FFB400] bg-[#FFB400]/5" : "border-white/10 hover:border-white/30 hover:bg-white/2"
+										currentSelectionId === product.id ? "border-[#FFB400] bg-[#FFB400]/5" : "border-white/10 hover:border-white/30 hover:bg-white/2",
 									)}
 								>
 									{/* Selection Indicator */}
 									{currentSelectionId === product.id && <div className="absolute top-2 right-2 w-1.5 h-1.5 bg-[#FFB400] rounded-full animate-pulse" />}
 
 									<div className="aspect-square w-full relative mb-3 bg-white/2 flex items-center justify-center p-4">
-										<SafeImage src={product.coverImage || ""} alt="" className="object-contain max-h-full grayscale group-hover:grayscale-0 transition-all" />
+										<SafeImage src={product.coverImage || ""} alt="" className="object-contain max-h-full grayscale group-hover:grayscale-0 transition-all" fill />
 									</div>
 
 									<span className="text-[8px] font-black text-[#FFB400] uppercase tracking-widest mb-1">{product.brand}</span>

@@ -25,7 +25,7 @@ export function PartModel({ modelName, type, position, children, disableCenter =
 	const clone = useMemo(() => SkeletonUtils.clone(scene), [scene]);
 
 	const config = MODEL_CALIBRATION[modelName] || (type ? MODEL_CALIBRATION[type] : { scale: [1, 1, 1], rotation: [0, 0, 0], centered: true });
-	console.log("Current Model:", modelName, "Config", config, "Type", type);
+	// console.log("Current Model:", modelName, "Config", config, "Type", type);
 
 	// Convert Euler rotation to Quaternion for gimbal-free rotation
 	const quaternion = useMemo(() => {

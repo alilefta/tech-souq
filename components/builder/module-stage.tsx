@@ -47,7 +47,7 @@ export function ModuleStage() {
 							)}
 
 							{/* 5. COOLER */}
-							{manifest.COOLER && <PartModel modelName={CATEGORY_MODEL_MAP.COOLER} type="COOLER" position={FOUNDRY_ANCHORS.MOTHERBOARD.cpu_socket ?? [0, 0.1, 0]} />}
+							{manifest.COOLER && <PartModel modelName={CATEGORY_MODEL_MAP.COOLER} type="COOLER" position={FOUNDRY_ANCHORS.MOTHERBOARD.cooling_fan ?? [0, 0.1, 0]} />}
 
 							{/* 6. GPU */}
 							{manifest.GPU && (
@@ -81,17 +81,18 @@ export function ModuleStage() {
 									{hasError("m2") && <ARLabel text="CLEARANCE_ERROR" status="warning" />}
 								</PartModel>
 							)}
-							{manifest.STORAGE2 && (
-								<PartModel modelName={CATEGORY_MODEL_MAP.STORAGE2} position={FOUNDRY_ANCHORS.MOTHERBOARD.storage2 ?? [0, -0.1, 0.1]} type="STORAGE2">
-									{hasError("m2") && <ARLabel text="CLEARANCE_ERROR" status="warning" />}
-								</PartModel>
-							)}
 						</PartModel>
 					) : (
 						/* Ghost Placeholder for Motherboard */
 						<group position={[0.05, 0.5, 0]}>
 							<ARLabel text="LOGIC_BOARD_REQUIRED" status="missing" scale={0.2} />
 						</group>
+					)}
+
+					{manifest.STORAGE2 && (
+						<PartModel modelName={CATEGORY_MODEL_MAP.STORAGE2} position={FOUNDRY_ANCHORS.CHASSIS.storage2 ?? [0.15, -0.35, 0.15]} type="STORAGE2">
+							{hasError("m2") && <ARLabel text="CLEARANCE_ERROR" status="warning" />}
+						</PartModel>
 					)}
 				</PartModel>
 			) : (
@@ -123,6 +124,9 @@ function StagingRack({ manifest }: { manifest: BuildManifest }) {
 		if (manifest.CPU) orphans.push({ type: "CPU", model: CATEGORY_MODEL_MAP.CPU });
 		if (manifest.GPU) orphans.push({ type: "GPU", model: CATEGORY_MODEL_MAP.GPU });
 		if (manifest.RAM) orphans.push({ type: "RAM", model: CATEGORY_MODEL_MAP.RAM });
+
+		if (manifest.STORAGE1) orphans.push({ type: "STORAGE1", model: CATEGORY_MODEL_MAP.STORAGE1 });
+		if (manifest.STORAGE2) orphans.push({ type: "STORAGE2", model: CATEGORY_MODEL_MAP.STORAGE2 });
 	}
 
 	return (

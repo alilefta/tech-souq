@@ -16,12 +16,12 @@ export function SystemAlertTicker({ alerts }: { alerts: ProtocolAlert[] }) {
 					initial={{ y: 20, opacity: 0 }}
 					animate={{ y: 0, opacity: 1 }}
 					exit={{ y: 20, opacity: 0 }}
-					className="absolute bottom-20 left-4 right-4 lg:left-auto lg:right-6 lg:bottom-24 lg:w-96 z-50 pointer-events-auto"
+					className="absolute bottom-20 left-0 right-0 lg:left-auto lg:right-6 lg:bottom-24 lg:w-96 z-50 pointer-events-auto"
 				>
 					<div
 						className={cn(
 							"p-4 border backdrop-blur-xl shadow-2xl flex gap-3 items-start",
-							activeAlert.severity === "CRITICAL" ? "bg-red-500/10 border-red-500 text-red-100" : "bg-[#FFB400]/10 border-[#FFB400] text-[#FFB400]"
+							activeAlert.severity === "CRITICAL" ? "bg-red-500/10 border-red-500 text-red-100" : "bg-[#FFB400]/10 border-[#FFB400] text-[#FFB400]",
 						)}
 					>
 						<div className="mt-0.5 shrink-0">{activeAlert.severity === "CRITICAL" ? <AlertTriangle size={16} /> : <Info size={16} />}</div>

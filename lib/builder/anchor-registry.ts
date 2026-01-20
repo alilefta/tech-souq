@@ -12,6 +12,7 @@ export interface HardwareAnchors {
 
 	psu_dock?: AnchorPoint; // Where RAM sticks sit
 	storage2?: AnchorPoint;
+	cooling_fan?: AnchorPoint;
 }
 
 // These coordinates are relative to the parent model's center (0,0,0)
@@ -19,7 +20,8 @@ export const FOUNDRY_ANCHORS: Record<string, HardwareAnchors> = {
 	// Where the Motherboard sits inside the Chassis
 	CHASSIS: {
 		mb_dock: [0, 0, 0] as [number, number, number],
-		psu_dock: [-0.04, 0.42, -0.14] as [number, number, number],
+		psu_dock: [-0.034, 0.42, -0.118] as [number, number, number],
+		storage2: [0, 0.135, 0.005] as [number, number, number], // Bottom of board
 	},
 	// Where parts sit on the Motherboard
 	MOTHERBOARD: {
@@ -36,7 +38,7 @@ export const FOUNDRY_ANCHORS: Record<string, HardwareAnchors> = {
 		] as [number, number, number][], // Cast as any or define proper type for array of points
 
 		// Storage M.2 Slots
-		m2_slot_1: [0, 0.19, 0.015] as [number, number, number], // Between CPU and GPU
-		storage2: [0, -0.15, 0.005] as [number, number, number], // Bottom of board
+		m2_slot_1: [0.05, 0.19, 0.015] as [number, number, number], // Between CPU and GPU,
+		cooling_fan: [0, 0.345, -0.03] as [number, number, number],
 	},
 };

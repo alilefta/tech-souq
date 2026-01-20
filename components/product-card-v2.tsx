@@ -2,18 +2,15 @@
 
 import { motion } from "motion/react";
 import { Activity, Plus, ShieldCheck } from "lucide-react";
-import Image from "next/image";
 import { ProductCardDTO } from "@/app/data/products";
 import Link from "next/link";
 import { useAction } from "next-safe-action/hooks";
-import { TechPlaceholder } from "@/components/ui/tech-placeholder";
-import { useState } from "react";
 import { useCart } from "@/store/useCart";
 import { addToCartAction } from "@/app/actions/cart";
 import { toast } from "sonner";
+import { SafeImage } from "./ui/safe-image";
 
 export function ProductCard({ product }: { product: ProductCardDTO }) {
-	const [imgError, setImgError] = useState(false);
 	const coverImage = product.coverImage; // Based on your DTO
 
 	const addItemOptimistically = useCart((state) => state.addItem);
@@ -75,43 +72,38 @@ export function ProductCard({ product }: { product: ProductCardDTO }) {
 			<div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-[#FFB400]/0 group-hover/card:border-[#FFB400]/40 transition-all duration-500" />
 			{/* Product Image Area */}
 			<div className="relative aspect-square overflow-hidden bg-linear-to-b from-white/1 to-transparent">
-				{!coverImage || imgError ? (
-					<TechPlaceholder name={product.name} />
-				) : (
-					<motion.div
-						className="relative w-full h-full"
-						// ELITE MOBILE LOGIC:
-						// Grayscale 0 (color) when in view on mobile
-						// but remains grayscale on desktop until hover (via Tailwind classes below)
-						initial={{ filter: "grayscale(100%)" }}
-						whileInView={{ filter: "grayscale(0%)" }}
-						viewport={{
-							once: false,
-							amount: 0.6, // Trigger when 60% of the card is visible
-						}}
-						transition={{ duration: 0.8, ease: "easeOut" }}
-					>
-						{/* Scanline overlay */}
-						<div className="absolute inset-0 z-10 pointer-events-none">
-							<motion.div
-								animate={{ y: ["-100%", "200%"] }}
-								transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-								className="w-full h-[30%] bg-linear-to-b from-transparent via-[#FFB400]/5 to-transparent opacity-0 group-hover/card:opacity-100"
-							/>
-						</div>
-
-						<Image
-							src={coverImage}
-							alt={product.name}
-							fill
-							sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-							onError={() => setImgError(true)}
-							// On MD (Desktop), the group-hover handles the reset
-							// On Mobile, the 'whileInView' parent div handles the filter
-							className="object-contain transition-all duration-700 p-8 md:grayscale md:group-hover/card:grayscale-0"
+				<motion.div
+					className="relative w-full h-full"
+					// ELITE MOBILE LOGIC:
+					// Grayscale 0 (color) when in view on mobile
+					// but remains grayscale on desktop until hover (via Tailwind classes below)
+					initial={{ filter: "grayscale(100%)" }}
+					whileInView={{ filter: "grayscale(0%)" }}
+					viewport={{
+						once: false,
+						amount: 0.6, // Trigger when 60% of the card is visible
+					}}
+					transition={{ duration: 0.8, ease: "easeOut" }}
+				>
+					{/* Scanline overlay */}
+					<div className="absolute inset-0 z-10 pointer-events-none">
+						<motion.div
+							animate={{ y: ["-100%", "200%"] }}
+							transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+							className="w-full h-[30%] bg-linear-to-b from-transparent via-[#FFB400]/5 to-transparent opacity-0 group-hover/card:opacity-100"
 						/>
-					</motion.div>
-				)}
+					</div>
+
+					<SafeImage
+						src={coverImage}
+						alt={product.name}
+						fill
+						sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+						// On MD (Desktop), the group-hover handles the reset
+						// On Mobile, the 'whileInView' parent div handles the filter
+						className="object-contain transition-all duration-700 p-8 md:grayscale md:group-hover/card:grayscale-0"
+					/>
+				</motion.div>
 
 				{/* TECH SPEC OVERLAY */}
 				<div className="absolute inset-0 bg-[#0A0E14]/90 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col justify-center p-8 backdrop-blur-md z-30">
