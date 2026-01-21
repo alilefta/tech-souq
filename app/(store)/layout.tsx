@@ -3,6 +3,7 @@ import Navbar from "@/components/ui/navbar-v2";
 import { AnnouncementBar } from "@/components/announcement-banner-v2";
 import FooterSection from "@/components/footer-section";
 import { CartWrapper } from "@/components/cart/cart-warpper";
+import FooterWrapper from "@/components/footer-wrapper";
 
 // TODO should be replaced
 export const metadata: Metadata = {
@@ -37,7 +38,9 @@ export default function StoreLayout({
 			<Navbar />
 			<CartWrapper />
 			<div>{children}</div>
-			<FooterSection />
+			<FooterWrapper>
+				<FooterSection />
+			</FooterWrapper>
 		</>
 	);
 }

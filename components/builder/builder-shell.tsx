@@ -11,6 +11,7 @@ import { useBuilderStore } from "@/store/useBuilderStore";
 import { useCart } from "@/store/useCart";
 import { toast } from "sonner";
 import { FoundryLoader } from "./foundry-loader";
+import Link from "next/link";
 
 export function BuilderShell({ allProducts }: { allProducts: ProductBuilderDTO[] }) {
 	const [viewMode, setViewMode] = useState<"HOLOGRAPHIC" | "SCHEMATIC">("HOLOGRAPHIC");
@@ -33,16 +34,16 @@ export function BuilderShell({ allProducts }: { allProducts: ProductBuilderDTO[]
 	};
 
 	return (
-		<div className="relative h-dvh w-full bg-[#0A0E14] flex flex-col overflow-hidden font-sans mt-8">
+		<div className="relative h-dvh w-full bg-[#0A0E14] flex flex-col overflow-hidden overflow-y-scroll font-sans">
 			{/* 1. GLOBAL HEADER */}
 			<header className="flex-none h-16 border-b border-white/5 bg-[#0A0E14] z-50 flex items-center justify-between px-4 lg:px-6">
 				<div className="flex items-center gap-2 md:gap-4">
-					<div className="flex items-center gap-2">
-						<Terminal size={16} className="text-[#FFB400]" />
+					<Link href="/" className="flex items-center gap-2 group cursor-pointer">
+						<Terminal size={16} className="text-[#FFB400] group-hover:rotate-12 transition-transform" />
 						<span className="text-sm lg:text-lg font-black uppercase tracking-tighter text-[#F5F5F0] hidden sm:inline">
 							Crucible_<span className="text-[#FFB400]">Core</span>
 						</span>
-					</div>
+					</Link>
 
 					{/* MODE TOGGLE */}
 					<div className="flex items-center bg-white/5 rounded-full p-1 border border-white/5 ml-2">

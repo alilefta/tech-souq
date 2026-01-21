@@ -70,7 +70,7 @@ export function HeaderSearch() {
 						exit={{ opacity: 0, y: 10 }}
 						className="absolute top-full left-0 w-full mt-2 bg-[#0A0E14] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-50 overflow-hidden"
 					>
-						<div className="p-2 border-b border-white/5 bg-white/[0.01]">
+						<div className="p-2 border-b border-white/5 bg-white/1">
 							<span className="text-[7px] font-mono text-[#94A3B8] uppercase tracking-[0.3em]">Query_Results: [{results.length}]</span>
 						</div>
 

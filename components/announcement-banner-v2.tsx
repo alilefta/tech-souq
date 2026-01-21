@@ -5,9 +5,14 @@ import { X, Sparkles, Zap } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
+import { usePathname } from "next/navigation";
 
 export function AnnouncementBar() {
 	const [isVisible, setIsVisible] = useState(true);
+
+	const pathname = usePathname();
+	// Hide in Builder to maximize 3D Viewport
+	if (pathname === "/builder") return null;
 
 	return (
 		<AnimatePresence>

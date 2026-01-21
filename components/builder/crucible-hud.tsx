@@ -94,7 +94,7 @@ export function CrucibleHUD({ allProducts }: { allProducts: ProductBuilderDTO[] 
 			</div>
 
 			{/* 2. DESKTOP SIDEBARS (Hidden on Mobile) */}
-			<aside className="absolute left-6 top-24 bottom-24 w-64 pointer-events-auto hidden lg:flex flex-col gap-4 z-40">
+			<aside className="absolute left-6 top-24 bottom-22 w-64 pointer-events-auto hidden lg:flex flex-col gap-4 z-40">
 				<div className="bg-black/60 border border-white/5 backdrop-blur-xl flex-1 overflow-hidden flex flex-col rounded-none">
 					<div className="p-4 border-b border-white/5 flex justify-between items-center">
 						<h2 className="text-[9px] font-black uppercase tracking-[0.3em] text-[#94A3B8]">Assembly_Chain</h2>
