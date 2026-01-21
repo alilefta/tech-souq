@@ -10,11 +10,15 @@ export interface BuilderState {
 	MaxStep: number;
 	manifest: BuildManifest;
 
+	isExploded: boolean;
+
 	// Actions
 	setStep: (step: number) => void;
 	setComponent: (type: BuildComponentType, product: ProductBuilderDTO) => void;
 	clearComponent: (type: BuildComponentType) => void;
 	resetFoundry: () => void;
+
+	toggleExploded: () => void;
 }
 
 const initialManifest: BuildManifest = {
@@ -46,6 +50,7 @@ export const useBuilderStore = create<BuilderState>((set) => ({
 	manifest: initialManifest,
 	MaxStep: 8,
 
+	isExploded: false,
 	setStep: (step) => set({ currentStep: step }),
 
 	// UNIFIED ACTION: setComponent handles both add and update
@@ -69,4 +74,11 @@ export const useBuilderStore = create<BuilderState>((set) => ({
 		})),
 
 	resetFoundry: () => set({ manifest: initialManifest, currentStep: 0 }),
+
+	toggleExploded: () =>
+		set((state) => {
+			return {
+				isExploded: !state.isExploded,
+			};
+		}),
 }));

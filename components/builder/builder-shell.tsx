@@ -5,14 +5,16 @@ import { Scene3D } from "./scene-3d";
 import { CrucibleHUD } from "./crucible-hud";
 import { SchematicView } from "./schematic-view";
 import { ProductBuilderDTO } from "@/app/data/products";
-import { Box, List, Terminal, RotateCcw, ArrowRight } from "lucide-react";
+import { Box, List, Terminal, RotateCcw, ArrowRight, Lock, Unlock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useBuilderStore } from "@/store/useBuilderStore";
 import { useCart } from "@/store/useCart";
 import { toast } from "sonner";
+import { FoundryLoader } from "./foundry-loader";
 
 export function BuilderShell({ allProducts }: { allProducts: ProductBuilderDTO[] }) {
 	const [viewMode, setViewMode] = useState<"HOLOGRAPHIC" | "SCHEMATIC">("HOLOGRAPHIC");
+	const [isViewportLocked, setIsViewportLocked] = useState(true);
 
 	// GLOBAL LOGIC HOISTING
 	const { resetFoundry, manifest } = useBuilderStore();
@@ -31,10 +33,10 @@ export function BuilderShell({ allProducts }: { allProducts: ProductBuilderDTO[]
 	};
 
 	return (
-		<div className="relative h-[100dvh] w-full bg-[#0A0E14] flex flex-col overflow-hidden font-sans">
+		<div className="relative h-dvh w-full bg-[#0A0E14] flex flex-col overflow-hidden font-sans mt-8">
 			{/* 1. GLOBAL HEADER */}
 			<header className="flex-none h-16 border-b border-white/5 bg-[#0A0E14] z-50 flex items-center justify-between px-4 lg:px-6">
-				<div className="flex items-center gap-4">
+				<div className="flex items-center gap-2 md:gap-4">
 					<div className="flex items-center gap-2">
 						<Terminal size={16} className="text-[#FFB400]" />
 						<span className="text-sm lg:text-lg font-black uppercase tracking-tighter text-[#F5F5F0] hidden sm:inline">
@@ -43,11 +45,11 @@ export function BuilderShell({ allProducts }: { allProducts: ProductBuilderDTO[]
 					</div>
 
 					{/* MODE TOGGLE */}
-					<div className="flex items-center bg-white/5 rounded-full p-1 border border-white/5 ml-2 md:ml-8">
+					<div className="flex items-center bg-white/5 rounded-full p-1 border border-white/5 ml-2">
 						<button
 							onClick={() => setViewMode("HOLOGRAPHIC")}
 							className={cn(
-								"px-3 lg:px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2",
+								"px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2",
 								viewMode === "HOLOGRAPHIC" ? "bg-[#FFB400] text-[#0A0E14]" : "text-[#94A3B8] hover:text-[#F5F5F0]",
 							)}
 						>
@@ -56,7 +58,7 @@ export function BuilderShell({ allProducts }: { allProducts: ProductBuilderDTO[]
 						<button
 							onClick={() => setViewMode("SCHEMATIC")}
 							className={cn(
-								"px-3 lg:px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2",
+								"px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2",
 								viewMode === "SCHEMATIC" ? "bg-[#FFB400] text-[#0A0E14]" : "text-[#94A3B8] hover:text-[#F5F5F0]",
 							)}
 						>
@@ -65,12 +67,26 @@ export function BuilderShell({ allProducts }: { allProducts: ProductBuilderDTO[]
 					</div>
 				</div>
 
-				<div className="flex items-center gap-4">
+				<div className="flex items-center gap-2 md:gap-4">
 					{/* Desktop Price Readout */}
 					<div className="hidden lg:block text-right">
 						<p className="text-[8px] font-mono text-[#94A3B8] uppercase tracking-widest">Allocation</p>
 						<p className="text-lg font-black text-[#F5F5F0] leading-none">${totalPrice.toLocaleString()}</p>
 					</div>
+
+					{/* NEW: VIEWPORT LOCK (Visible only in Holographic) */}
+					{viewMode === "HOLOGRAPHIC" && (
+						<button
+							onClick={() => setIsViewportLocked(!isViewportLocked)}
+							className={cn(
+								"p-2 border transition-all rounded-full lg:rounded-none",
+								!isViewportLocked ? "border-[#FFB400] text-[#FFB400] bg-[#FFB400]/10" : "border-white/10 bg-black/40 text-[#94A3B8]",
+							)}
+							title={isViewportLocked ? "Unlock Camera" : "Lock Camera"}
+						>
+							{isViewportLocked ? <Lock size={16} /> : <Unlock size={16} />}
+						</button>
+					)}
 
 					<button
 						onClick={resetFoundry}
@@ -83,20 +99,22 @@ export function BuilderShell({ allProducts }: { allProducts: ProductBuilderDTO[]
 			</header>
 
 			{/* 2. VIEWPORT CONTENT */}
-			<div className="flex-1 relative overflow-hidden">
+			<div className="flex-1 relative overflow-hidden bg-[#0A0E14]">
 				{viewMode === "HOLOGRAPHIC" ? (
 					<>
+						{/* LOADER: Needs higher Z-Index to sit on top of Canvas */}
+						<FoundryLoader />
+
 						<div className="absolute inset-0 z-0">
-							<Scene3D />
+							<Scene3D interactive={!isViewportLocked} />
 						</div>
+
 						<div className="relative z-10 h-full pointer-events-none">
-							{/* REMOVE mobile footer logic from inside here */}
 							<CrucibleHUD allProducts={allProducts} />
 						</div>
 					</>
 				) : (
 					<div className="h-full overflow-y-auto custom-scrollbar bg-[#0A0E14]">
-						{/* Pass explicit padding to ensure content isn't hidden behind footer */}
 						<SchematicView allProducts={allProducts} />
 					</div>
 				)}

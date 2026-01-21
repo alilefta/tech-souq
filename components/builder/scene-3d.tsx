@@ -1,21 +1,29 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Grid } from "@react-three/drei";
-import { Suspense } from "react";
+import { OrbitControls, ContactShadows, Environment, Grid, AdaptiveDpr, PerformanceMonitor, BakeShadows } from "@react-three/drei";
+import { Suspense, useState } from "react";
 import { ModuleStage } from "./module-stage";
 import * as THREE from "three";
+import { CameraManager } from "./camera-manager";
 
-export function Scene3D() {
+interface Scene3DProps {
+	interactive?: boolean; // Controlled by HUD
+}
+
+export function Scene3D({ interactive }: Scene3DProps) {
+	const [dpr, setDpr] = useState(1.5); // Default to high quality
+
 	return (
 		<div className="h-full w-full bg-[#0A0E14]">
 			<Canvas
+				dpr={dpr}
 				shadows
 				// 1. ELITE CAMERA POSITION
 				// Position: [X, Y, Z] -> [1.2, 0.8, 1.8]
 				// This places the "lens" about 1.5 meters away and slightly above.
 				// FOV: 45 is a standard "Human Eye" lens (35mm-50mm equivalent).
-				camera={{ position: [1.2, 0.9, 1.8], fov: 45 }}
+				camera={{ position: [-1.5, 0.8, 1.5], fov: 45 }}
 				gl={{
 					antialias: true,
 					alpha: true,
@@ -23,7 +31,11 @@ export function Scene3D() {
 					toneMapping: THREE.ACESFilmicToneMapping,
 				}}
 			>
+				<PerformanceMonitor onIncline={() => setDpr(2)} onDecline={() => setDpr(0.9)} />
+				<AdaptiveDpr pixelated />
+				<BakeShadows />
 				<color attach="background" args={["#0A0E14"]} />
+				<CameraManager active={interactive ?? false} />
 
 				<fog attach="fog" args={["#0A0E14", 2, 10]} />
 				<ambientLight intensity={0.5} />
@@ -65,6 +77,7 @@ export function Scene3D() {
 				<OrbitControls
 					makeDefault
 					// Look at the "Heart" of the PC (roughly 30cm up from the floor)
+					enabled={interactive}
 					target={[0, 0.1, 0]}
 					minPolarAngle={0}
 					maxPolarAngle={Math.PI / 2.1}

@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { ShieldCheck, Terminal, ArrowRight, ChevronRight, Lock, Activity, AlertTriangle, PlusSquare, Settings2, Eye } from "lucide-react";
+import { ShieldCheck, ArrowRight, ChevronRight, Lock, Activity, AlertTriangle, PlusSquare, Settings2, Eye, Minimize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BUILD_STEPS, BuildComponentType, isStepAuthorized, useBuilderStore } from "@/store/useBuilderStore";
 import { ProductBuilderDTO } from "@/app/data/products";
@@ -14,12 +14,11 @@ import { SystemAlertTicker } from "./system-alert-ticker";
 import { ModuleSelectionSheet } from "./module-selection-sheet";
 import { useBuilderLogic } from "@/hooks/useBuilderLogic";
 import { STEP_LABELS } from "@/lib/builder/step-labels"; // Use the shared labels
-import { SafeImage } from "@/components/ui/safe-image";
 import { ProtocolAlert } from "@/lib/builder/resolver";
 
 export function CrucibleHUD({ allProducts }: { allProducts: ProductBuilderDTO[] }) {
 	// 1. STATE & LOGIC HOOKS
-	const { currentStep, setStep, manifest, setComponent, resetFoundry } = useBuilderStore();
+	const { currentStep, setStep, manifest, setComponent } = useBuilderStore();
 	const { addItem } = useCart();
 
 	// Unified Logic Hook (Shared with SchematicView)
@@ -27,7 +26,6 @@ export function CrucibleHUD({ allProducts }: { allProducts: ProductBuilderDTO[] 
 		activeType,
 		availableModules,
 		alerts,
-		totalPrice,
 	}: {
 		activeType: BuildComponentType;
 		availableModules: ProductBuilderDTO[];
@@ -42,6 +40,8 @@ export function CrucibleHUD({ allProducts }: { allProducts: ProductBuilderDTO[] 
 	const [inspectedModule, setInspectedModule] = useState<ProductBuilderDTO | null>(null);
 	const [isRegistryOpen, setIsRegistryOpen] = useState(false);
 
+	const { isExploded, toggleExploded } = useBuilderStore();
+
 	// ACTION: Authorize Build
 	const handleAuthorize = () => {
 		const parts = Object.values(manifest).filter((p) => p !== null);
@@ -55,21 +55,26 @@ export function CrucibleHUD({ allProducts }: { allProducts: ProductBuilderDTO[] 
 
 	return (
 		<div className="h-full w-full flex flex-col justify-between p-4 lg:p-6 pointer-events-none relative font-sans">
-			{/* 1. TOP HEADER */}
-			<header className="flex justify-between items-start z-50 pointer-events-auto">
-				<div className="flex flex-col gap-1 lg:gap-2">
-					<div className="flex items-center gap-3 bg-black/40 backdrop-blur-md px-3 py-1 border border-white/5 rounded-full w-fit">
-						<Terminal size={12} className="text-[#FFB400]" />
-						<span className="text-[#FFB400] text-[9px] font-black uppercase tracking-[0.3em]">Protocol v60.4</span>
-					</div>
-					{/* <h1 className="text-2xl lg:text-5xl font-black uppercase tracking-tighter text-[#F5F5F0] drop-shadow-2xl">
-						Crucible_<span className="text-[#FFB400]">Core</span>
-					</h1> */}
+			{/* 1. HUD CONTROLS (Floating below Global Header) */}
+			<div className="flex justify-between items-start pointer-events-auto w-full z-50 relative">
+				{/* EXPLODE TOGGLE: Visible on Desktop OR Mobile Visual Mode */}
+				<div className={cn("transition-opacity", mobileView === "CONFIG" ? "lg:opacity-100 opacity-0 pointer-events-none lg:pointer-events-auto" : "opacity-100")}>
+					<button
+						onClick={toggleExploded}
+						className={cn(
+							"p-3 border transition-all flex items-center gap-3 backdrop-blur-md rounded-full lg:rounded-none",
+							isExploded ? "border-[#FFB400] text-[#FFB400] bg-[#FFB400]/10" : "border-white/10 bg-black/40 text-[#94A3B8]",
+						)}
+						title="Toggle Exploded Assembly"
+					>
+						<Minimize2 size={18} className={isExploded ? "rotate-45 transition-transform" : "transition-transform"} />
+						<span className="hidden lg:inline text-[9px] font-black uppercase tracking-widest">{isExploded ? "Implode_View" : "Explode_View"}</span>
+					</button>
 				</div>
 
-				{/* MOBILE VIEW TOGGLE (Distinct from Shell Toggle) */}
-				<div className="lg:hidden flex flex-col items-end gap-2">
-					<div className="flex bg-black/60 backdrop-blur-md border border-white/10 rounded-full p-1">
+				{/* MOBILE: Visual/Config Toggle */}
+				<div className="lg:hidden flex flex-col items-end gap-2 ml-auto">
+					<div className="flex bg-black/80 backdrop-blur-xl border border-white/10 rounded-full p-1 shadow-2xl">
 						<button
 							onClick={() => setMobileView("CONFIG")}
 							className={cn("p-2 rounded-full transition-all flex items-center gap-2", mobileView === "CONFIG" ? "bg-[#FFB400] text-[#0A0E14]" : "text-[#94A3B8]")}
@@ -86,19 +91,10 @@ export function CrucibleHUD({ allProducts }: { allProducts: ProductBuilderDTO[] 
 						</button>
 					</div>
 				</div>
-
-				{/* DESKTOP TOTAL */}
-				<div className="hidden lg:block bg-[#FFB400] px-6 py-2 text-[#0A0E14] shadow-[0_0_50px_rgba(255,180,0,0.2)] pointer-events-auto">
-					<p className="text-[9px] font-black uppercase tracking-widest mb-1">Total_Allocation</p>
-					<div className="flex items-baseline gap-2">
-						<span className="text-4xl font-black tracking-tighter">${totalPrice.toLocaleString()}</span>
-						<span className="text-[10px] font-bold">USD</span>
-					</div>
-				</div>
-			</header>
+			</div>
 
 			{/* 2. DESKTOP SIDEBARS (Hidden on Mobile) */}
-			<aside className="absolute left-6 top-32 bottom-32 w-64 pointer-events-auto hidden lg:flex flex-col gap-4 z-40">
+			<aside className="absolute left-6 top-24 bottom-24 w-64 pointer-events-auto hidden lg:flex flex-col gap-4 z-40">
 				<div className="bg-black/60 border border-white/5 backdrop-blur-xl flex-1 overflow-hidden flex flex-col rounded-none">
 					<div className="p-4 border-b border-white/5 flex justify-between items-center">
 						<h2 className="text-[9px] font-black uppercase tracking-[0.3em] text-[#94A3B8]">Assembly_Chain</h2>
@@ -135,13 +131,13 @@ export function CrucibleHUD({ allProducts }: { allProducts: ProductBuilderDTO[] 
 			</aside>
 
 			{/* RIGHT: DIAGNOSTICS */}
-			<aside className="absolute right-6 top-32 w-72 hidden lg:flex flex-col pointer-events-auto z-40">
+			<aside className="absolute right-6 top-24 w-72 hidden lg:flex flex-col pointer-events-auto z-40">
 				<div className="bg-black/60 border border-white/5 backdrop-blur-xl p-0 flex flex-col">
 					<div className="p-4 border-b border-white/5 flex items-center gap-2">
 						<Activity size={14} className={cn(criticalAlert ? "text-red-500" : "text-[#FFB400]")} />
 						<h3 className="text-[9px] font-black uppercase tracking-[0.3em] text-[#F5F5F0]">System_Diagnostics</h3>
 					</div>
-					<div className="p-4 space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar">
+					<div className="p-4 space-y-2 max-h-75 overflow-y-auto custom-scrollbar">
 						<AnimatePresence mode="popLayout">
 							{alerts.length === 0 ? (
 								<div className="text-center py-8 opacity-40">
@@ -174,8 +170,8 @@ export function CrucibleHUD({ allProducts }: { allProducts: ProductBuilderDTO[] 
 
 			{/* 3. MOBILE CONFIGURATION DECK */}
 			{mobileView === "CONFIG" && (
-				<div className="lg:hidden absolute inset-0 z-40 bg-[#0A0E14]/95 backdrop-blur-xl pointer-events-auto overflow-y-auto custom-scrollbar p-4">
-					<div className="space-y-3 pb-32">
+				<div className="lg:hidden absolute inset-0 z-40  bg-[#0A0E14]/95 backdrop-blur-xl pointer-events-auto overflow-y-auto custom-scrollbar p-4">
+					<div className="space-y-3 pb-32 pt-16">
 						<h3 className="text-[9px] font-black uppercase tracking-[0.3em] text-[#94A3B8] mb-4">Assembly_Sequence</h3>
 						{BUILD_STEPS.map((step, i) => (
 							<div key={step} className="space-y-2">
@@ -225,7 +221,7 @@ export function CrucibleHUD({ allProducts }: { allProducts: ProductBuilderDTO[] 
 				{/* CAROUSEL TRAY */}
 				{isStepAuthorized(currentStep, manifest) && (
 					<div className="w-full max-w-4xl pointer-events-auto mb-4">
-						<motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="bg-black/80 border border-white/10 backdrop-blur-xl p-2 relative">
+						<motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="bg-black/65 border border-white/10 backdrop-blur-xl p-2 relative">
 							<div className="absolute -top-3 left-4 bg-[#FFB400] text-[#0A0E14] text-[8px] font-black uppercase px-2 py-0.5 tracking-widest">Select_{activeType}</div>
 							<div className="flex gap-2 overflow-x-auto pb-2 pt-2 custom-scrollbar px-2">
 								{availableModules.length > 0 ? (
@@ -311,9 +307,12 @@ export function CrucibleHUD({ allProducts }: { allProducts: ProductBuilderDTO[] 
 			/>
 
 			{/* DESKTOP ALERT TICKER */}
-			<div className="hidden lg:block">
+			<div className="absolute bottom-4 left-4 right-4 lg:hidden pointer-events-auto z-40">
 				<SystemAlertTicker alerts={alerts} />
 			</div>
+			{/* <div className="hidden lg:block">
+				<SystemAlertTicker alerts={alerts} />
+			</div> */}
 		</div>
 	);
 }

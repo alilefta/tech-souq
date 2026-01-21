@@ -1,14 +1,12 @@
 import { CartWithItemsDTO } from "@/app/data/cart";
 import { ProductCardDTO } from "@/app/data/products";
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 
 type CartItem = CartWithItemsDTO["items"][0];
 export interface CartState {
 	isOpen: boolean;
 	items: CartItem[]; // The main state array
 
-	// Actions
 	setIsOpen: (val: boolean) => void;
 
 	// 1. SYNC: The Server tells us the "Real Truth"
@@ -35,18 +33,19 @@ export const useCart = create<CartState>((set) => ({
 						i.productId === product.id
 							? {
 									...i,
-									// If isReplace is true (PDP mode), we set the value.
-									// If false (Product Card mode), we increment.
 									quantity: isReplace ? quantity : i.quantity + quantity,
-							  }
-							: i
+								}
+							: i,
 					),
 					isOpen: true,
 				};
 			}
 
 			// Optimistic ID using timestamp to avoid collisions
-			const optimisticId = Date.now();
+			// We use negative numbers for optimistic items so we can identify them later if needed
+			// Date.now() ensures time-sort, Random ensures loop-safety
+
+			const optimisticId = -1 * (Date.now() + Math.floor(Math.random() * 9999));
 
 			const newItem: CartItem = {
 				id: optimisticId,
@@ -57,7 +56,6 @@ export const useCart = create<CartState>((set) => ({
 					...product, // Spreading the DTO keeps it clean
 					brand: "BASE_60", // Hardcoded or from DTO
 					stock: 100,
-					// Mock the relations for the UI
 					category: {
 						...product.category,
 						arabicName: null,
@@ -89,8 +87,8 @@ export const useCart = create<CartState>((set) => ({
 					? {
 							...i,
 							quantity,
-					  }
-					: i
+						}
+					: i,
 			),
 		}));
 	},

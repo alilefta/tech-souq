@@ -16,7 +16,7 @@ export function SystemAlertTicker({ alerts }: { alerts: ProtocolAlert[] }) {
 					initial={{ y: 20, opacity: 0 }}
 					animate={{ y: 0, opacity: 1 }}
 					exit={{ y: 20, opacity: 0 }}
-					className="absolute bottom-20 left-0 right-0 lg:left-auto lg:right-6 lg:bottom-24 lg:w-96 z-50 pointer-events-auto"
+					className="absolute bottom-2 left-0 right-0 lg:left-auto lg:right-6 lg:bottom-24 lg:w-96 z-50 pointer-events-auto"
 				>
 					<div
 						className={cn(

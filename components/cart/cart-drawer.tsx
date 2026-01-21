@@ -8,8 +8,10 @@ import { useCart } from "@/store/useCart";
 import { CartWithItemsDTO } from "@/app/data/cart";
 import { useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export function CartDrawer({ cart }: { cart: CartWithItemsDTO | null }) {
+	const router = useRouter();
 	// cart prop used to get stored cart data and for syncing with UI cart items
 	const syncCart = useCart((state) => state.syncCart);
 
@@ -25,6 +27,11 @@ export function CartDrawer({ cart }: { cart: CartWithItemsDTO | null }) {
 			syncCart(cart.items);
 		}
 	}, [cart, syncCart]);
+
+	const handleCheckout = () => {
+		setIsOpen(false); // Close the drawer instantly
+		router.push("/checkout"); // Navigate to the terminal
+	};
 
 	return (
 		<Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -111,12 +118,11 @@ export function CartDrawer({ cart }: { cart: CartWithItemsDTO | null }) {
 								<button
 									className="group relative w-full bg-[#FFB400] text-[#0A0E14] font-black text-xs uppercase tracking-[0.3em] py-5 flex items-center justify-center gap-3 overflow-hidden transition-all hover:shadow-[0_0_30px_rgba(255,180,0,0.3)]"
 									disabled={isEmpty}
+									onClick={handleCheckout}
 								>
-									<Link href={"/checkout"}>
-										<span className="relative z-10 flex items-center gap-3">
-											Initialize Checkout <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
-										</span>
-									</Link>
+									<span className="relative z-10 flex items-center gap-3">
+										Initialize Checkout <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
+									</span>
 									{/* Diagonal Shine Animation */}
 									<div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
 										<div className="absolute top-0 -inset-full h-full w-1/2 z-10 block transform -skew-x-30 bg-linear-to-r from-transparent via-white/40 to-transparent -translate-x-[150%] group-hover:translate-x-[250%] transition-transform duration-1000 ease-in-out" />

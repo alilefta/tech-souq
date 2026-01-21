@@ -20,7 +20,7 @@ export const FOUNDRY_ANCHORS: Record<string, HardwareAnchors> = {
 	// Where the Motherboard sits inside the Chassis
 	CHASSIS: {
 		mb_dock: [0, 0, 0] as [number, number, number],
-		psu_dock: [-0.034, 0.42, -0.118] as [number, number, number],
+		psu_dock: [0.008, 0.03, -0.118] as [number, number, number],
 		storage2: [0, 0.135, 0.005] as [number, number, number], // Bottom of board
 	},
 	// Where parts sit on the Motherboard

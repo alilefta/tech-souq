@@ -20,7 +20,10 @@ type STORAGE = z.infer<typeof StorageSchema>;
 type COOLER = z.infer<typeof CoolerSchema>;
 
 // Helper to count occurrences in an array (For accurate cable checking)
-const countItems = (arr: string[]) => {
+const countItems = (arr: string[] | undefined | null) => {
+	// 1. DEFENSIVE CHECK: Return empty object if array is missing
+	if (!arr || !Array.isArray(arr)) return {};
+
 	return arr.reduce(
 		(acc, curr) => {
 			acc[curr] = (acc[curr] || 0) + 1;
@@ -112,8 +115,8 @@ export function resolveCompatibility(manifest: BuilderState["manifest"]): Protoc
 
 	// 4. POWER CONNECTORS (FIXED QUANTITY LOGIC)
 	if (p && m) {
-		const psuPins = countItems(p.cpuPowerConnectors);
-		const mbPins = countItems(m.cpuPowerConnectors);
+		const psuPins = countItems(p.cpuPowerConnectors || []);
+		const mbPins = countItems(m.cpuPowerConnectors || []);
 
 		let powerMissing = false;
 		// Check if PSU has enough of every specific pin type required by MB
@@ -127,7 +130,7 @@ export function resolveCompatibility(manifest: BuilderState["manifest"]): Protoc
 		if (powerMissing) {
 			alerts.push({
 				code: "CPU_POWER_CONFLICT",
-				message: `Critical: PSU lacks required CPU cables [${m.cpuPowerConnectors.join(" + ")}].`,
+				message: `Critical: PSU lacks required CPU cables [${(m.cpuPowerConnectors || []).join(" + ")}].`,
 				severity: "CRITICAL",
 			});
 		}
@@ -135,8 +138,8 @@ export function resolveCompatibility(manifest: BuilderState["manifest"]): Protoc
 
 	// 4.5 GPU POWER (New Check)
 	if (p && g) {
-		const psuPins = countItems(p.gpuPowerConnectors);
-		const gpuPins = countItems(g.powerConnectors);
+		const psuPins = countItems(p.gpuPowerConnectors || []);
+		const gpuPins = countItems(g.powerConnectors || []);
 		let gpuPowerMissing = false;
 
 		for (const [pin, count] of Object.entries(gpuPins)) {
@@ -148,7 +151,7 @@ export function resolveCompatibility(manifest: BuilderState["manifest"]): Protoc
 		if (gpuPowerMissing) {
 			alerts.push({
 				code: "GPU_POWER_CONFLICT",
-				message: `Critical: PSU lacks required GPU cables [${g.powerConnectors.join(" + ")}].`,
+				message: `Critical: PSU lacks required GPU cables [${(g.powerConnectors || []).join(" + ")}].`,
 				severity: "CRITICAL",
 			});
 		}
