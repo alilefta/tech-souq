@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useGLTF, Float, PresentationControls, Environment, ContactShadows, PerspectiveCamera, Html, AdaptiveDpr } from "@react-three/drei";
+import { useGLTF, PresentationControls, Environment, ContactShadows, PerspectiveCamera, Html, AdaptiveDpr } from "@react-three/drei";
 import { Suspense, useRef } from "react";
 import * as THREE from "three";
 import { Loader2, ShieldCheck } from "lucide-react";
@@ -13,18 +13,14 @@ const DRACO_URL = "https://www.gstatic.com/draco/versioned/decoders/1.5.5/";
 function HeroModel() {
 	const { scene } = useGLTF("/assets/models/hero/rtx-5090.glb", DRACO_URL);
 	const meshRef = useRef<THREE.Group>(null);
-	const { viewport } = useThree();
+	const { size } = useThree(); // Use pixel size for responsive logic
 
 	// RESPONSIVE LOGIC:
 	// If viewport width is small (mobile), reduce scale slightly to fit better.
 	// Desktop users requested scale 4.
 
-	console.log("Current Viewport:", viewport.width);
-	const isMobile = viewport.width < 3;
-
-	const scale = isMobile ? 3 : 4;
-	const arScale = isMobile ? 0.1 : 0.2;
-	const arPos: [x: number, y: number, z: number] = isMobile ? [0.3, 0.28, 0.5] : [0.3, 0.38, 0.5];
+	const isMobile = size.width < 480;
+	const arScale = isMobile ? 0.2 : 0.3;
 
 	useFrame((state) => {
 		if (meshRef.current) {
@@ -34,19 +30,28 @@ function HeroModel() {
 
 	return (
 		<group ref={meshRef}>
-			<primitive object={scene} scale={scale} rotation={[0.2, 2.5, 0.1]} position={[0, -0.45, 0]} />
+			<primitive object={scene} scale={4} rotation={[0.2, 2.5, 0.1]} position={[0, -0.45, 0]} />
 
 			<ARLabel
 				text="Foundry_Analysis::01"
 				variant="scientific"
 				// Adjusted label position to stick closer to the smaller mobile model if needed
-				position={arPos}
+				position={[0.3, 0.35, 0.5]}
 				scale={arScale}
 				lineHeight={50}
 				lineWidth={30}
 			/>
 		</group>
 	);
+}
+
+function ResponsiveCamera() {
+	const { size } = useThree();
+	const isMobile = size.width < 640;
+	// Move camera back on mobile to fit the tall object in a narrow screen
+	const zDist = isMobile ? 6 : 4;
+
+	return <PerspectiveCamera makeDefault position={[0, 0, zDist]} fov={30} />;
 }
 
 export default function HeroVisual3D() {
@@ -79,7 +84,7 @@ export default function HeroVisual3D() {
 						<AdaptiveDpr pixelated />
 
 						<PerspectiveCamera makeDefault position={[0, 0, 4]} fov={30} />
-
+						<ResponsiveCamera />
 						<ambientLight intensity={0.5} />
 						<spotLight position={[5, 10, 5]} angle={0.5} penumbra={1} intensity={2} color="#ffffff" />
 						<pointLight position={[-5, 0, -5]} intensity={2} color="#FFB400" />

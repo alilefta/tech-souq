@@ -84,7 +84,7 @@ export function MobileNav() {
 				</div>
 
 				{/* 3. FOOTER: ADMIN & TELEMETRY */}
-				<div className="p-6 bg-white/[0.02] border-t border-white/5 space-y-6">
+				<div className="p-6 bg-white/2 border-t border-white/5 space-y-6">
 					{/* Admin Shortcut */}
 					<Link
 						href="/admin"
