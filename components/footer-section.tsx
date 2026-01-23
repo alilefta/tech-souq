@@ -5,6 +5,7 @@ import { Globe, Github, Instagram, Twitter } from "lucide-react";
 import { Logo } from "@/components/ui/logo"; // Import our new logo
 import Link from "next/link";
 
+// Contact and blog routes are done.
 export default function FooterSection() {
 	return (
 		<footer className="w-full bg-[#0A0E14] pt-20 pb-10 px-8 relative overflow-hidden border-t border-white/5 selection:bg-[#FFB400] selection:text-[#0A0E14]">

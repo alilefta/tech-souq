@@ -3,7 +3,6 @@ import { BlogCard } from "@/components/blog/blog-card";
 import { Terminal, Search, Rss } from "lucide-react";
 import { SafeImage } from "@/components/ui/safe-image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 
 export const metadata = {
 	title: "Intelligence Feed | BASE 60",
@@ -16,7 +15,7 @@ export default function BlogPage() {
 
 	return (
 		<main className="bg-[#0A0E14] min-h-screen pt-24 lg:pt-32 pb-20 font-sans selection:bg-[#FFB400] selection:text-[#0A0E14]">
-			<div className="max-w-[1600px] mx-auto px-6 lg:px-12">
+			<div className="max-w-400 mx-auto px-6 lg:px-12">
 				{/* 1. HEADER */}
 				<header className="mb-16 border-b border-white/5 pb-12 relative overflow-hidden">
 					<div className="absolute top-0 right-0 opacity-[0.02] text-[#F5F5F0] pointer-events-none select-none">
@@ -36,13 +35,13 @@ export default function BlogPage() {
 						{/* NEWSLETTER MINI-FORM */}
 						<div className="w-full md:w-auto flex flex-col items-end gap-2">
 							<span className="text-[8px] font-mono text-[#94A3B8] uppercase tracking-widest">Establish_Signal_Uplink</span>
-							<div className="flex w-full md:w-80 h-10 border border-white/10 bg-white/[0.02]">
+							<div className="flex w-full md:w-80 h-10 border border-white/10 bg-white/2">
 								<input
 									type="email"
 									placeholder="ENTER_COMM_ADDRESS..."
 									className="flex-1 bg-transparent px-4 text-[10px] font-mono uppercase text-[#F5F5F0] outline-none placeholder:text-[#94A3B8]/30"
 								/>
-								<button className="px-4 hover:bg-[#FFB400] hover:text-[#0A0E14] transition-colors text-[#FFB400]">
+								<button title="RSS Feed" className="px-4 hover:bg-[#FFB400] hover:text-[#0A0E14] transition-colors text-[#FFB400]">
 									<Rss size={14} />
 								</button>
 							</div>
@@ -52,7 +51,7 @@ export default function BlogPage() {
 
 				{/* 2. HERO LOG (Featured) */}
 				<Link href={`/blog/${featured.slug}`} className="group block mb-24 relative overflow-hidden border border-white/5 bg-[#0A0E14]">
-					<div className="grid grid-cols-1 lg:grid-cols-12 min-h-[500px]">
+					<div className="grid grid-cols-1 lg:grid-cols-12 min-h-125">
 						<div className="lg:col-span-7 relative h-64 lg:h-full overflow-hidden">
 							<SafeImage
 								src={featured.image}
@@ -87,7 +86,7 @@ export default function BlogPage() {
 						/>
 					</div>
 					<div className="md:col-span-4 bg-[#0A0E14] border-l border-white/5 px-4 flex items-center">
-						<select className="w-full bg-transparent border-none text-[10px] font-mono uppercase text-[#94A3B8] outline-none appearance-none cursor-pointer">
+						<select title="Filter_Posts" className="w-full bg-transparent border-none text-[10px] font-mono uppercase text-[#94A3B8] outline-none appearance-none cursor-pointer">
 							<option>Filter: ALL_CHANNELS</option>
 							<option>Hardware_Analysis</option>
 							<option>Engineering_Guide</option>
