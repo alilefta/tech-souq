@@ -53,7 +53,7 @@ export default function CategorySection() {
 				<div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
 					<div className="max-w-2xl">
 						<h2 className="text-[#94A3B8] text-xs font-black uppercase tracking-[0.3em] mb-4 flex items-center gap-2">
-							<span className="w-8 h-[1px] bg-[#FFB400]" />
+							<span className="w-8 h-px bg-[#FFB400]" />
 							The Bazaar Map
 						</h2>
 						<h3 className="text-[#F5F5F0] text-4xl md:text-5xl font-bold tracking-tighter leading-none">

@@ -7,7 +7,6 @@ import { CartItem } from "@/components/cart/cart-item";
 import { useCart } from "@/store/useCart";
 import { CartWithItemsDTO } from "@/app/data/cart";
 import { useEffect } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export function CartDrawer({ cart }: { cart: CartWithItemsDTO | null }) {
@@ -29,8 +28,8 @@ export function CartDrawer({ cart }: { cart: CartWithItemsDTO | null }) {
 	}, [cart, syncCart]);
 
 	const handleCheckout = () => {
-		setIsOpen(false); // Close the drawer instantly
-		router.push("/checkout"); // Navigate to the terminal
+		setIsOpen(false);
+		router.push("/checkout");
 	};
 
 	return (
@@ -38,13 +37,13 @@ export function CartDrawer({ cart }: { cart: CartWithItemsDTO | null }) {
 			<SheetDescription className="sr-only">Shopping Cart Manifest</SheetDescription>
 			<SheetContent className="w-full sm:max-w-md bg-[#0A0E14] border-l border-white/5 p-0 flex flex-col font-sans" aria-description="shopping cart">
 				{/* 1. HEADER: Manifest Info (Always Visible) */}
-				<SheetHeader className="p-6 border-b border-white/5 bg-white/[0.01]">
+				<SheetHeader className="p-6 border-b border-white/5 bg-white/1">
 					<div className="flex items-center justify-between mb-2">
 						<span className="text-[10px] font-mono text-[#94A3B8] tracking-[0.3em] uppercase">
 							Terminal_Session: {new Date().getHours()}
 							{new Date().getMinutes()}
 						</span>
-						<div className="flex items-center gap-2">
+						<div className="flex items-center gap-2 mr-4">
 							<div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
 							<span className="text-[8px] font-bold text-[#F5F5F0] uppercase tracking-widest">System_Live</span>
 						</div>
