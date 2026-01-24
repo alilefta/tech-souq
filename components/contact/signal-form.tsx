@@ -11,7 +11,7 @@ import { FoundrySelect } from "@/components/ui/inputs/foundry-select";
 
 const signalSchema = z.object({
 	name: z.string().min(2, "IDENT_REQUIRED"),
-	email: z.string().email("INVALID_SIGNAL"),
+	email: z.email("INVALID_SIGNAL"),
 	channel: z.string().min(1, "CHANNEL_REQUIRED"),
 	message: z.string().min(10, "PAYLOAD_TOO_SHORT"),
 });
@@ -22,7 +22,7 @@ export function SignalForm() {
 	const {
 		control,
 		handleSubmit,
-		formState: { isSubmitting, isValid },
+		formState: { isSubmitting },
 	} = useForm<SignalData>({
 		resolver: zodResolver(signalSchema),
 		defaultValues: {
