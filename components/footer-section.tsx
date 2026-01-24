@@ -89,7 +89,7 @@ export default function FooterSection() {
 								</Link>
 							</li>
 							<li>
-								<Link href="#" className="hover:text-[#FFB400] transition-colors">
+								<Link href="/returns" className="hover:text-[#FFB400] transition-colors">
 									Return_Logistics
 								</Link>
 							</li>
@@ -117,10 +117,10 @@ export default function FooterSection() {
 						<span className="hidden sm:inline">SEC_PROTOCOL: AES_60_ENCRYPTED</span>
 					</div>
 					<div className="flex gap-8 text-[9px] font-black uppercase tracking-widest text-[#94A3B8]">
-						<Link href="#" className="hover:text-[#F5F5F0]">
+						<Link href="/privacy" className="hover:text-[#F5F5F0]">
 							Privacy_Policy
 						</Link>
-						<Link href="#" className="hover:text-[#F5F5F0]">
+						<Link href="/terms" className="hover:text-[#F5F5F0]">
 							Terms_Of_Assembly
 						</Link>
 					</div>
