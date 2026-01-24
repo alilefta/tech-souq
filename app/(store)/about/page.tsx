@@ -1,7 +1,7 @@
 import { Terminal, ShieldCheck, Cpu, Globe, History, Activity } from "lucide-react";
 import { SafeImage } from "@/components/ui/safe-image";
-import { Reveal } from "@/components/ui/reveal";
 import { cn } from "@/lib/utils";
+import { ManifestImage } from "@/components/about/manifest-image";
 
 export const metadata = {
 	title: "The Origin Protocol | BASE 60",
@@ -51,7 +51,8 @@ export default function AboutPage() {
 
 			{/* 2. THE VISUAL MANIFEST (Image Grid) */}
 			<section className="mb-32">
-				<div className="grid grid-cols-1 md:grid-cols-3 h-150 w-full border-y border-white/5">
+				{/* FIX: Changed h-[600px] to h-auto md:h-[600px] to allow mobile stacking */}
+				<div className="grid grid-cols-1 md:grid-cols-3 h-auto md:h-150 w-full border-y border-white/5">
 					<ManifestImage src="https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&q=80&w=1000" label="Foundry_Core_01" sub="Baghdad_HQ" />
 					<ManifestImage src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1000" label="Assembly_Line" sub="Precision_Engineering" delay={0.1} />
 					<ManifestImage src="https://images.unsplash.com/photo-1555664424-778a69022365?auto=format&fit=crop&q=80&w=1000" label="Global_Dispatch" sub="Logistics_Network" delay={0.2} />
@@ -96,29 +97,6 @@ export default function AboutPage() {
 				</div>
 			</section>
 		</main>
-	);
-}
-
-// --- SUB COMPONENTS ---
-
-function ManifestImage({ src, label, sub, delay = 0 }: { src: string; label: string; sub: string; delay?: number }) {
-	return (
-		<div className="relative group overflow-hidden border-r border-white/5 last:border-none">
-			<SafeImage src={src} alt={label} fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105" />
-			<div className="absolute inset-0 bg-linear-to-t from-[#0A0E14] via-[#0A0E14]/40 to-transparent opacity-80" />
-
-			{/* HUD Overlay */}
-			<div className="absolute bottom-8 left-8">
-				<div className="flex items-center gap-2 mb-2">
-					<div className="w-1.5 h-1.5 bg-[#FFB400] rounded-full animate-pulse" />
-					<span className="text-[9px] font-mono text-[#FFB400] uppercase tracking-widest">{label}</span>
-				</div>
-				<p className="text-xl font-bold text-[#F5F5F0] uppercase tracking-tight">{sub}</p>
-			</div>
-
-			{/* Scanline */}
-			<div className="absolute inset-0 bg-white/2 translate-y-full group-hover:translate-y-0 transition-transform duration-700 pointer-events-none" />
-		</div>
 	);
 }
 
