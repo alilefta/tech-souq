@@ -63,7 +63,7 @@ export function TrackingTerminal() {
 					</div>
 				) : result ? (
 					<TrackingResult order={result} />
-				) : actionResult.hasError ? (
+				) : !actionResult.data ? (
 					<div className="flex flex-col items-center justify-center h-64 border border-dashed border-red-500/20 bg-red-500/5">
 						<AlertTriangle className="text-red-500 mb-4" size={32} />
 						<h3 className="text-lg font-black text-red-500 uppercase tracking-tight">Signal_Lost</h3>

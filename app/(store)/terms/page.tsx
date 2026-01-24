@@ -1,5 +1,4 @@
-import { Terminal, AlertTriangle, Gavel, Scale } from "lucide-react";
-import Link from "next/link";
+import { Terminal, AlertTriangle } from "lucide-react";
 
 export const metadata = {
 	title: "Operational Directives | BASE 60",
@@ -8,7 +7,7 @@ export const metadata = {
 
 export default function TermsPage() {
 	return (
-		<main className="bg-[#0A0E14] min-h-screen pt-32 pb-20 font-sans selection:bg-[#FFB400] selection:text-[#0A0E14]">
+		<main className="bg-[#0A0E14] min-h-screen pts-32 pb-20 font-sans selection:bg-[#FFB400] selection:text-[#0A0E14]">
 			<div className="max-w-400 mx-auto px-6 lg:px-12">
 				{/* HEADER */}
 				<header className="mb-20 border-b border-white/5 pb-12">
