@@ -57,12 +57,12 @@ export default function FooterSection() {
 								</Link>
 							</li>
 							<li>
-								<Link href="/builds" className="hover:text-[#FFB400] transition-colors">
+								<Link href="/products?page=1&category=builds" className="hover:text-[#FFB400] transition-colors">
 									Assembled_Modules
 								</Link>
 							</li>
 							<li>
-								<Link href="/peripherals" className="hover:text-[#FFB400] transition-colors">
+								<Link href="/products?page=1&category=peripherals" className="hover:text-[#FFB400] transition-colors">
 									Peripherals
 								</Link>
 							</li>
@@ -74,17 +74,17 @@ export default function FooterSection() {
 						<h4 className="text-[#F5F5F0] text-[10px] font-black uppercase tracking-[0.3em] mb-8 border-b border-white/5 pb-2">Transfers</h4>
 						<ul className="space-y-4 text-[11px] font-bold uppercase tracking-widest text-[#94A3B8]">
 							<li>
-								<Link href="#" className="hover:text-[#FFB400] transition-colors">
+								<Link href="/global-express" className="hover:text-[#FFB400] transition-colors">
 									Global_Express
 								</Link>
 							</li>
 							<li>
-								<Link href="#" className="hover:text-[#FFB400] transition-colors">
+								<Link href="/tracking-node" className="hover:text-[#FFB400] transition-colors">
 									Tracking_Node
 								</Link>
 							</li>
 							<li>
-								<Link href="#" className="hover:text-[#FFB400] transition-colors">
+								<Link href="/warranty-auth" className="hover:text-[#FFB400] transition-colors">
 									Warranty_Auth
 								</Link>
 							</li>
