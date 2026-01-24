@@ -7,6 +7,7 @@ import { PerformanceMetrics } from "@/components/admin/analytics/performance-met
 import { LiveFoundryLogs } from "@/components/admin/analytics/live-foundry-logs";
 import { HighYieldRegistry } from "@/components/admin/analytics/high-yield-registry";
 import { Activity, Globe, Terminal, Cpu } from "lucide-react";
+import { RandomBar } from "@/components/admin/analytics/random-bar";
 
 export default function AnalyticsHub() {
 	return (
@@ -82,16 +83,20 @@ export default function AnalyticsHub() {
 			<div className="bg-white/1 border border-white/5 p-8 relative overflow-hidden group">
 				<Globe className="absolute -right-20 -bottom-20 w-64 h-64 text-[#FFB400] opacity-[0.02]" />
 				<h3 className="text-xs font-black uppercase tracking-[0.3em] mb-10 relative z-10">Geospatial_Node_Distribution</h3>
+
 				<div className="grid grid-cols-1 sm:grid-cols-3 gap-10 relative z-10">
 					{["Baghdad_Central", "London_Node", "Dubai_Hub"].map((hub) => (
 						<div key={hub} className="space-y-4">
 							<div className="flex justify-between items-end">
 								<p className="text-[10px] font-black uppercase text-[#F5F5F0]">{hub}</p>
-								<p className="text-sm font-mono font-black text-[#FFB400]">{Math.floor(Math.random() * 50) + 50}%</p>
+								{/* Note: We can't show exact % here because it's calculated inside the child now. 
+                        We replace it with a static "Active" label or handle state differently. 
+                        For visual dashboards, "Active" is often cleaner. */}
+								<p className="text-[8px] font-mono text-[#94A3B8] uppercase">Signal_Active</p>
 							</div>
-							{/* <div className="h-[1px] w-full bg-white/5">
-								<motion.div initial={{ width: 0 }} whileInView={{ width: "70%" }} className="h-full bg-[#FFB400]" />
-							</div> */}
+
+							{/* USE THE NEW COMPONENT */}
+							<RandomBar />
 						</div>
 					))}
 				</div>

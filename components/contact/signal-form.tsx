@@ -18,6 +18,21 @@ const signalSchema = z.object({
 
 type SignalData = z.infer<typeof signalSchema>;
 
+const generatePacketId = () => {
+	// 1. Get current timestamp (Hex)
+	const time = Date.now().toString(16).slice(-4).toUpperCase();
+
+	// 2. Generate random crypto bytes
+	const array = new Uint8Array(2);
+	crypto.getRandomValues(array);
+	const random = Array.from(array)
+		.map((b) => b.toString(16).padStart(2, "0"))
+		.join("")
+		.toUpperCase();
+
+	return `PKT-${time}-${random}`;
+};
+
 export function SignalForm() {
 	const {
 		control,
@@ -34,11 +49,15 @@ export function SignalForm() {
 	});
 
 	const onSubmit = async (data: SignalData) => {
+		console.log(data.email);
 		// Simulate Network Request
 		await new Promise((resolve) => setTimeout(resolve, 2000));
 
+		// Now we can safely call the external helper
+		const packetId = generatePacketId();
+
 		toast.success("TRANSMISSION_SENT", {
-			description: `PACKET_ID: ${Math.random().toString(36).substring(2, 6).toUpperCase()} // AWAITING_ACK`,
+			description: `ID: ${packetId} // AWAITING_ACK`,
 			icon: <Terminal className="text-[#FFB400]" size={14} />,
 		});
 	};

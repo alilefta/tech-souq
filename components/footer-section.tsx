@@ -47,8 +47,13 @@ export default function FooterSection() {
 						<h4 className="text-[#F5F5F0] text-[10px] font-black uppercase tracking-[0.3em] mb-8 border-b border-white/5 pb-2">Registry</h4>
 						<ul className="space-y-4 text-[11px] font-bold uppercase tracking-widest text-[#94A3B8]">
 							<li>
-								<Link href="/components" className="hover:text-[#FFB400] transition-colors">
-									Components
+								<Link href="/about" className="hover:text-[#FFB400] transition-colors">
+									About_Foundary
+								</Link>
+							</li>
+							<li>
+								<Link href="/contact" className="hover:text-[#FFB400] transition-colors">
+									Technical_Support
 								</Link>
 							</li>
 							<li>
@@ -59,11 +64,6 @@ export default function FooterSection() {
 							<li>
 								<Link href="/peripherals" className="hover:text-[#FFB400] transition-colors">
 									Peripherals
-								</Link>
-							</li>
-							<li>
-								<Link href="/support" className="hover:text-[#FFB400] transition-colors">
-									Technical_Support
 								</Link>
 							</li>
 						</ul>

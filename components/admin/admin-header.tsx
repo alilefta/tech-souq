@@ -1,15 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Wifi, Clock } from "lucide-react";
+import { Wifi, Clock, Menu } from "lucide-react"; // Import Menu for mobile trigger
 import { HeaderSearch } from "./header-search";
 import { NotificationsTerminal } from "./notifications-terminal";
 import { ProfileTerminal } from "./profile-terminal";
+import { MobileSidebar } from "./mobile-sidebar";
 
 export function AdminHeader() {
 	const [time, setTime] = useState("");
 
-	// Live clock to maintain the "Operations Room" feel
 	useEffect(() => {
 		const timer = setInterval(() => {
 			setTime(
@@ -18,22 +18,27 @@ export function AdminHeader() {
 					hour: "2-digit",
 					minute: "2-digit",
 					second: "2-digit",
-				})
+				}),
 			);
 		}, 1000);
 		return () => clearInterval(timer);
 	}, []);
 
 	return (
-		<header className="h-20 border-b border-white/5 bg-[#0A0E14] flex items-center justify-between px-8 sticky top-0 z-40 backdrop-blur-md">
-			{/* 1. REGISTRY QUICK SEARCH */}
+		<header className="h-20 border-b border-white/5 bg-[#0A0E14] flex items-center justify-between px-4 lg:px-8 sticky top-0 z-40 backdrop-blur-md gap-4">
+			{/* 1. MOBILE MENU TRIGGER (Hidden on Desktop) */}
+			<div className="lg:hidden">
+				<MobileSidebar />
+			</div>
+
+			{/* 2. REGISTRY QUICK SEARCH (Flex-1) */}
 			<div className="flex-1 max-w-xl">
 				<HeaderSearch />
 			</div>
 
-			{/* 2. SYSTEM DATA HUB */}
-			<div className="flex items-center gap-8">
-				{/* TELEMETRY: Clock & Node */}
+			{/* 3. SYSTEM DATA HUB */}
+			<div className="flex items-center gap-4 lg:gap-8">
+				{/* TELEMETRY: Clock & Node (Desktop Only) */}
 				<div className="hidden xl:flex items-center gap-6 border-x border-white/5 px-8 h-20">
 					<div className="flex flex-col items-end">
 						<span className="text-[7px] font-mono text-[#94A3B8] uppercase tracking-[0.3em] mb-1">Foundry_Time</span>
@@ -53,7 +58,7 @@ export function AdminHeader() {
 				</div>
 
 				{/* ACTIONS: Signals & Auth */}
-				<div className="flex items-center gap-4">
+				<div className="flex items-center gap-2 lg:gap-4">
 					<NotificationsTerminal />
 					<ProfileTerminal />
 				</div>

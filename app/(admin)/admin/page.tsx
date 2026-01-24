@@ -10,7 +10,7 @@ export default function AdminDashboard() {
 				<div>
 					<div className="flex items-center gap-2 text-[#FFB400] mb-2">
 						<Terminal size={14} />
-						<span className="text-[10px] font-black uppercase tracking-[0.4em]">Initialize_Overseer_Protocol</span>
+						<span className="text-[10px] font-black uppercase tracking-[0.4em]">Initialize Overseer_Protocol</span>
 					</div>
 					<h1 className="text-4xl lg:text-6xl font-black uppercase tracking-tighter">
 						Foundry <span className="text-transparent bg-clip-text bg-linear-to-r from-[#FFB400] to-[#FF8C00]">Metrics</span>
@@ -53,32 +53,33 @@ export default function AdminDashboard() {
 							View_Registry
 						</Link>
 					</div>
-
-					<div className="border border-white/5 bg-white/1">
-						<table className="w-full text-left border-collapse">
-							<thead>
-								<tr className="border-b border-white/5 text-[9px] font-black uppercase text-[#94A3B8] tracking-widest">
-									<th className="p-4">Dispatch_ID</th>
-									<th className="p-4">Recipient_Node</th>
-									<th className="p-4">Module_Count</th>
-									<th className="p-4">Status</th>
-									<th className="p-4 text-right">Value</th>
-								</tr>
-							</thead>
-							<tbody className="text-[11px] font-bold text-[#F5F5F0] uppercase tracking-tighter font-mono">
-								{[1, 2, 3, 4, 5].map((order) => (
-									<tr key={order} className="border-b border-white/5 hover:bg-white/2 transition-colors group cursor-pointer">
-										<td className="p-4 text-[#FFB400]">#BBL-102{order}</td>
-										<td className="p-4">Baghdad // node_0{order}</td>
-										<td className="p-4">02 Units</td>
-										<td className="p-4">
-											<span className="px-2 py-0.5 bg-green-500/10 text-green-500 text-[8px] font-black uppercase">Cleared</span>
-										</td>
-										<td className="p-4 text-right">$2,499.00</td>
+					<div className="border border-white/5 bg-white/[0.01] overflow-hidden">
+						<div className="overflow-x-auto custom-scrollbar">
+							<table className="w-full text-left border-collapse min-w-[800px]">
+								<thead>
+									<tr className="border-b border-white/5 text-[9px] font-black uppercase text-[#94A3B8] tracking-widest bg-white/[0.02]">
+										<th className="p-4">Dispatch_ID</th>
+										<th className="p-4">Recipient_Node</th>
+										<th className="p-4">Module_Count</th>
+										<th className="p-4">Status</th>
+										<th className="p-4 text-right">Value</th>
 									</tr>
-								))}
-							</tbody>
-						</table>
+								</thead>
+								<tbody className="text-[11px] font-bold text-[#F5F5F0] uppercase tracking-tighter font-mono">
+									{[1, 2, 3, 4, 5].map((order) => (
+										<tr key={order} className="border-b border-white/5 hover:bg-white/2 transition-colors group cursor-pointer">
+											<td className="p-4 text-[#FFB400]">#BBL-102{order}</td>
+											<td className="p-4">Baghdad // node_0{order}</td>
+											<td className="p-4">02 Units</td>
+											<td className="p-4">
+												<span className="px-2 py-0.5 bg-green-500/10 text-green-500 text-[8px] font-black uppercase">Cleared</span>
+											</td>
+											<td className="p-4 text-right">$2,499.00</td>
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</div>
 					</div>
 				</div>
 

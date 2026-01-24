@@ -54,7 +54,7 @@ export function Sidebar() {
 								href={item.path}
 								className={cn(
 									"flex items-center gap-4 px-4 py-3 text-[10px] font-bold uppercase tracking-widest transition-all relative group",
-									isActive ? "text-[#FFB400] bg-[#FFB400]/5" : "text-[#94A3B8] hover:text-[#F5F5F0] hover:bg-white/2"
+									isActive ? "text-[#FFB400] bg-[#FFB400]/5" : "text-[#94A3B8] hover:text-[#F5F5F0] hover:bg-white/2",
 								)}
 							>
 								<item.icon size={16} strokeWidth={isActive ? 2.5 : 1.5} />
