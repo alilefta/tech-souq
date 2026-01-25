@@ -14,11 +14,13 @@ export const checkoutFormSchema = z.object({
 	city: z.string().min(1, "HUB_REQUIRED"),
 	address: z.string().min(1, "COORDINATES_REQUIRED"),
 	zipCode: z.coerce.number().min(1, "ROUTING_INDEX_REQUIRED"),
-	payment_method: z.enum(["card", "paypal", "wire"]),
+	payment_method: z.enum(["stripe", "paypal", "wire"]),
 	// Payment details (Optional based on method)
 	cardNumber: z.string().optional(),
 	expireDate: z.string().optional(),
 	cvv: z.string().optional(),
+
+	discountCode: z.string().optional(),
 });
 
 export type CheckoutFormValues = z.infer<typeof checkoutFormSchema>;

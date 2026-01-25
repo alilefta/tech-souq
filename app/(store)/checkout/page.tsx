@@ -1,5 +1,5 @@
 // app/checkout/page.tsx
-import { Terminal, ShieldCheck, Globe } from "lucide-react";
+import { ShieldCheck, Globe } from "lucide-react";
 import { ManifestSummary } from "@/components/checkout/manifest-summary";
 import { LogisticsForm } from "@/components/checkout/logistics-form";
 
