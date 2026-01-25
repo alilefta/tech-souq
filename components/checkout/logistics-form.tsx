@@ -1,7 +1,7 @@
 // components/checkout/logistics-form.tsx
 "use client";
 
-import { ArrowRight, CreditCard, Landmark, ShieldCheck, Wallet, Lock, Terminal, Activity } from "lucide-react";
+import { ArrowRight, CreditCard, Landmark, ShieldCheck, Wallet, Terminal, Activity } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react"; // Added AnimatePresence
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,8 +15,7 @@ import { FieldError, FieldSet } from "../ui/field";
 import { ReactNode, useState } from "react";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { useAction } from "next-safe-action/hooks";
-import { createOrderAction, initializePaymentFlow } from "@/app/actions/order";
-import { useRouter } from "next/navigation";
+import { initializePaymentFlow } from "@/app/actions/order";
 import { StripePaymentWrapper } from "./stripe-form-wrapper";
 import { StripePaymentForm } from "./stripe-payment-form";
 
@@ -108,15 +107,7 @@ export function LogisticsForm() {
 		mode: "onBlur",
 	});
 
-	// const stripe = loadStripe(NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
-
-	// const { loading, clientSecret } = useCheckout({
-	// 	cartId: undefined,
-	// 	discountCode: undefined,
-	// 	shippingMethodId: undefined,
-	// });
-
-	const router = useRouter();
+	//const router = useRouter();
 
 	// 1. INITIALIZE ACTION HOOK
 	const { executeAsync: executeInit, isExecuting } = useAction(initializePaymentFlow, {
