@@ -55,7 +55,12 @@ export default function AboutPage() {
 				<div className="grid grid-cols-1 md:grid-cols-3 h-auto md:h-150 w-full border-y border-white/5">
 					<ManifestImage src="https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&q=80&w=1000" label="Foundry_Core_01" sub="Baghdad_HQ" />
 					<ManifestImage src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1000" label="Assembly_Line" sub="Precision_Engineering" delay={0.1} />
-					<ManifestImage src="https://images.unsplash.com/photo-1555664424-778a69022365?auto=format&fit=crop&q=80&w=1000" label="Global_Dispatch" sub="Logistics_Network" delay={0.2} />
+					<ManifestImage
+						src="https://images.unsplash.com/photo-1606964212858-c215029db704?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+						label="Global_Dispatch"
+						sub="Logistics_Network"
+						delay={0.2}
+					/>
 				</div>
 			</section>
 

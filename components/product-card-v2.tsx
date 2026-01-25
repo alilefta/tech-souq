@@ -62,6 +62,8 @@ export function ProductCard({ product }: { product: ProductCardDTO }) {
 		await executeAddToCart({ productId: product.id, quantity: 1 });
 	};
 
+	console.log(product.originalPrice && product.originalPrice > product.price);
+
 	return (
 		<motion.div
 			initial={{ opacity: 0, y: 20 }}
@@ -74,7 +76,7 @@ export function ProductCard({ product }: { product: ProductCardDTO }) {
 			<div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-[#FFB400]/0 group-hover/card:border-[#FFB400]/40 transition-all duration-500" />
 
 			{/* IMAGE AREA */}
-			<div className="relative aspect-square overflow-hidden bg-gradient-to-b from-white/[0.02] to-transparent">
+			<div className="relative aspect-square overflow-hidden bg-linear-to-b from-white/2 to-transparent">
 				{/* 
                    MOBILE ACTIVATION LOGIC:
                    We wrap the image in a motion div that handles the grayscale filter based on viewport.
@@ -93,7 +95,6 @@ export function ProductCard({ product }: { product: ProductCardDTO }) {
 						loading="eager"
 						sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
 						className="object-contain transition-transform duration-700 md:group-hover/card:scale-110"
-						// Removed manual grayscale classes here to let motion.div handle it cleanly
 					/>
 				</motion.div>
 
@@ -102,7 +103,7 @@ export function ProductCard({ product }: { product: ProductCardDTO }) {
 					<motion.div
 						animate={{ y: ["-100%", "200%"] }}
 						transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-						className="w-full h-[30%] bg-gradient-to-b from-transparent via-[#FFB400]/5 to-transparent opacity-0 group-hover/card:opacity-100"
+						className="w-full h-[30%] bg-linear-to-b from-transparent via-[#FFB400]/5 to-transparent opacity-0 group-hover/card:opacity-100"
 					/>
 				</div>
 
@@ -167,7 +168,7 @@ export function ProductCard({ product }: { product: ProductCardDTO }) {
 			</div>
 
 			{/* FOOTER METADATA */}
-			<div className="px-6 py-2 bg-white/[0.01] border-t border-white/5 flex justify-between items-center opacity-40 group-hover/card:opacity-100 transition-opacity">
+			<div className="px-6 py-2 bg-white/1 border-t border-white/5 flex justify-between items-center opacity-40 group-hover/card:opacity-100 transition-opacity">
 				<span className="text-[7px] font-mono text-[#94A3B8] uppercase tracking-widest">Node_BBL_01</span>
 				<div className="flex gap-1">
 					{[1, 2, 3].map((i) => (

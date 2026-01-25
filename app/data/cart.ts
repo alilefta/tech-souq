@@ -57,6 +57,32 @@ export async function getCart(): Promise<CartWithItemsDTO | null> {
 	return cartToDTOMapper(cart);
 }
 
+export async function getCartById(id: string): Promise<CartWithItemsDTO | null> {
+	const cart = await prisma.cart.findUnique({
+		where: {
+			id,
+		},
+		include: {
+			items: {
+				include: {
+					product: {
+						include: {
+							category: true,
+						},
+					},
+				},
+				orderBy: {
+					productId: "asc",
+				},
+			},
+		},
+	});
+
+	if (!cart) return null;
+
+	return cartToDTOMapper(cart);
+}
+
 export function cartToDTOMapper(
 	c: Cart & {
 		items: (CartItem & {
@@ -64,7 +90,7 @@ export function cartToDTOMapper(
 				category: Category;
 			};
 		})[];
-	}
+	},
 ): CartWithItemsDTO {
 	return {
 		id: c.id,
