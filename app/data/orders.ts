@@ -114,7 +114,6 @@ function mapOrderToOrderDTO(
 ): OrderDTO {
 	return {
 		...order,
-		zipCode: "12345",
 		total: Number(order.total),
 		shippingCost: Number(order.shippingCost),
 
