@@ -13,7 +13,7 @@ export const checkoutFormSchema = z.object({
 	country: z.string().min(1, "SECTOR_REQUIRED"),
 	city: z.string().min(1, "HUB_REQUIRED"),
 	address: z.string().min(1, "COORDINATES_REQUIRED"),
-	zipCode: z.coerce.number().min(1, "ROUTING_INDEX_REQUIRED"),
+	zipCode: z.coerce.string().min(1, "ROUTING_INDEX_REQUIRED"),
 	payment_method: z.enum(["stripe", "paypal", "wire"]),
 	// Payment details (Optional based on method)
 	cardNumber: z.string().optional(),

@@ -1,9 +1,9 @@
 // components/checkout/logistics-form.tsx
 "use client";
 
-import { ArrowRight, CreditCard, Landmark, ShieldCheck, Wallet, Terminal, Activity } from "lucide-react";
+import { ArrowRight, CreditCard, Landmark, ShieldCheck, Wallet, Terminal, Activity, AlertCircle } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react"; // Added AnimatePresence
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -12,12 +12,13 @@ import { countries } from "@/lib/data/countries";
 import { ComboboxWithLabel } from "../ui/inputs/combobox-with-label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { FieldError, FieldSet } from "../ui/field";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { useAction } from "next-safe-action/hooks";
 import { initializePaymentFlow } from "@/app/actions/order";
 import { StripePaymentWrapper } from "./stripe-form-wrapper";
 import { StripePaymentForm } from "./stripe-payment-form";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const CheckoutFormSchema = z.object({
 	firstName: z.string().min(1, "Required"),
@@ -39,17 +40,11 @@ const CheckoutFormSchema = z.object({
 	country: z.string().min(1, "Required"),
 	city: z.string().min(1, "Required"),
 	address: z.string().min(1, "Required"),
-	zipCode: z.preprocess<string, z.core.SomeType>(
-		(val) => String(val),
-		z
-			.string()
-			.regex(/^\d{5}(-\d{4})?$/, "Invalid ZIP code format")
-			.transform((v) => {
-				const n = Number(v);
-				if (n < 1) throw new Error("Zip/Post Code is required");
-				return n;
-			}),
-	),
+	zipCode: z
+		.string()
+		.trim()
+		.min(1, "Zip/Post Code is required")
+		.regex(/^\d{5}(-\d{4})?$/, "Invalid ZIP code format"),
 
 	payment_method: z.enum(["stripe", "paypal", "wire"]),
 	discountCode: z.string().optional(),
@@ -86,11 +81,13 @@ const paymentMethods: PaymentMethod[] = [
 type CheckoutFormSchemaType = z.infer<typeof CheckoutFormSchema>;
 
 export function LogisticsForm() {
-	// 1. STATE FOR THE HANDSHAKE
 	const [clientSecret, setClientSecret] = useState<string | null>(null);
 	const [orderNumber, setOrderNumber] = useState<string | null>(null);
 
-	const { handleSubmit, control, watch, formState } = useForm<CheckoutFormSchemaType>({
+	const searchParams = useSearchParams();
+	const router = useRouter();
+
+	const { handleSubmit, control, watch, formState, getValues } = useForm<CheckoutFormSchemaType>({
 		resolver: zodResolver(CheckoutFormSchema),
 		defaultValues: {
 			firstName: "",
@@ -100,12 +97,25 @@ export function LogisticsForm() {
 			country: "",
 			address: "",
 			phoneNumber: "",
-			zipCode: 12345,
+			zipCode: "",
 			payment_method: "stripe",
 			discountCode: undefined,
 		},
-		mode: "onBlur",
+		mode: "onChange",
 	});
+
+	useEffect(() => {
+		if (searchParams.get("error") === "payment_failed") {
+			toast.error("AUTHORIZATION_REJECTED", {
+				description: "The banking node declined the transfer. Please retry.",
+				icon: <AlertCircle className="text-red-500" />,
+				duration: 8000,
+			});
+
+			// Clean the URL so a refresh doesn't show the error again
+			router.replace("/checkout");
+		}
+	}, [searchParams]);
 
 	//const router = useRouter();
 
@@ -130,7 +140,10 @@ export function LogisticsForm() {
 		},
 	});
 
-	const selectedMethod = watch("payment_method");
+	const selectedMethod = useWatch({
+		control,
+		name: "payment_method",
+	});
 
 	async function onSubmit(data: CheckoutFormSchemaType) {
 		if (!clientSecret) {
@@ -234,15 +247,10 @@ export function LogisticsForm() {
 									<InputWithLabel
 										field={field}
 										fieldState={fieldState}
-										onChange={(e) => {
-											const v = e.currentTarget.value;
-											field.onChange(Number(v));
-										}}
 										nameInSchema="zipCode"
 										fieldTitle="Routing_Index (Zip)"
 										containerClassName="md:col-span-2"
-										placeholder="000000"
-										type="number"
+										placeholder="00000"
 									/>
 								)}
 							/>
@@ -382,7 +390,15 @@ export function LogisticsForm() {
 					</div>
 
 					<StripePaymentWrapper clientSecret={clientSecret}>
-						<StripePaymentForm orderNumber={orderNumber} />
+						<StripePaymentForm
+							customerAddress={{
+								city: getValues("city"),
+								country: getValues("country"),
+								line1: getValues("address"),
+								postalCode: getValues("zipCode"),
+							}}
+							customerEmail={getValues("email")}
+						/>
 					</StripePaymentWrapper>
 				</div>
 			)}

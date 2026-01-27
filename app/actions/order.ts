@@ -55,6 +55,8 @@ export const initializePaymentFlow = cartActionClient.inputSchema(checkoutFormSc
 				address: parsedInput.address,
 				city: parsedInput.city,
 				country: parsedInput.country,
+				zipCode: parsedInput.zipCode,
+				phoneNumber: parsedInput.phoneNumber,
 				total: totalAmount,
 				status: "PENDING", // Wait for payment
 				items: {
@@ -128,6 +130,8 @@ export const createOrderAction = cartActionClient.inputSchema(checkoutFormSchema
 					city: parsedInput.city,
 					country: parsedInput.country,
 					total: subtotal,
+					zipCode: parsedInput.zipCode,
+					phoneNumber: parsedInput.phoneNumber,
 					status: "PAID", // Simplified for MVP
 					// Map items and snapshot their current price
 					items: {

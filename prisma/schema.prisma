@@ -123,7 +123,8 @@ model Order {
   address        String
   city           String
   country        String     
-
+  zipCode        String      @default("")
+  phoneNumber    String      @default("")
   total          Decimal     @db.Decimal(10, 2)
   shippingCost   Decimal     @db.Decimal(10, 2) @default(0.00)
   status         OrderStatus @default(PENDING) 

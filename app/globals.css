@@ -339,3 +339,35 @@
 @utility min-h-safe {
 	min-height: 100dvh;
 }
+
+@media print {
+	/* Hide everything by default */
+	body * {
+		visibility: hidden;
+	}
+
+	/* Reset background to white for paper */
+	body {
+		background-color: white !important;
+		color: black !important;
+	}
+
+	/* Show ONLY the Invoice Template */
+	.print\:block,
+	.print\:block * {
+		visibility: visible;
+	}
+
+	/* Position the invoice at the top */
+	.print\:block {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100%;
+	}
+
+	/* Remove browser headers/footers if possible (optional) */
+	@page {
+		margin: 1cm;
+	}
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormContext, Controller } from "react-hook-form";
+import { useFormContext, Controller, useWatch } from "react-hook-form";
 import { Cpu, Layout, Box, Zap, MemoryStick, Terminal, Info, Activity, LucideIcon, Database, Fan, Trash2 } from "lucide-react";
 import { InputWithLabel } from "@/components/ui/inputs/input-with-label";
 import { FoundrySelect as FoundarySelectField } from "@/components/ui/inputs/foundary-form-select";
@@ -46,7 +46,10 @@ export function CompatibilityLogicModule() {
 		}
 	};
 
-	const coolerType = watch("compatibility.coolerType");
+	const coolerType = useWatch({
+		control,
+		name: "compatibility.coolerType",
+	});
 
 	return (
 		<section className="space-y-8">
@@ -56,7 +59,7 @@ export function CompatibilityLogicModule() {
 					<div
 						className={cn(
 							"w-10 h-10 border flex items-center justify-center transition-all",
-							isEnabled ? "border-[#FFB400] text-[#FFB400] shadow-[0_0_15px_rgba(255,180,0,0.2)]" : "border-white/10 text-[#94A3B8]"
+							isEnabled ? "border-[#FFB400] text-[#FFB400] shadow-[0_0_15px_rgba(255,180,0,0.2)]" : "border-white/10 text-[#94A3B8]",
 						)}
 					>
 						<Terminal size={18} />
@@ -164,7 +167,7 @@ export function CompatibilityLogicModule() {
 											onClick={() => setValue("compatibility.integratedGraphics", !watch("compatibility.integratedGraphics") as boolean)}
 											className={cn(
 												"flex items-center justify-between p-4 border cursor-pointer transition-all h-12 bg-white/2",
-												watch("compatibility.integratedGraphics") ? "border-[#FFB400] text-[#FFB400]" : "border-white/10 text-[#94A3B8]"
+												watch("compatibility.integratedGraphics") ? "border-[#FFB400] text-[#FFB400]" : "border-white/10 text-[#94A3B8]",
 											)}
 										>
 											<span className="text-[10px] font-black uppercase">Integrated_Graphics</span>
@@ -304,7 +307,7 @@ export function CompatibilityLogicModule() {
 																	"py-3 border text-[10px] font-mono transition-all text-center",
 																	currentValues.includes(size)
 																		? "border-[#FFB400] bg-[#FFB400]/10 text-[#FFB400] shadow-[0_0_10px_rgba(255,180,0,0.1)]"
-																		: "border-white/5 bg-white/1 text-[#94A3B8] hover:border-white/20"
+																		: "border-white/5 bg-white/1 text-[#94A3B8] hover:border-white/20",
 																)}
 															>
 																{size}
@@ -365,7 +368,7 @@ export function CompatibilityLogicModule() {
 															if (current)
 																setValue(
 																	"compatibility.m2Slots",
-																	current.filter((_, i) => i !== index)
+																	current.filter((_, i) => i !== index),
 																);
 														}}
 														className="mb-2 text-[#94A3B8] hover:text-red-500"
@@ -484,7 +487,7 @@ export function CompatibilityLogicModule() {
 																	"py-3 border text-[10px] font-mono transition-all text-center",
 																	currentValues.includes(form)
 																		? "border-[#FFB400] bg-[#FFB400]/10 text-[#FFB400]"
-																		: "border-white/5 bg-white/1 text-[#94A3B8] hover:border-white/20"
+																		: "border-white/5 bg-white/1 text-[#94A3B8] hover:border-white/20",
 																)}
 															>
 																{form}
@@ -580,7 +583,7 @@ export function CompatibilityLogicModule() {
 																	"py-3 border text-[10px] font-mono transition-all text-center",
 																	currentValues.includes(size)
 																		? "border-[#FFB400] bg-[#FFB400]/10 text-[#FFB400] shadow-[0_0_10px_rgba(255,180,0,0.1)]"
-																		: "border-white/5 bg-white/1 text-[#94A3B8] hover:border-white/20"
+																		: "border-white/5 bg-white/1 text-[#94A3B8] hover:border-white/20",
 																)}
 															>
 																{size}mm
@@ -683,7 +686,7 @@ export function CompatibilityLogicModule() {
 											onClick={() => setValue("compatibility.xmpExpo", !watch("compatibility.xmpExpo") as boolean)}
 											className={cn(
 												"flex items-center justify-between p-4 border cursor-pointer transition-all h-12 bg-white/2",
-												watch("compatibility.xmpExpo") ? "border-[#FFB400] text-[#FFB400]" : "border-white/10 text-[#94A3B8]"
+												watch("compatibility.xmpExpo") ? "border-[#FFB400] text-[#FFB400]" : "border-white/10 text-[#94A3B8]",
 											)}
 										>
 											<span className="text-[10px] font-black uppercase">XMP_EXPO_PROFILE</span>

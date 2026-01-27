@@ -1,13 +1,24 @@
 import { Order, OrderItem, OrderStatus, Product } from "@/generated/prisma/client";
+import { CompatibilitySchemaType } from "@/lib/schemas/product";
 import { prisma } from "@/prisma/prisma";
 
+type Override<T, R> = Omit<T, keyof R> & R;
+
+type ProductDetailDTO = Override<
+	Product,
+	{
+		price: number;
+		originalPrice: number | null;
+		compatibility: CompatibilitySchemaType | null;
+	}
+>;
 interface OrderItemDTO {
 	id: number;
 	orderId: string;
 	productId: number;
 	quantity: number;
 	priceAt_time: number;
-	product: Pick<Product, "id" | "name">;
+	product: ProductDetailDTO;
 }
 
 export interface OrderDTO {
@@ -23,9 +34,11 @@ export interface OrderDTO {
 	total: number;
 	shippingCost: number;
 	status: OrderStatus;
+	phoneNumber: string;
 	carrier: string | null;
 	discountId: number | null;
 	createdAt: Date;
+	zipCode: string;
 	items: OrderItemDTO[];
 }
 
@@ -34,12 +47,7 @@ export async function getOrders(): Promise<OrderDTO[]> {
 		include: {
 			items: {
 				include: {
-					product: {
-						select: {
-							name: true,
-							id: true,
-						},
-					},
+					product: true,
 				},
 			},
 		},
@@ -57,12 +65,7 @@ export async function getOrderDetails(orderNumber: string) {
 		include: {
 			items: {
 				include: {
-					product: {
-						select: {
-							id: true,
-							name: true,
-						},
-					},
+					product: true,
 				},
 			},
 		},
@@ -85,7 +88,7 @@ export async function getFilteredOrders({ query, node, status }: { query?: strin
 								{ firstName: { contains: query, mode: "insensitive" } },
 								{ lastName: { contains: query, mode: "insensitive" } },
 							],
-					  }
+						}
 					: {},
 				// 2. Filter by Node (Country/Sector)
 				node && node !== "ALL" ? { country: node } : {},
@@ -103,21 +106,26 @@ export async function getFilteredOrders({ query, node, status }: { query?: strin
 }
 
 // Helpers
+
 function mapOrderToOrderDTO(
 	order: Order & {
-		items: (OrderItem & { product: Pick<Product, "id" | "name"> })[];
-	}
+		items: (OrderItem & { product: Product })[];
+	},
 ): OrderDTO {
 	return {
 		...order,
+		zipCode: "12345",
 		total: Number(order.total),
 		shippingCost: Number(order.shippingCost),
+
 		items: order.items.map((oi) => ({
 			...oi,
 			priceAt_time: Number(oi.priceAt_time),
 			product: {
-				id: oi.productId,
-				name: oi.product.name,
+				...oi.product,
+				price: Number(oi.product.price),
+				originalPrice: Number(oi.product.originalPrice),
+				compatibility: oi.product.compatibility as unknown as CompatibilitySchemaType | null,
 			},
 		})),
 	};

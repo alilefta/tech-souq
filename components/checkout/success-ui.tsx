@@ -4,8 +4,40 @@ import { motion } from "motion/react";
 import { ShieldCheck, Package, Globe, ArrowRight, Zap, Terminal as TerminalIcon } from "lucide-react";
 import Link from "next/link";
 import { OrderDTO } from "@/app/data/orders";
+import { useEffect } from "react";
+import { useBuilderStore } from "@/store/useBuilderStore";
+import { useCart } from "@/store/useCart";
+import { clearCartSession } from "@/app/actions/cleanup";
+import { InvoiceTemplate } from "./invoice-template";
+import { toast } from "sonner";
 
 export function SuccessUI({ order }: { order: OrderDTO }) {
+	const resetCart = useCart((state) => state.syncCart);
+	const resetBuilder = useBuilderStore((state) => state.resetFoundry);
+
+	useEffect(() => {
+		// 1. CLEANUP PROTOCOL
+		const performCleanup = async () => {
+			// A. Wipe Client Stores
+			resetCart([]); // Clear Zustand Cart
+			resetBuilder(); // Clear 3D Builder State
+
+			// B. Wipe Server Cookie
+			await clearCartSession();
+		};
+
+		performCleanup();
+	}, []); // runs at mount only
+
+	const handleArchive = () => {
+		toast.success("GENERATING_PHYSICAL_COPY", {
+			description: "FORMATTING_MANIFEST_FOR_OUTPUT...",
+		});
+		setTimeout(() => {
+			window.print();
+		}, 800);
+	};
+
 	return (
 		<div className="max-w-4xl mx-auto px-6 relative">
 			{/* 1. BACKGROUND SEAL: The Babylonian Star pulses behind everything */}
@@ -101,12 +133,18 @@ export function SuccessUI({ order }: { order: OrderDTO }) {
 							Return to Command Center
 						</motion.button>
 					</Link>
-					<button className="px-10 py-5 border border-white/10 text-[#F5F5F0] font-black text-xs uppercase tracking-[0.2em] hover:bg-white/5 transition-all flex items-center gap-3">
+					<button
+						onClick={handleArchive}
+						className="px-10 py-5 border border-white/10 text-[#F5F5F0] font-black text-xs uppercase tracking-[0.2em] hover:bg-white/5 transition-all flex items-center gap-3"
+					>
 						Archive Manifest <ArrowRight size={14} />
 					</button>
 				</div>
 
 				<p className="mt-12 text-[8px] font-mono text-[#94A3B8] uppercase tracking-[0.4em] opacity-30">A confirmation signal has been sent to {order.email}</p>
+
+				{/* --- PRINT UI (Only visible when printing) --- */}
+				<InvoiceTemplate order={order} />
 			</div>
 		</div>
 	);

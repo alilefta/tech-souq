@@ -29,7 +29,6 @@ type Props<S extends FieldValues> = {
 
 export function ComboboxWithLabel<S extends FieldValues>({ fieldTitle, nameInSchema, containerClassName, triggerClassName, field, fieldState, placeholder, data }: Props<S>) {
 	const [open, setOpen] = React.useState(false);
-
 	return (
 		<Field orientation="vertical" data-invalid={fieldState.invalid} className={cx("space-y-2", containerClassName)}>
 			<FieldLabel htmlFor={nameInSchema} className="text-[9px] font-black uppercase tracking-[0.2em] text-[#94A3B8] mb-0">
@@ -49,7 +48,7 @@ export function ComboboxWithLabel<S extends FieldValues>({ fieldTitle, nameInSch
 							// Dynamic focus/open state
 							open ? "border-[#FFB400]/40 bg-[#FFB400]/5" : "border-white/10",
 							!field.value ? "text-[#94A3B8]/40" : "text-[#F5F5F0]",
-							triggerClassName
+							triggerClassName,
 						)}
 					>
 						<span className="truncate uppercase tracking-tight">{field.value ? data.find((item) => item.value === field.value)?.label : placeholder}</span>

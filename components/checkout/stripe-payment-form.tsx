@@ -5,7 +5,18 @@ import { useState } from "react";
 import { Lock, AlertCircle, Loader2 } from "lucide-react";
 import { motion } from "motion/react";
 
-export function StripePaymentForm({ orderNumber }: { orderNumber: string }) {
+export function StripePaymentForm({
+	customerEmail,
+	customerAddress,
+}: {
+	customerEmail: string;
+	customerAddress: {
+		city: string;
+		country: string;
+		line1: string;
+		postalCode: string;
+	};
+}) {
 	const stripe = useStripe();
 	const elements = useElements();
 
@@ -31,7 +42,7 @@ export function StripePaymentForm({ orderNumber }: { orderNumber: string }) {
 				// 2. THE RETURN URL
 				// Where Stripe redirects the user after payment succeeds/fails.
 				// We will build this page in Step 5.
-				return_url: `${window.location.origin}/checkout/success/${orderNumber}`,
+				return_url: `${window.location.origin}/checkout/return`,
 			},
 		});
 
@@ -39,7 +50,16 @@ export function StripePaymentForm({ orderNumber }: { orderNumber: string }) {
 		// If we reach this line, it means there was an error (e.g., "Card Declined")
 		// If success, the browser redirects automatically, so this code never runs.
 		if (error) {
-			setErrorMessage(error.message ?? "An unexpected error occurred.");
+			// Map Stripe error types to Foundry terminology
+			let protocolMessage = "TRANSACTION_TERMINATED";
+
+			if (error.type === "card_error" || error.type === "validation_error") {
+				protocolMessage = error.message || "INVALID_PAYMENT_DATA";
+			} else {
+				protocolMessage = "GATEWAY_CONNECTION_FAILURE";
+			}
+
+			setErrorMessage(protocolMessage);
 			setIsProcessing(false);
 		}
 	};
@@ -54,7 +74,16 @@ export function StripePaymentForm({ orderNumber }: { orderNumber: string }) {
 
 			{/* STRIPE ELEMENT INJECTION POINT */}
 			<div className="bg-[#0A0E14] border border-white/10 p-1">
-				<PaymentElement />
+				<PaymentElement
+					options={{
+						defaultValues: {
+							billingDetails: {
+								address: customerAddress,
+								email: customerEmail,
+							},
+						},
+					}}
+				/>
 			</div>
 
 			{/* ERROR TERMINAL */}
