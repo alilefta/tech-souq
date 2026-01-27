@@ -3,7 +3,7 @@ import { ShieldCheck, Globe } from "lucide-react";
 import { ManifestSummary } from "@/components/checkout/manifest-summary";
 import { LogisticsForm } from "@/components/checkout/logistics-form";
 
-export default function CheckoutPage() {
+export default function CheckoutPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
 	return (
 		<main className="bg-[#0A0E14] min-h-screen pt-24 pb-20 selection:bg-[#FFB400] selection:text-[#0A0E14]">
 			<div className="max-w-7xl mx-auto px-6 lg:px-12">
@@ -32,7 +32,7 @@ export default function CheckoutPage() {
 				<div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
 					{/* LOGISTICS ENTRY (The Forms) */}
 					<div className="lg:col-span-7 order-2 lg:order-1">
-						<LogisticsForm />
+						<LogisticsForm searchParams={searchParams} />
 					</div>
 
 					{/* MANIFEST VERIFICATION (Sticky Summary) */}

@@ -12,7 +12,7 @@ import { countries } from "@/lib/data/countries";
 import { ComboboxWithLabel } from "../ui/inputs/combobox-with-label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { FieldError, FieldSet } from "../ui/field";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, use, useEffect, useState } from "react";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { useAction } from "next-safe-action/hooks";
 import { initializePaymentFlow } from "@/app/actions/order";
@@ -80,14 +80,15 @@ const paymentMethods: PaymentMethod[] = [
 
 type CheckoutFormSchemaType = z.infer<typeof CheckoutFormSchema>;
 
-export function LogisticsForm() {
+export function LogisticsForm({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
 	const [clientSecret, setClientSecret] = useState<string | null>(null);
 	const [orderNumber, setOrderNumber] = useState<string | null>(null);
 
-	const searchParams = useSearchParams();
+	const { error: errorSearchParam } = use(searchParams);
+
 	const router = useRouter();
 
-	const { handleSubmit, control, watch, formState, getValues } = useForm<CheckoutFormSchemaType>({
+	const { handleSubmit, control, formState, getValues } = useForm<CheckoutFormSchemaType>({
 		resolver: zodResolver(CheckoutFormSchema),
 		defaultValues: {
 			firstName: "",
@@ -105,7 +106,7 @@ export function LogisticsForm() {
 	});
 
 	useEffect(() => {
-		if (searchParams.get("error") === "payment_failed") {
+		if (errorSearchParam === "payment_failed") {
 			toast.error("AUTHORIZATION_REJECTED", {
 				description: "The banking node declined the transfer. Please retry.",
 				icon: <AlertCircle className="text-red-500" />,
@@ -115,7 +116,7 @@ export function LogisticsForm() {
 			// Clean the URL so a refresh doesn't show the error again
 			router.replace("/checkout");
 		}
-	}, [searchParams]);
+	}, [errorSearchParam]);
 
 	//const router = useRouter();
 
