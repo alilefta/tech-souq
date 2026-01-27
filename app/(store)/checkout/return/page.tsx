@@ -3,11 +3,7 @@ import { stripe } from "@/lib/stripe";
 import { redirect } from "next/navigation";
 
 interface PageProps {
-	searchParams: Promise<{
-		payment_intent?: string;
-		payment_intent_client_secret?: string;
-		redirect_status?: string; // 'succeeded' | 'failed' | 'canceled'
-	}>;
+	searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export default async function ReturnPage({ searchParams }: PageProps) {
@@ -16,7 +12,7 @@ export default async function ReturnPage({ searchParams }: PageProps) {
 	if (!payment_intent) return redirect("/checkout");
 
 	// 1. FETCH STATUS FROM STRIPE (Single Source of Truth)
-	const paymentIntentData = await stripe.paymentIntents.retrieve(payment_intent);
+	const paymentIntentData = await stripe.paymentIntents.retrieve(payment_intent[0]);
 
 	// 2. SUCCESS CASE
 	if (paymentIntentData.status === "succeeded") {

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Geist_Mono, Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import { Analytics } from "@vercel/analytics/next";
 
 // 1. SANS: For standard UI and body text
 const fontSans = Inter({
@@ -40,6 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 			>
 				<main>{children}</main>
 				<Toaster position="bottom-left" />
+				<Analytics />
 			</body>
 		</html>
 	);
