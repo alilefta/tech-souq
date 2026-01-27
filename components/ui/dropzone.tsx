@@ -14,7 +14,7 @@ const Dropzone = ({ className }: DropzoneProps) => {
 
 	const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
 		if (acceptedFiles?.length) {
-			console.log(acceptedFiles);
+			//	console.log(acceptedFiles);
 			setFiles((previousFiles) => [...previousFiles, ...acceptedFiles.map((file) => Object.assign(file, { preview: URL.createObjectURL(file) }))]);
 		}
 

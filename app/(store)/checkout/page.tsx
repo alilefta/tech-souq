@@ -1,9 +1,18 @@
 // app/checkout/page.tsx
-import { ShieldCheck, Globe } from "lucide-react";
+import { ShieldCheck, Globe, AlertTriangle, PackageOpen } from "lucide-react";
 import { ManifestSummary } from "@/components/checkout/manifest-summary";
 import { LogisticsForm } from "@/components/checkout/logistics-form";
+import { getCart } from "@/app/data/cart";
+import { EmptyStateButton } from "@/components/checkout/empty-state-button";
 
-export default function CheckoutPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+export default async function CheckoutPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+	const cart = await getCart();
+	const hasItems = cart && cart.items.length > 0;
+
+	if (!hasItems) {
+		return <EmptyManifestProtocol />;
+	}
+
 	return (
 		<main className="bg-[#0A0E14] min-h-screen pt-24 pb-20 selection:bg-[#FFB400] selection:text-[#0A0E14]">
 			<div className="max-w-7xl mx-auto px-6 lg:px-12">
@@ -42,6 +51,48 @@ export default function CheckoutPage({ searchParams }: { searchParams: Promise<{
 						</div>
 					</aside>
 				</div>
+			</div>
+		</main>
+	);
+}
+
+// ----------------------------------------------------------------------
+// SUB-COMPONENT: EMPTY STATE
+// ----------------------------------------------------------------------
+
+function EmptyManifestProtocol() {
+	return (
+		<main className="bg-[#0A0E14] min-h-screen flex items-center justify-center p-6 font-sans">
+			<div className="w-full max-w-lg border border-red-500/20 bg-red-500/2 p-12 text-center relative overflow-hidden group">
+				{/* 1. WARNING HUD */}
+				<div className="absolute top-0 left-0 w-full h-1 bg-red-500/50 shadow-[0_0_20px_#ef4444]" />
+				<div className="absolute top-4 left-4 flex items-center gap-2 text-red-500">
+					<AlertTriangle size={14} />
+					<span className="text-[9px] font-black uppercase tracking-widest">Protocol_Halt</span>
+				</div>
+
+				{/* 2. VISUAL */}
+				<div className="my-8 relative inline-block">
+					<PackageOpen size={64} className="text-[#94A3B8] opacity-20" strokeWidth={1} />
+					<div className="absolute inset-0 flex items-center justify-center">
+						<div className="w-24 h-24 border border-dashed border-red-500/20 rounded-full animate-spin-slow" />
+					</div>
+				</div>
+
+				{/* 3. MESSAGE */}
+				<h2 className="text-3xl font-black text-[#F5F5F0] uppercase tracking-tighter mb-4">
+					Manifest <span className="text-red-500">Void</span>
+				</h2>
+				<p className="text-[#94A3B8] text-sm font-mono leading-relaxed mb-10">
+					No hardware modules detected in the secure container. <br />
+					Logistics clearance requires active inventory allocation.
+				</p>
+
+				{/* 4. RECOVERY ACTION */}
+				<EmptyStateButton />
+
+				{/* Background Noise */}
+				<div className="absolute inset-0 pointer-events-none opacity-[0.05]" style={{ backgroundImage: "radial-gradient(#ef4444 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
 			</div>
 		</main>
 	);

@@ -120,7 +120,9 @@ export function ProductListItem({ product }: { product: ProductCardDTO }) {
 						<span className="text-[#94A3B8] text-[9px] font-bold uppercase tracking-widest">Foundry_In_Stock</span>
 					</div>
 					<div className="flex flex-col">
-						<span className="text-[#94A3B8] text-[10px] line-through opacity-40 font-mono">${product.originalPrice}</span>
+						{product.originalPrice !== null && Number(product.originalPrice) > Number(product.price) && (
+							<span className="text-[#94A3B8] text-[10px] line-through opacity-40 mb-0.5 font-mono">${product.originalPrice}</span>
+						)}
 						<span className="text-[#F5F5F0] text-3xl font-black tracking-tighter leading-none">
 							<span className="text-[#FFB400] text-xl mr-1">$</span>
 							{product.price}

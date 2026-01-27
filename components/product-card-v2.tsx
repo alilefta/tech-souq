@@ -8,8 +8,9 @@ import { useAction } from "next-safe-action/hooks";
 import { useCart } from "@/store/useCart";
 import { addToCartAction } from "@/app/actions/cart";
 import { toast } from "sonner";
-import { SafeImage } from "./ui/safe-image";
+import { SafeImage } from "@/components/ui/safe-image";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function ProductCard({ product }: { product: ProductCardDTO }) {
 	const coverImage = product.coverImage; // Based on your DTO
@@ -62,7 +63,7 @@ export function ProductCard({ product }: { product: ProductCardDTO }) {
 		await executeAddToCart({ productId: product.id, quantity: 1 });
 	};
 
-	console.log(product.originalPrice && product.originalPrice > product.price);
+	// console.log(product.originalPrice && product.originalPrice > product.price);
 
 	return (
 		<motion.div
@@ -136,9 +137,28 @@ export function ProductCard({ product }: { product: ProductCardDTO }) {
 					</div>
 				</div>
 
-				<Link href={`/products/${product.slug}`}>
-					<h4 className="text-[#F5F5F0] text-lg sm:text-xl font-bold tracking-tighter mb-4 group-hover/card:text-[#FFB400] transition-colors line-clamp-1">{product.name}</h4>
-				</Link>
+				{/* SMART TITLE SYSTEM */}
+				<TooltipProvider>
+					<Tooltip delayDuration={300}>
+						<TooltipTrigger asChild>
+							<Link href={`/products/${product.slug}`} className="block mb-4 sm:mb-6">
+								<h4
+									className="text-[#F5F5F0] text-sm sm:text-lg font-bold tracking-tight leading-snug group-hover/card:text-[#FFB400] transition-colors line-clamp-2 min-h-[3rem]"
+									title={product.name} // Native fallback for mobile
+								>
+									{product.name}
+								</h4>
+							</Link>
+						</TooltipTrigger>
+						<TooltipContent
+							className="bg-[#0A0E14] border border-white/10 text-xs font-mono text-[#94A3B8] max-w-[300px] rounded-none shadow-2xl p-4 uppercase tracking-wide leading-relaxed z-50"
+							side="top"
+							align="start"
+						>
+							{product.name}
+						</TooltipContent>
+					</Tooltip>
+				</TooltipProvider>
 
 				<div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
 					<div className="flex flex-col">

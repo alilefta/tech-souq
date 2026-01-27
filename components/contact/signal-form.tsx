@@ -49,7 +49,7 @@ export function SignalForm() {
 	});
 
 	const onSubmit = async (data: SignalData) => {
-		console.log(data.email);
+		// console.log(data.email);
 		// Simulate Network Request
 		await new Promise((resolve) => setTimeout(resolve, 2000));
 
