@@ -3,6 +3,7 @@ import { ProductGallery } from "./product-gallery";
 import { ProductDetailsDTO } from "@/app/data/products";
 import Link from "next/link";
 import { AddToCartWithQTY } from "./add-to-cart-with-qty";
+import { ProductTitle } from "../product-title";
 
 export function ProductDetailsUI({ product }: { product: ProductDetailsDTO }) {
 	return (
@@ -33,10 +34,7 @@ export function ProductDetailsUI({ product }: { product: ProductDetailsDTO }) {
 						</div>
 					</div>
 
-					<h1 className="text-[#F5F5F0] text-5xl md:text-7xl font-bold tracking-tighter leading-[0.85] uppercase mb-4">
-						<span className="block text-xl md:text-2xl text-[#94A3B8] font-medium tracking-normal mb-2">{product.brand}</span>
-						{product.name}
-					</h1>
+					<ProductTitle brand={product.brand} name={product.name} />
 
 					<div className="flex items-end justify-between md:justify-start gap-6 mt-8">
 						<div className="flex flex-col">
