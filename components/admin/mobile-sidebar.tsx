@@ -89,7 +89,7 @@ export function MobileSidebar() {
 
 				{/* SYSTEM STATUS FOOTER */}
 				<div className="p-6 border-t border-white/5 bg-[#0A0E14]">
-					<div className="bg-white/[0.02] border border-white/5 p-4 space-y-3">
+					<div className="bg-white/2 border border-white/5 p-4 space-y-3">
 						<div className="flex justify-between items-center">
 							<span className="text-[8px] font-mono text-[#94A3B8] uppercase">Sync_Status</span>
 							<span className="text-[8px] font-bold text-green-500 uppercase tracking-tighter">Live</span>

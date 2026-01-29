@@ -7,7 +7,7 @@ import FooterWrapper from "@/components/footer-wrapper";
 
 // TODO should be replaced
 export const metadata: Metadata = {
-	title: "TechSouq - Your Trusted Tech Marketplace",
+	title: "Base_60 - Your Trusted Tech Marketplace",
 	description: "Discover the latest gadgets, electronics, and tech accessories at unbeatable prices",
 	icons: {
 		icon: [
