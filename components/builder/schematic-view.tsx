@@ -2,7 +2,7 @@
 
 import { BUILD_STEPS, isStepAuthorized, useBuilderStore } from "@/store/useBuilderStore";
 import { ProductBuilderDTO } from "@/app/data/products";
-import { ShieldCheck, ChevronRight, Lock, Terminal, Info, PlusSquare, ArrowRight } from "lucide-react";
+import { ShieldCheck, ChevronRight, Lock, Terminal, Info, PlusSquare, ArrowRight, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useBuilderLogic } from "@/hooks/useBuilderLogic";
 import { SafeImage } from "@/components/ui/safe-image";
@@ -13,6 +13,9 @@ import { useState } from "react";
 import { ModuleInspectionSheet } from "./module-inspection-sheet";
 import { ModuleSelectionSheet } from "./module-selection-sheet";
 import { SystemAlertTicker } from "./system-alert-ticker";
+import { useRouter } from "next/navigation";
+import { useAction } from "next-safe-action/hooks";
+import { addBulkToCartAction } from "@/app/actions/cart";
 
 // Re-use the label map from HUD or import it if shared
 const STEP_LABELS: Record<string, string> = {
@@ -32,15 +35,32 @@ export function SchematicView({ allProducts }: { allProducts: ProductBuilderDTO[
 	const { availableModules, activeType, totalPrice, alerts } = useBuilderLogic(allProducts);
 	const { addItem } = useCart();
 
+	const router = useRouter();
+
+	const { executeAsync: executeBulkAdd, isExecuting: isSyncing } = useAction(addBulkToCartAction, {
+		onSuccess: () => {
+			toast.success("BUILD_AUTHORIZED", { description: "SYSTEM_CONFIG_TRANSFERRED_TO_LOGISTICS" });
+			// Optional: Redirect straight to checkout for smooth flow
+			setTimeout(() => router.push("/checkout"), 1000);
+		},
+		onError: ({ error }) => {
+			toast.error("SYNC_FAILURE", { description: error.serverError || "DATABASE_HANDSHAKE_FAILED" });
+		},
+	});
+
 	// LOCAL STATE FOR MODALS
 	const [inspectedModule, setInspectedModule] = useState<ProductBuilderDTO | null>(null);
 	const [isRegistryOpen, setIsRegistryOpen] = useState(false);
 
-	const handleAuthorize = () => {
+	const handleAuthorize = async () => {
 		const parts = Object.values(manifest).filter((p) => p !== null);
 		if (parts.length === 0) return toast.error("PROTOCOL_ERROR", { description: "MANIFEST_EMPTY" });
-		parts.forEach((part) => addItem(part, 1));
-		toast.success("BUILD_AUTHORIZED", { description: "SYSTEM_CONFIG_TRANSFERRED" });
+		// A. Optimistic Update (Client Store)
+		parts.forEach((part) => addItem(part!, 1));
+
+		// B. Server Sync (The Fix)
+		const payload = parts.map((p) => ({ productId: p!.id, quantity: 1 }));
+		await executeBulkAdd({ items: payload });
 	};
 
 	return (
@@ -69,7 +89,7 @@ export function SchematicView({ allProducts }: { allProducts: ProductBuilderDTO[
 					const selectedPart = manifest[step];
 
 					return (
-						<div key={step} className={cn("border transition-all bg-[#0A0E14]", isActive ? "border-[#FFB400] bg-[#FFB400]/[0.02]" : "border-white/10")}>
+						<div key={step} className={cn("border transition-all bg-[#0A0E14]", isActive ? "border-[#FFB400] bg-[#FFB400]/2" : "border-white/10")}>
 							{/* STEP HEADER */}
 							<button
 								onClick={() => isAuthorized && setStep(i)}
@@ -176,9 +196,11 @@ export function SchematicView({ allProducts }: { allProducts: ProductBuilderDTO[
 					</div>
 					<button
 						onClick={handleAuthorize}
+						disabled={isSyncing}
 						className="h-12 px-8 bg-[#FFB400] text-[#0A0E14] font-black uppercase text-xs tracking-[0.2em] shadow-lg hover:bg-white transition-all flex items-center gap-3"
 					>
-						Authorize <ArrowRight size={16} />
+						{isSyncing ? "SYNCING_LOGISTICS..." : "Authorize_Build"}
+						{isSyncing ? <Activity className="animate-spin" size={16} /> : <ArrowRight size={16} />}
 					</button>
 				</div>
 			</div>

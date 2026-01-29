@@ -15,12 +15,26 @@ import { ModuleSelectionSheet } from "./module-selection-sheet";
 import { useBuilderLogic } from "@/hooks/useBuilderLogic";
 import { STEP_LABELS } from "@/lib/builder/step-labels"; // Use the shared labels
 import { ProtocolAlert } from "@/lib/builder/resolver";
+import { useRouter } from "next/navigation";
+import { useAction } from "next-safe-action/hooks";
+import { addBulkToCartAction } from "@/app/actions/cart";
 
 export function CrucibleHUD({ allProducts }: { allProducts: ProductBuilderDTO[] }) {
 	// 1. STATE & LOGIC HOOKS
 	const { currentStep, setStep, manifest, setComponent } = useBuilderStore();
 	const { addItem } = useCart();
+	const router = useRouter();
 
+	const { executeAsync: executeBulkAdd, isExecuting: isSyncing } = useAction(addBulkToCartAction, {
+		onSuccess: () => {
+			toast.success("BUILD_AUTHORIZED", { description: "SYSTEM_CONFIG_TRANSFERRED_TO_LOGISTICS" });
+			// Optional: Redirect straight to checkout for smooth flow
+			setTimeout(() => router.push("/checkout"), 1000);
+		},
+		onError: ({ error }) => {
+			toast.error("SYNC_FAILURE", { description: error.serverError || "DATABASE_HANDSHAKE_FAILED" });
+		},
+	});
 	// Unified Logic Hook (Shared with SchematicView)
 	const {
 		activeType,
@@ -43,14 +57,18 @@ export function CrucibleHUD({ allProducts }: { allProducts: ProductBuilderDTO[] 
 	const { isExploded, toggleExploded } = useBuilderStore();
 
 	// ACTION: Authorize Build
-	const handleAuthorize = () => {
+	const handleAuthorize = async () => {
 		const parts = Object.values(manifest).filter((p) => p !== null);
 		if (parts.length === 0) {
 			toast.error("PROTOCOL_ERROR", { description: "MANIFEST_EMPTY // CANNOT_AUTHORIZE" });
 			return;
 		}
-		parts.forEach((part) => addItem(part, 1));
-		toast.success("BUILD_AUTHORIZED", { description: "SYSTEM_CONFIG_TRANSFERRED_TO_LOGISTICS" });
+		// A. Optimistic Update (Client Store)
+		parts.forEach((part) => addItem(part!, 1));
+
+		// B. Server Sync (The Fix)
+		const payload = parts.map((p) => ({ productId: p!.id, quantity: 1 }));
+		await executeBulkAdd({ items: payload });
 	};
 
 	return (
@@ -122,7 +140,7 @@ export function CrucibleHUD({ allProducts }: { allProducts: ProductBuilderDTO[] 
 										</span>
 									</div>
 									{manifest[step] ? <ShieldCheck size={12} className="text-green-500" /> : !isAuthorized && <Lock size={10} />}
-									{isActive && <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-[#FFB400]" />}
+									{isActive && <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[#FFB400]" />}
 								</button>
 							);
 						})}
@@ -272,9 +290,11 @@ export function CrucibleHUD({ allProducts }: { allProducts: ProductBuilderDTO[] 
 					</div>
 					<button
 						onClick={handleAuthorize}
+						disabled={isSyncing}
 						className="h-12 px-10 bg-[#FFB400] text-[#0A0E14] font-black uppercase text-[10px] tracking-[0.3em] shadow-2xl hover:bg-white transition-all flex items-center gap-4"
 					>
-						Authorize_Build <ArrowRight size={16} />
+						{isSyncing ? "SYNCING_LOGISTICS..." : "Authorize_Build"}
+						{isSyncing ? <Activity className="animate-spin" size={16} /> : <ArrowRight size={16} />}
 					</button>
 				</div>
 			</div>

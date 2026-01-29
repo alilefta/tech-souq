@@ -5,7 +5,7 @@ import { cartActionClient } from "@/lib/safe-action";
 import { prisma } from "@/prisma/prisma";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
-import { success, z } from "zod";
+import { z } from "zod";
 
 type CartDTO = Cart & { items: CartItem[] };
 
@@ -81,6 +81,64 @@ export const addToCartAction = cartActionClient.inputSchema(AddToCartSchema).act
 	// This causes CartWrapper to re-run and fetch fresh data
 	revalidatePath("/", "layout");
 
+	return { success: true, cartId };
+});
+
+const AddBulkToCartSchema = z.object({
+	items: z.array(
+		z.object({
+			productId: z.number(),
+			quantity: z.number().min(1),
+		}),
+	),
+});
+export const addBulkToCartAction = cartActionClient.inputSchema(AddBulkToCartSchema).action(async ({ parsedInput, ctx }) => {
+	const { items } = parsedInput;
+	let cartId = ctx.cartId;
+
+	// 1. ENSURE CART EXISTS (Same logic as single add)
+	if (!cartId) {
+		const cart = await prisma.cart.create({ data: {} });
+		cartId = cart.id;
+		(await cookies()).set("base60_cart_id", cart.id, {
+			path: "/",
+			secure: process.env.NODE_ENV === "production",
+			httpOnly: true,
+			maxAge: 60 * 60 * 24 * 30,
+		});
+	}
+
+	// 2. BULK UPSERT LOGIC (Atomic Transaction)
+	// We use a transaction to ensure all parts land in the cart together
+	await prisma.$transaction(async (tx) => {
+		for (const item of items) {
+			const existingItem = await tx.cartItem.findUnique({
+				where: {
+					productId_cartId: {
+						cartId: cartId!,
+						productId: item.productId,
+					},
+				},
+			});
+
+			if (existingItem) {
+				await tx.cartItem.update({
+					where: { id: existingItem.id },
+					data: { quantity: existingItem.quantity + item.quantity },
+				});
+			} else {
+				await tx.cartItem.create({
+					data: {
+						quantity: item.quantity,
+						cartId: cartId!,
+						productId: item.productId,
+					},
+				});
+			}
+		}
+	});
+
+	revalidatePath("/", "layout");
 	return { success: true, cartId };
 });
 

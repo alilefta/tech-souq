@@ -1,7 +1,7 @@
 import { ProductCard } from "@/components/product-card-v2";
 import { getFilteredProducts } from "@/app/data/products";
 import { ProductFilters } from "./product-filters";
-import { LayoutGrid, List, SearchX, SlidersHorizontal } from "lucide-react";
+import { SearchX, SlidersHorizontal } from "lucide-react";
 import { SortProducts } from "./SortProducts";
 import { getFlatCategories } from "../../data/category";
 import { SearchProducts } from "./SearchProducts";
