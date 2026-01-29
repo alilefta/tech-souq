@@ -15,26 +15,13 @@ import { ModuleSelectionSheet } from "./module-selection-sheet";
 import { useBuilderLogic } from "@/hooks/useBuilderLogic";
 import { STEP_LABELS } from "@/lib/builder/step-labels"; // Use the shared labels
 import { ProtocolAlert } from "@/lib/builder/resolver";
-import { useRouter } from "next/navigation";
-import { useAction } from "next-safe-action/hooks";
-import { addBulkToCartAction } from "@/app/actions/cart";
+import { AddBulkToCartSchemaType } from "@/lib/schemas/actions/cart";
 
-export function CrucibleHUD({ allProducts }: { allProducts: ProductBuilderDTO[] }) {
+export function CrucibleHUD({ allProducts, onAuthorize, isSyncing }: { allProducts: ProductBuilderDTO[]; onAuthorize: (items: AddBulkToCartSchemaType) => void; isSyncing: boolean }) {
 	// 1. STATE & LOGIC HOOKS
 	const { currentStep, setStep, manifest, setComponent } = useBuilderStore();
 	const { addItem } = useCart();
-	const router = useRouter();
 
-	const { executeAsync: executeBulkAdd, isExecuting: isSyncing } = useAction(addBulkToCartAction, {
-		onSuccess: () => {
-			toast.success("BUILD_AUTHORIZED", { description: "SYSTEM_CONFIG_TRANSFERRED_TO_LOGISTICS" });
-			// Optional: Redirect straight to checkout for smooth flow
-			setTimeout(() => router.push("/checkout"), 1000);
-		},
-		onError: ({ error }) => {
-			toast.error("SYNC_FAILURE", { description: error.serverError || "DATABASE_HANDSHAKE_FAILED" });
-		},
-	});
 	// Unified Logic Hook (Shared with SchematicView)
 	const {
 		activeType,
@@ -63,12 +50,15 @@ export function CrucibleHUD({ allProducts }: { allProducts: ProductBuilderDTO[] 
 			toast.error("PROTOCOL_ERROR", { description: "MANIFEST_EMPTY // CANNOT_AUTHORIZE" });
 			return;
 		}
-		// A. Optimistic Update (Client Store)
-		parts.forEach((part) => addItem(part!, 1));
 
-		// B. Server Sync (The Fix)
-		const payload = parts.map((p) => ({ productId: p!.id, quantity: 1 }));
-		await executeBulkAdd({ items: payload });
+		parts.forEach((part) => addItem(part, 1));
+
+		const payload = {
+			items: parts.map((p) => ({ productId: p.id, quantity: 1 })),
+		};
+
+		// 3. Fire Server Signal
+		onAuthorize(payload);
 	};
 
 	return (

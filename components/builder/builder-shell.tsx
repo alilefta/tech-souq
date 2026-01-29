@@ -5,13 +5,16 @@ import { Scene3D } from "./scene-3d";
 import { CrucibleHUD } from "./crucible-hud";
 import { SchematicView } from "./schematic-view";
 import { ProductBuilderDTO } from "@/app/data/products";
-import { Box, List, Terminal, RotateCcw, ArrowRight, Lock, Unlock } from "lucide-react";
+import { Box, List, Terminal, RotateCcw, ArrowRight, Lock, Unlock, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useBuilderStore } from "@/store/useBuilderStore";
 import { useCart } from "@/store/useCart";
 import { toast } from "sonner";
 import { FoundryLoader } from "./foundry-loader";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAction } from "next-safe-action/hooks";
+import { addBulkToCartAction } from "@/app/actions/cart";
 
 export function BuilderShell({ allProducts }: { allProducts: ProductBuilderDTO[] }) {
 	const [viewMode, setViewMode] = useState<"HOLOGRAPHIC" | "SCHEMATIC">("HOLOGRAPHIC");
@@ -21,16 +24,33 @@ export function BuilderShell({ allProducts }: { allProducts: ProductBuilderDTO[]
 	const { resetFoundry, manifest } = useBuilderStore();
 	const { addItem } = useCart();
 
+	const router = useRouter();
+
+	const { executeAsync: executeBulkAdd, isExecuting: isSyncing } = useAction(addBulkToCartAction, {
+		onSuccess: () => {
+			toast.success("BUILD_AUTHORIZED", { description: "SYSTEM_CONFIG_TRANSFERRED_TO_LOGISTICS" });
+			// Optional: Redirect straight to checkout for smooth flow
+			setTimeout(() => router.push("/checkout"), 1000);
+		},
+		onError: ({ error }) => {
+			toast.error("SYNC_FAILURE", { description: error.serverError || "DATABASE_HANDSHAKE_FAILED" });
+		},
+	});
+
 	const totalPrice = Object.values(manifest).reduce((acc, item) => acc + (Number(item?.price) || 0), 0);
 
-	const handleAuthorize = () => {
+	const handleAuthorize = async () => {
 		const parts = Object.values(manifest).filter((p) => p !== null);
 		if (parts.length === 0) {
 			toast.error("PROTOCOL_ERROR", { description: "MANIFEST_EMPTY // CANNOT_AUTHORIZE" });
 			return;
 		}
-		parts.forEach((part) => addItem(part, 1));
-		toast.success("BUILD_AUTHORIZED", { description: "SYSTEM_CONFIG_TRANSFERRED_TO_LOGISTICS" });
+		// A. Optimistic Update (Client Store)
+		parts.forEach((part) => addItem(part!, 1));
+
+		// B. Server Sync (The Fix)
+		const payload = parts.map((p) => ({ productId: p!.id, quantity: 1 }));
+		await executeBulkAdd({ items: payload });
 	};
 
 	return (
@@ -111,12 +131,12 @@ export function BuilderShell({ allProducts }: { allProducts: ProductBuilderDTO[]
 						</div>
 
 						<div className="relative z-10 h-full pointer-events-none">
-							<CrucibleHUD allProducts={allProducts} />
+							<CrucibleHUD allProducts={allProducts} onAuthorize={executeBulkAdd} isSyncing={isSyncing} />
 						</div>
 					</>
 				) : (
 					<div className="h-full overflow-y-auto custom-scrollbar bg-[#0A0E14]">
-						<SchematicView allProducts={allProducts} />
+						<SchematicView allProducts={allProducts} onAuthorize={executeBulkAdd} isSyncing={isSyncing} />
 					</div>
 				)}
 			</div>
@@ -129,9 +149,11 @@ export function BuilderShell({ allProducts }: { allProducts: ProductBuilderDTO[]
 				</div>
 				<button
 					onClick={handleAuthorize}
+					disabled={isSyncing}
 					className="w-full h-12 bg-[#FFB400] text-[#0A0E14] font-black uppercase text-xs tracking-[0.2em] flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(255,180,0,0.2)]"
 				>
-					Authorize <ArrowRight size={16} />
+					{isSyncing ? "SYNCING_LOGISTICS..." : "Authorize_Build"}
+					{isSyncing ? <Activity className="animate-spin" size={16} /> : <ArrowRight size={16} />}
 				</button>
 			</div>
 		</div>

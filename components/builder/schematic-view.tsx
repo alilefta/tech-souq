@@ -13,9 +13,7 @@ import { useState } from "react";
 import { ModuleInspectionSheet } from "./module-inspection-sheet";
 import { ModuleSelectionSheet } from "./module-selection-sheet";
 import { SystemAlertTicker } from "./system-alert-ticker";
-import { useRouter } from "next/navigation";
-import { useAction } from "next-safe-action/hooks";
-import { addBulkToCartAction } from "@/app/actions/cart";
+import { AddBulkToCartSchemaType } from "@/lib/schemas/actions/cart";
 
 // Re-use the label map from HUD or import it if shared
 const STEP_LABELS: Record<string, string> = {
@@ -30,23 +28,10 @@ const STEP_LABELS: Record<string, string> = {
 	PSU: "Energy_Cell",
 };
 
-export function SchematicView({ allProducts }: { allProducts: ProductBuilderDTO[] }) {
+export function SchematicView({ allProducts, onAuthorize, isSyncing }: { allProducts: ProductBuilderDTO[]; onAuthorize: (items: AddBulkToCartSchemaType) => void; isSyncing: boolean }) {
 	const { currentStep, setStep, manifest, setComponent } = useBuilderStore();
 	const { availableModules, activeType, totalPrice, alerts } = useBuilderLogic(allProducts);
 	const { addItem } = useCart();
-
-	const router = useRouter();
-
-	const { executeAsync: executeBulkAdd, isExecuting: isSyncing } = useAction(addBulkToCartAction, {
-		onSuccess: () => {
-			toast.success("BUILD_AUTHORIZED", { description: "SYSTEM_CONFIG_TRANSFERRED_TO_LOGISTICS" });
-			// Optional: Redirect straight to checkout for smooth flow
-			setTimeout(() => router.push("/checkout"), 1000);
-		},
-		onError: ({ error }) => {
-			toast.error("SYNC_FAILURE", { description: error.serverError || "DATABASE_HANDSHAKE_FAILED" });
-		},
-	});
 
 	// LOCAL STATE FOR MODALS
 	const [inspectedModule, setInspectedModule] = useState<ProductBuilderDTO | null>(null);
@@ -55,12 +40,14 @@ export function SchematicView({ allProducts }: { allProducts: ProductBuilderDTO[
 	const handleAuthorize = async () => {
 		const parts = Object.values(manifest).filter((p) => p !== null);
 		if (parts.length === 0) return toast.error("PROTOCOL_ERROR", { description: "MANIFEST_EMPTY" });
-		// A. Optimistic Update (Client Store)
-		parts.forEach((part) => addItem(part!, 1));
+		// 1. Optimistic Update (Instant feedback)
+		parts.forEach((part) => addItem(part, 1));
 
-		// B. Server Sync (The Fix)
-		const payload = parts.map((p) => ({ productId: p!.id, quantity: 1 }));
-		await executeBulkAdd({ items: payload });
+		// 2. Prepare Payload
+		const payload = {
+			items: parts.map((p) => ({ productId: p.id, quantity: 1 })),
+		};
+		onAuthorize(payload);
 	};
 
 	return (

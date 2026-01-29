@@ -2,17 +2,12 @@
 
 import { Cart, CartItem } from "@/generated/prisma/client";
 import { cartActionClient } from "@/lib/safe-action";
+import { AddBulkToCartSchema, AddToCartSchema, RemoveFromCartSchema, UpdateQuantitySchema } from "@/lib/schemas/actions/cart";
 import { prisma } from "@/prisma/prisma";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
-import { z } from "zod";
 
 type CartDTO = Cart & { items: CartItem[] };
-
-const AddToCartSchema = z.object({
-	productId: z.number(),
-	quantity: z.number().min(1).default(1),
-});
 
 export const addToCartAction = cartActionClient.inputSchema(AddToCartSchema).action(async ({ parsedInput, ctx }) => {
 	const { productId, quantity } = parsedInput;
@@ -84,14 +79,6 @@ export const addToCartAction = cartActionClient.inputSchema(AddToCartSchema).act
 	return { success: true, cartId };
 });
 
-const AddBulkToCartSchema = z.object({
-	items: z.array(
-		z.object({
-			productId: z.number(),
-			quantity: z.number().min(1),
-		}),
-	),
-});
 export const addBulkToCartAction = cartActionClient.inputSchema(AddBulkToCartSchema).action(async ({ parsedInput, ctx }) => {
 	const { items } = parsedInput;
 	let cartId = ctx.cartId;
@@ -142,11 +129,6 @@ export const addBulkToCartAction = cartActionClient.inputSchema(AddBulkToCartSch
 	return { success: true, cartId };
 });
 
-const UpdateQuantitySchema = z.object({
-	itemId: z.number(),
-	quantity: z.number().min(1).default(1),
-});
-
 export const updateItemQuantityAction = cartActionClient.inputSchema(UpdateQuantitySchema).action(async ({ parsedInput, ctx }) => {
 	const { itemId, quantity } = parsedInput;
 	const cartId = ctx.cartId;
@@ -176,9 +158,7 @@ export const updateItemQuantityAction = cartActionClient.inputSchema(UpdateQuant
 	revalidatePath("/", "layout");
 	return { success: true };
 });
-const RemoveFromCartSchema = z.object({
-	itemId: z.number(),
-});
+
 export const removeFromCartAction = cartActionClient.inputSchema(RemoveFromCartSchema).action(async ({ parsedInput, ctx }) => {
 	const itemId = parsedInput.itemId;
 
