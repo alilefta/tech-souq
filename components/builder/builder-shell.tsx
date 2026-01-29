@@ -29,7 +29,7 @@ export function BuilderShell({ allProducts }: { allProducts: ProductBuilderDTO[]
 	const { executeAsync: executeBulkAdd, isExecuting: isSyncing } = useAction(addBulkToCartAction, {
 		onSuccess: () => {
 			toast.success("BUILD_AUTHORIZED", { description: "SYSTEM_CONFIG_TRANSFERRED_TO_LOGISTICS" });
-			// Optional: Redirect straight to checkout for smooth flow
+
 			setTimeout(() => router.push("/checkout"), 1000);
 		},
 		onError: ({ error }) => {
@@ -41,18 +41,21 @@ export function BuilderShell({ allProducts }: { allProducts: ProductBuilderDTO[]
 
 	const handleAuthorize = async () => {
 		const parts = Object.values(manifest).filter((p) => p !== null);
+
 		if (parts.length === 0) {
 			toast.error("PROTOCOL_ERROR", { description: "MANIFEST_EMPTY // CANNOT_AUTHORIZE" });
 			return;
 		}
-		// A. Optimistic Update (Client Store)
-		parts.forEach((part) => addItem(part!, 1));
 
-		// B. Server Sync (The Fix)
-		const payload = parts.map((p) => ({ productId: p!.id, quantity: 1 }));
-		await executeBulkAdd({ items: payload });
+		// A. Optimistic Update
+		parts.forEach((part) => addItem(part, 1));
+
+		// B. Server Sync
+		const payload = {
+			items: parts.map((p) => ({ productId: p!.id, quantity: 1 })),
+		};
+		await executeBulkAdd(payload);
 	};
-
 	return (
 		<div className="relative h-dvh w-full bg-[#0A0E14] flex flex-col overflow-hidden overflow-y-scroll font-sans">
 			{/* 1. GLOBAL HEADER */}
@@ -95,7 +98,6 @@ export function BuilderShell({ allProducts }: { allProducts: ProductBuilderDTO[]
 						<p className="text-lg font-black text-[#F5F5F0] leading-none">${totalPrice.toLocaleString()}</p>
 					</div>
 
-					{/* NEW: VIEWPORT LOCK (Visible only in Holographic) */}
 					{viewMode === "HOLOGRAPHIC" && (
 						<button
 							onClick={() => setIsViewportLocked(!isViewportLocked)}
@@ -131,12 +133,12 @@ export function BuilderShell({ allProducts }: { allProducts: ProductBuilderDTO[]
 						</div>
 
 						<div className="relative z-10 h-full pointer-events-none">
-							<CrucibleHUD allProducts={allProducts} onAuthorize={executeBulkAdd} isSyncing={isSyncing} />
+							<CrucibleHUD allProducts={allProducts} onAuthorize={handleAuthorize} isSyncing={isSyncing} />
 						</div>
 					</>
 				) : (
 					<div className="h-full overflow-y-auto custom-scrollbar bg-[#0A0E14]">
-						<SchematicView allProducts={allProducts} onAuthorize={executeBulkAdd} isSyncing={isSyncing} />
+						<SchematicView allProducts={allProducts} onAuthorize={handleAuthorize} isSyncing={isSyncing} />
 					</div>
 				)}
 			</div>

@@ -7,13 +7,10 @@ import { cn } from "@/lib/utils";
 import { useBuilderLogic } from "@/hooks/useBuilderLogic";
 import { SafeImage } from "@/components/ui/safe-image";
 import { motion, AnimatePresence } from "motion/react";
-import { useCart } from "@/store/useCart";
-import { toast } from "sonner";
 import { useState } from "react";
 import { ModuleInspectionSheet } from "./module-inspection-sheet";
 import { ModuleSelectionSheet } from "./module-selection-sheet";
 import { SystemAlertTicker } from "./system-alert-ticker";
-import { AddBulkToCartSchemaType } from "@/lib/schemas/actions/cart";
 
 // Re-use the label map from HUD or import it if shared
 const STEP_LABELS: Record<string, string> = {
@@ -28,27 +25,13 @@ const STEP_LABELS: Record<string, string> = {
 	PSU: "Energy_Cell",
 };
 
-export function SchematicView({ allProducts, onAuthorize, isSyncing }: { allProducts: ProductBuilderDTO[]; onAuthorize: (items: AddBulkToCartSchemaType) => void; isSyncing: boolean }) {
+export function SchematicView({ allProducts, onAuthorize, isSyncing }: { allProducts: ProductBuilderDTO[]; onAuthorize: () => void; isSyncing: boolean }) {
 	const { currentStep, setStep, manifest, setComponent } = useBuilderStore();
 	const { availableModules, activeType, totalPrice, alerts } = useBuilderLogic(allProducts);
-	const { addItem } = useCart();
 
 	// LOCAL STATE FOR MODALS
 	const [inspectedModule, setInspectedModule] = useState<ProductBuilderDTO | null>(null);
 	const [isRegistryOpen, setIsRegistryOpen] = useState(false);
-
-	const handleAuthorize = async () => {
-		const parts = Object.values(manifest).filter((p) => p !== null);
-		if (parts.length === 0) return toast.error("PROTOCOL_ERROR", { description: "MANIFEST_EMPTY" });
-		// 1. Optimistic Update (Instant feedback)
-		parts.forEach((part) => addItem(part, 1));
-
-		// 2. Prepare Payload
-		const payload = {
-			items: parts.map((p) => ({ productId: p.id, quantity: 1 })),
-		};
-		onAuthorize(payload);
-	};
 
 	return (
 		<div className="w-full max-w-3xl mx-auto p-4 lg:p-12 pb-48 font-sans relative min-h-full">
@@ -182,7 +165,7 @@ export function SchematicView({ allProducts, onAuthorize, isSyncing }: { allProd
 						<p className="text-xl font-black text-[#F5F5F0]">${totalPrice.toLocaleString()}</p>
 					</div>
 					<button
-						onClick={handleAuthorize}
+						onClick={onAuthorize}
 						disabled={isSyncing}
 						className="h-12 px-8 bg-[#FFB400] text-[#0A0E14] font-black uppercase text-xs tracking-[0.2em] shadow-lg hover:bg-white transition-all flex items-center gap-3"
 					>

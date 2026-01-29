@@ -8,19 +8,15 @@ import { ProductBuilderDTO } from "@/app/data/products";
 import { BuilderModuleCard } from "./builder-module-card";
 import { useState } from "react";
 import { ModuleInspectionSheet } from "./module-inspection-sheet";
-import { toast } from "sonner";
-import { useCart } from "@/store/useCart";
 import { SystemAlertTicker } from "./system-alert-ticker";
 import { ModuleSelectionSheet } from "./module-selection-sheet";
 import { useBuilderLogic } from "@/hooks/useBuilderLogic";
 import { STEP_LABELS } from "@/lib/builder/step-labels"; // Use the shared labels
 import { ProtocolAlert } from "@/lib/builder/resolver";
-import { AddBulkToCartSchemaType } from "@/lib/schemas/actions/cart";
 
-export function CrucibleHUD({ allProducts, onAuthorize, isSyncing }: { allProducts: ProductBuilderDTO[]; onAuthorize: (items: AddBulkToCartSchemaType) => void; isSyncing: boolean }) {
+export function CrucibleHUD({ allProducts, onAuthorize, isSyncing }: { allProducts: ProductBuilderDTO[]; onAuthorize: () => void; isSyncing: boolean }) {
 	// 1. STATE & LOGIC HOOKS
 	const { currentStep, setStep, manifest, setComponent } = useBuilderStore();
-	const { addItem } = useCart();
 
 	// Unified Logic Hook (Shared with SchematicView)
 	const {
@@ -42,24 +38,6 @@ export function CrucibleHUD({ allProducts, onAuthorize, isSyncing }: { allProduc
 	const [isRegistryOpen, setIsRegistryOpen] = useState(false);
 
 	const { isExploded, toggleExploded } = useBuilderStore();
-
-	// ACTION: Authorize Build
-	const handleAuthorize = async () => {
-		const parts = Object.values(manifest).filter((p) => p !== null);
-		if (parts.length === 0) {
-			toast.error("PROTOCOL_ERROR", { description: "MANIFEST_EMPTY // CANNOT_AUTHORIZE" });
-			return;
-		}
-
-		parts.forEach((part) => addItem(part, 1));
-
-		const payload = {
-			items: parts.map((p) => ({ productId: p.id, quantity: 1 })),
-		};
-
-		// 3. Fire Server Signal
-		onAuthorize(payload);
-	};
 
 	return (
 		<div className="h-full w-full flex flex-col justify-between p-4 lg:p-6 pointer-events-none relative font-sans">
@@ -279,7 +257,7 @@ export function CrucibleHUD({ allProducts, onAuthorize, isSyncing }: { allProduc
 						</div>
 					</div>
 					<button
-						onClick={handleAuthorize}
+						onClick={onAuthorize}
 						disabled={isSyncing}
 						className="h-12 px-10 bg-[#FFB400] text-[#0A0E14] font-black uppercase text-[10px] tracking-[0.3em] shadow-2xl hover:bg-white transition-all flex items-center gap-4"
 					>
