@@ -36,7 +36,7 @@ export function MobileSidebar() {
 			</SheetTrigger>
 			<SheetContent side="left" className="w-72 bg-[#0A0E14] border-r border-white/10 p-0 flex flex-col font-sans">
 				{/* BRAND UNIT */}
-				<div className="p-8 border-b border-white/5">
+				<Link href={"/"} className="p-8 border-b border-white/5">
 					<div className="flex items-center gap-3">
 						<Logo />
 						<div className="flex flex-col">
@@ -46,7 +46,7 @@ export function MobileSidebar() {
 							<span className="text-[7px] font-mono text-[#94A3B8] uppercase tracking-[0.4em] mt-1">Foundry_Mobile</span>
 						</div>
 					</div>
-				</div>
+				</Link>
 
 				{/* NAVIGATION MODULES */}
 				<nav className="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar">

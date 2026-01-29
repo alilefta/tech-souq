@@ -24,7 +24,7 @@ export function Sidebar() {
 		<aside className="w-64 border-r border-white/5 bg-[#0A0E14] hidden lg:flex flex-col">
 			{/* BRAND UNIT */}
 			<div className="p-8 border-b border-white/5">
-				<Link href="/admin" className="flex items-center gap-3">
+				<Link href="/" className="flex items-center gap-3">
 					<Logo />
 					<div className="flex flex-col">
 						<span className="text-sm font-black tracking-tighter uppercase leading-none">

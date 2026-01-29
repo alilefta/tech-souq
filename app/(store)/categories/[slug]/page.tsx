@@ -3,6 +3,7 @@ import { getCategoryBySlug } from "@/app/data/category";
 import { getFilteredProducts } from "@/app/data/products";
 import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/product-card-v2";
+import { CategoryEmptyState } from "@/components/categories/category-empty-state";
 
 interface CategoryDetailPageProps {
 	params: Promise<{
@@ -35,11 +36,16 @@ export default async function CategoryDetailPage({ params }: CategoryDetailPageP
 				</div>
 
 				{/* PRODUCT GRID */}
-				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-					{products.map((p) => (
-						<ProductCard key={p.id} product={p} />
-					))}
-				</div>
+				{products.length > 0 ? (
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+						{products.map((p) => (
+							<ProductCard key={p.id} product={p} />
+						))}
+					</div>
+				) : (
+					// RENDER THE EMPTY STATE
+					<CategoryEmptyState />
+				)}
 			</div>
 		</main>
 	);

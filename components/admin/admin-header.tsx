@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Wifi, Clock, Menu } from "lucide-react"; // Import Menu for mobile trigger
+import { Wifi, Clock } from "lucide-react"; // Import Menu for mobile trigger
 import { HeaderSearch } from "./header-search";
 import { NotificationsTerminal } from "./notifications-terminal";
 import { ProfileTerminal } from "./profile-terminal";

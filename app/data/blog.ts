@@ -19,7 +19,7 @@ export const BLOG_POSTS: BlogPostDTO[] = [
 		title: "Architecture Analysis: RTX 5090 Blackwell Core",
 		excerpt: "Deep diving into the thermal density and CUDA core efficiency of the new Blackwell architecture. Is the power draw justified?",
 		category: "Hardware_Analysis",
-		author: "Zaid Al-Hilli",
+		author: "Ali Mohsin",
 		readTime: "08_MIN",
 		date: "2026.01.15",
 		image: "https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&q=80&w=1000",
@@ -67,7 +67,7 @@ export const BLOG_POSTS: BlogPostDTO[] = [
 		author: "Foundry_Core",
 		readTime: "06_MIN",
 		date: "2025.12.20",
-		image: "https://images.unsplash.com/photo-1624705002806-5d72df8343e7?auto=format&fit=crop&q=80&w=1000",
+		image: "https://images.unsplash.com/photo-1582954820640-42c30eeabe35?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 		slug: "cable-management-science",
 	},
 	{
@@ -78,7 +78,7 @@ export const BLOG_POSTS: BlogPostDTO[] = [
 		author: "Sarah Jenkins",
 		readTime: "09_MIN",
 		date: "2025.12.12",
-		image: "https://images.unsplash.com/photo-1555664424-778a69022365?auto=format&fit=crop&q=80&w=1000",
+		image: "https://images.unsplash.com/photo-1593955654387-9dcbc8ef8071?q=80&w=2710&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 		slug: "supply-chain-2026",
 	},
 ];

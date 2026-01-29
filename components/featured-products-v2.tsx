@@ -2,6 +2,7 @@
 
 import { getFeaturedProducts } from "@/app/data/products";
 import { ProductCard } from "./product-card-v2";
+import Link from "next/link";
 
 // const products = [
 // 	{
@@ -73,7 +74,7 @@ export default async function FeaturedProducts() {
 					</div>
 
 					<button className="px-6 py-3 border border-white/10 hover:border-[#FFB400] text-[#F5F5F0] text-xs font-bold uppercase tracking-widest transition-all rounded-sm">
-						View All Components
+						<Link href={"/products"}>View All Components</Link>
 					</button>
 				</div>
 

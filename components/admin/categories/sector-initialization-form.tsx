@@ -13,6 +13,7 @@ import { SingleImageIngest } from "../ui/single-image-ingest";
 import { useAction } from "next-safe-action/hooks";
 import { createSector, updateSector } from "@/app/actions/category";
 import { InferSafeActionFnResult } from "next-safe-action";
+import { FoundrySelect } from "@/components/ui/inputs/foundary-form-select";
 
 type AddSectorActionResults = InferSafeActionFnResult<typeof createSector>;
 type EditSectorActionResults = InferSafeActionFnResult<typeof updateSector>;
@@ -30,7 +31,7 @@ export function SectorInitializationForm({ isEdit, initialData, sectorId }: { is
 					description: "",
 					gridDisplay: "small",
 					imageUrl: "",
-			  },
+				},
 		mode: "onChange",
 	});
 
@@ -120,21 +121,29 @@ export function SectorInitializationForm({ isEdit, initialData, sectorId }: { is
 								)}
 							/>
 							<div className="space-y-2">
-								<label className="text-[9px] font-black uppercase tracking-[0.2em] text-[#94A3B8]">Bento_Grid_Allocation</label>
-								<Controller
-									name="gridDisplay"
+								<FoundrySelect
 									control={control}
-									render={({ field }) => (
-										<select
-											{...field}
-											className="w-full h-12 bg-white/2 border border-white/10 rounded-none px-4 text-xs font-mono uppercase text-[#F5F5F0] outline-none focus:border-[#FFB400]/40 transition-all cursor-pointer appearance-none"
-										>
-											<option value="small">Small_Module [1x1]</option>
-											<option value="medium">Medium_Module [2x1]</option>
-											<option value="large">Large_Module [2x2]</option>
-											<option value="tall">Tall_Module [1x2]</option>
-										</select>
-									)}
+									fieldTitle="Bento_Grid_Allocation"
+									nameInSchema="gridDisplay"
+									placeholder="Grid_View"
+									options={[
+										{
+											label: "Small_Module [1x1]",
+											value: "small",
+										},
+										{
+											label: "Medium_Module [2x1]",
+											value: "medium",
+										},
+										{
+											label: "Large_Module [2x2]",
+											value: "large",
+										},
+										{
+											label: "Tall_Module [1x2]",
+											value: "tall",
+										},
+									]}
 								/>
 							</div>
 						</div>
