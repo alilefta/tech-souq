@@ -1,7 +1,5 @@
+// app/icon.tsx
 import { ImageResponse } from "next/og";
-
-// Route segment config
-export const runtime = "edge";
 
 // Image metadata
 export const size = {
@@ -10,48 +8,29 @@ export const size = {
 };
 export const contentType = "image/png";
 
-// Image generation
+// THE BASE 60 LOGO GENERATOR
 export default function Icon() {
 	return new ImageResponse(
-		// ImageResponse JSX element
 		<div
 			style={{
-				fontSize: 24,
-				background: "#0A0E14",
 				width: "100%",
 				height: "100%",
 				display: "flex",
 				alignItems: "center",
 				justifyContent: "center",
-				borderRadius: "0px", // Industrial Square
-				position: "relative",
+				background: "transparent",
 			}}
 		>
-			{/* Amber Border */}
-			<div
-				style={{
-					position: "absolute",
-					inset: 0,
-					border: "2px solid #FFB400",
-					opacity: 1,
-				}}
-			/>
+			{/* THE OUTER FOUNDRY SHELL */}
+			<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+				{/* Hexagonal Frame (Amber Stroke) */}
+				<path d="M16 2L28 9V23L16 30L4 23V9L16 2Z" stroke="#FFB400" strokeWidth="3" fill="#0A0E14" strokeLinejoin="round" />
 
-			{/* The "6" Glyph */}
-			<div
-				style={{
-					color: "#F5F5F0",
-					fontWeight: 900,
-					fontFamily: "monospace",
-					lineHeight: 1,
-					fontSize: 18,
-					marginTop: -2,
-				}}
-			>
-				60
-			</div>
+				{/* The Silicon Core (Amber Fill) */}
+				<rect x="13" y="11" width="6" height="10" fill="#FFB400" />
+				<rect x="11" y="13" width="10" height="6" fill="#FFB400" />
+			</svg>
 		</div>,
-		// ImageResponse options
 		{
 			...size,
 		},
